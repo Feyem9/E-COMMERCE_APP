@@ -8,6 +8,9 @@ from itsdangerous import URLSafeTimedSerializer
 
 # app.config['SECRET_KEY'] = os.urandom(24)#type:ignore
 # s = URLSafeTimedSerializer(app.config['SECRET_KEY'])#type:ignore
+
+def home():
+    return render_template('home.html')
 def register():
     return render_template('register.html')
 
@@ -17,8 +20,13 @@ def register_post():
     password = request.form.get('password')
     contact = request.form.get('contact')
     address = request.form.get('address')
-    customer = Customers(email, name, generate_password_hash(password), contact, address)
-    db.session.add(customer)
+    print(email , address)
+    customer = Customers.query.filter_by(email=email).first()
+    if customer:
+        return redirect('/register')
+
+    new_customer = Customers(email, name, generate_password_hash(password, salt_length=32), contact, address)
+    db.session.add(new_customer)
     db.session.commit()
     return redirect('/login')
 def login():
@@ -29,9 +37,11 @@ def login_post():
     password = request.form.get('password')
     customer = Customers.query.filter_by(email=email).first()
     if customer and check_password_hash(customer.password, password):
-        session['customer_id'] = customer.id
+        session['customer']={"id" :customer.id,
+         "name" :customer.name
+        }
         return redirect('/')
-    return redirect('/login')
+    return redirect('/')
 
 def logout():
     if 'customer_id' in session:

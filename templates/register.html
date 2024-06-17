@@ -7,5 +7,39 @@
 </head>
 <body>
     <h1>register work</h1>
+    <form action="/register-post" method="post">
+        <div class="mb-3">
+            <label for="email" class="form-label">Email address</label>
+            <input type="email" name="email" class="form-control" id="email" aria-describedby="email">
+        </div>
+
+        <div class="mb-3">
+            <label for="name" class="form-label">name</label>
+            <input type="text" class="form-control" id="name" name="name" aria-describedby="name">
+        </div>
+
+        <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Password</label>
+            <input type="password" class="form-control" id="exampleInputPassword1" name="password">
+        </div>
+
+        <div class="mb-3">
+            <label for="contact" class="form-label">contact</label>
+            <input type="text" class="form-control" id="contact" name="contact">
+        </div>
+
+        <div class="mb-3">
+            <label for="address" class="form-label">address</label>
+            <input type="text" class="form-control" id="address" name="address">
+        </div>
+
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
+            register
+        </button>
+        
+    </form>
 </body>
 </html>
