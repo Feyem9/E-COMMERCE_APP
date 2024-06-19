@@ -1,13 +1,23 @@
-from flask import abort,app, render_template , redirect , request , session , url_for 
+from flask import abort, render_template , redirect , request , session , url_for 
 from werkzeug.security import generate_password_hash , check_password_hash 
 from models.customer_model import Customers
-from config import db
+from config import db ,MAIL_PASSWORD ,MAIL_PORT,MAIL_SERVER,MAIL_USE_SSL,MAIL_USE_TLS,MAIL_USERNAME
 from itsdangerous import URLSafeTimedSerializer
-# from utils import send_email #type:ignore
-# import os
+# from flask_mail import Mail , Message
+from app import mail , index, app
 
-# app.config['SECRET_KEY'] = os.urandom(24)#type:ignore
-# s = URLSafeTimedSerializer(app.config['SECRET_KEY'])#type:ignore
+
+app.MAIL_SERVER = MAIL_SERVER
+app.MAIL_PORT = MAIL_PORT
+app.MAIL_USERNAME = MAIL_USERNAME
+app.MAIL_PASSWORD = MAIL_PASSWORD
+app.MAIL_USE_SSL = MAIL_USE_SSL
+app.MAIL_USE_TLS = MAIL_USE_TLS
+
+mails = mail
+
+SECRET_KEY = '123'
+s = URLSafeTimedSerializer(SECRET_KEY)
 
 def home():
     return render_template('home.html')
@@ -36,44 +46,60 @@ def login_post():
     email = request.form.get('email')
     password = request.form.get('password')
     customer = Customers.query.filter_by(email=email).first()
-    if customer and check_password_hash(customer.password, password):
-        session['customer']={"id" :customer.id,
-         "name" :customer.name
-        }
-        return redirect('/')
+    # if customer and check_password_hash(customer.password, password):
+    if customer != customer :
+        return redirect('/login' , message='please register before login')
+    elif check_password_hash(customer.password , password) == False:
+        return redirect('/login')
+    # print(session)
+    session['customer']={"id" :customer.id,
+     "name" :customer.name,
+     "email" :customer.email,
+     "contact" :customer.contact,
+     "address" :customer.address
+    }
     return redirect('/')
-
+    # return redirect('/')
 def logout():
     if 'customer_id' in session:
         session.pop('customer_id', None)
     return redirect('/')
 
 def profile():
-    if 'customer_id' not in session:
+    if 'customer' not in session:
         return redirect('/login')
-    customer_id = session.get('customer_id')
+    
+    # print(session.get('customer'))
+    customer_id = session.get('customer')['id']
+    # print(customer_id['id'])
     customer = Customers.query.filter_by(id=customer_id).first()
+ 
     return render_template('profile.html', customer=customer)
 
 def forgot_password():
     return render_template('forgot_password.html')
 
 def forgot_password_post():
-    email = request.form.get('email')
-    customer = Customers.query.filter_by(email=email).first()
-    if customer:
-        token = s.dumps(email, salt='email-confirm')#type:ignore
-        confirm_url = url_for('confirm_email', token=token, _external=True)
-        html = render_template('activate.html', confirm_url=confirm_url)
-        subject = "Please confirm your email"
-        send_email(customer.email, subject, html)#type:ignore
-        return redirect('/login')
-    return redirect('/forgot_password')
+    # email = request.form.get('email')
+    # customer = Customers.query.filter_by(email=email).first()
+    indexs = index
+    return indexs
+    # if customer:
+    #     token = s.dumps(email, salt='email-confirm')
+    #     confirm_url = url_for('confirm_email', token=token, _external=True)
+    #     html = render_template('activate.html', confirm_url=confirm_url)
+    #     subject = "Please confirm your email"
+    #     # send_email(customer.email, subject, html)
+        # return redirect('/login')
+    return redirect('/forgot-password')
+
+def new_func(confirm_url):
+    html = render_template('activate.html', confirm_url=confirm_url)
 
 
 def confirm_email(token):
     try:
-        email = s.loads(token, salt='email-confirm', max_age=3600)#type:ignore
+        email = s.loads(token, salt='email-confirm', max_age=3600)
     except:
         abort(404)
     customer = Customers.query.filter_by(email=email).first_or_404()

@@ -12,24 +12,24 @@
     <h1>login work</h1>
     <form action="/login-post" method="post">
         <div class="mb-3">
-            <label for="" class="form-label">Email</label>
+            <label for="email" class="form-label">Email</label>
             <input
                 type="email"
                 class="form-control"
-                name=""
-                id=""
+                name="email"
+                id="email"
                 aria-describedby="emailHelpId"
                 placeholder="abc@mail.com"
             />
         </div>
 
         <div class="mb-3">
-            <label for="" class="form-label">Password</label>
+            <label for="password" class="form-label">Password</label>
             <input
                 type="password"
                 class="form-control"
-                name=""
-                id=""
+                name="password"
+                id="password"
                 placeholder="password"
             />
         </div>
@@ -41,8 +41,9 @@
             login
         </button>
         
+        <p>forgot password <a href="/forgot-password">forgot password ?</a></p>
         
-        
+        <p>don't have an account <a href="/register">register</a></p>
     </form>
 </body>
 </html>
