@@ -1,0 +1,43 @@
+{% extends '/base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+</head>
+<body>
+    <h1>Product List</h1>
+    <a href="/product/add-product">Add a Product</a>
+    {% for product in products %}
+        <div class="product-card">
+            <img src="{{url_for('static', filename='image_uploads/' + show_image(product.picture))}}" alt="{{ product.name }}">
+            <h2>{{ product.name }}</h2>
+            <!-- <p>{{ product.description }}</p>
+            <p>Quantity: {{ product.quantity }}</p>
+            <p>Discount Price: {{ product.discount_price }}</p>
+            <p>Current Price: {{ product.current_price }}</p> -->
+            <a href="/product/view-product/{{ product.id }}">View</a>
+            <a href="/product/update-product/{{ product.id }}">Update</a>
+            <form action="/product/delete-product/{{ product.id }}" method="POST">
+                <input type="hidden" name="_method" value="DELETE">
+                <button>delete</button>
+            </form>
+        </div>
+        <div class="">
+            <button
+                type="button"
+                class="btn btn-primary"
+            >
+                <a href="/cart" style="color: white;">add to cart</a>
+            </button>
+            
+        </div>
+    {% endfor %}
+</body>
+</html>
+
+{% endblock %}

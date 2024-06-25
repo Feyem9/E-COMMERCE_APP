@@ -59,6 +59,11 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                 <li class="nav-item mx-2" id="items">
+                    <a class="nav-link text-grey" href="/product"><span class="badge bg-success"></span> Products
+                        <i class="fa-solid fa-shop"></i>
+                    </a>
+                </li>
+                <li class="nav-item mx-2" id="items">
 
                     {% if cart | length < 1 %} <a class="nav-link text-grey" href="/cart"><span
                             class="badge bg-success"></span> Cart
@@ -78,6 +83,7 @@
                         <i class="fa-solid fa-heart"></i>
                     </a>
                 </li>
+                
 
 
                 <li class="nav-item dropdown mx-2">

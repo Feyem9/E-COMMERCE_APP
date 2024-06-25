@@ -1,20 +1,19 @@
 from flask import abort, render_template , redirect , request , session , url_for 
 from werkzeug.security import generate_password_hash , check_password_hash 
 from models.customer_model import Customers
-from config import db ,MAIL_PASSWORD ,MAIL_PORT,MAIL_SERVER,MAIL_USE_SSL,MAIL_USE_TLS,MAIL_USERNAME
+from config import db 
+# ,mail , index
 from itsdangerous import URLSafeTimedSerializer
-# from flask_mail import Mail , Message
-from app import mail , index, app
 
 
-app.MAIL_SERVER = MAIL_SERVER
-app.MAIL_PORT = MAIL_PORT
-app.MAIL_USERNAME = MAIL_USERNAME
-app.MAIL_PASSWORD = MAIL_PASSWORD
-app.MAIL_USE_SSL = MAIL_USE_SSL
-app.MAIL_USE_TLS = MAIL_USE_TLS
+# app.MAIL_SERVER = MAIL_SERVER
+# app.MAIL_PORT = MAIL_PORT
+# app.MAIL_USERNAME = MAIL_USERNAME
+# app.MAIL_PASSWORD = MAIL_PASSWORD
+# app.MAIL_USE_SSL = MAIL_USE_SSL
+# app.MAIL_USE_TLS = MAIL_USE_TLS
 
-mails = mail
+# mails = mail
 
 SECRET_KEY = '123'
 s = URLSafeTimedSerializer(SECRET_KEY)
@@ -22,7 +21,7 @@ s = URLSafeTimedSerializer(SECRET_KEY)
 def home():
     return render_template('home.html')
 def register():
-    return render_template('register.html')
+    return render_template('/customers/register.html')
 
 def register_post():
     email = request.form.get('email')
@@ -33,14 +32,14 @@ def register_post():
     print(email , address)
     customer = Customers.query.filter_by(email=email).first()
     if customer:
-        return redirect('/register')
+        return redirect('/customers/register')
 
     new_customer = Customers(email, name, generate_password_hash(password, salt_length=32), contact, address)
     db.session.add(new_customer)
     db.session.commit()
-    return redirect('/login')
+    return redirect('/customers/login')
 def login():
-    return render_template('login.html')
+    return render_template('/customers/login.html')
 
 def login_post():
     email = request.form.get('email')
@@ -50,7 +49,7 @@ def login_post():
     if customer != customer :
         return redirect('/login' , message='please register before login')
     elif check_password_hash(customer.password , password) == False:
-        return redirect('/login')
+        return redirect('/customers/login')
     # print(session)
     session['customer']={"id" :customer.id,
      "name" :customer.name,
@@ -67,23 +66,23 @@ def logout():
 
 def profile():
     if 'customer' not in session:
-        return redirect('/login')
+        return redirect('/customers/login')
     
     # print(session.get('customer'))
     customer_id = session.get('customer')['id']
     # print(customer_id['id'])
     customer = Customers.query.filter_by(id=customer_id).first()
  
-    return render_template('profile.html', customer=customer)
+    return render_template('/customers/profile.html', customer=customer)
 
 def forgot_password():
-    return render_template('forgot_password.html')
+    return render_template('/customers/forgot_password.html')
 
 def forgot_password_post():
     # email = request.form.get('email')
     # customer = Customers.query.filter_by(email=email).first()
-    indexs = index
-    return indexs
+    # indexs = index
+    # return indexs
     # if customer:
     #     token = s.dumps(email, salt='email-confirm')
     #     confirm_url = url_for('confirm_email', token=token, _external=True)

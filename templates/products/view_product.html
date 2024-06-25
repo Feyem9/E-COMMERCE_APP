@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <img src="{{url_for('static', filename='image_uploads/' + show_image(product.picture))}}" alt="{{ product.name }}">
+    <h2>{{ product.name }}</h2>
+    <p>{{ product.description }}</p>
+    <p>Quantity: {{ product.quantity }}</p>
+    <p>Discount Price: {{ product.discount_price }}</p>
+    <p>Current Price: {{ product.current_price }}</p>
+
+ 
+    <form action="/product/add-to-cart-post/{{product_id}}" method="POST">
+        <input type="hidden" name="product_id" value="{{ product.id }}">
+        <button type="submit">Add to Cart</button>
+    </form>
+    
+
+</body>
+</html>
