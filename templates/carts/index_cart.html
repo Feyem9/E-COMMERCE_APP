@@ -1,13 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+
 <body>
 
-    <h1>good</h1>
+    {% for cart in carts %}
+    <!-- <p> {{cart.id}} </p> -->
+    <p> {{cart.product_id}} </p>
+    <p> {{cart.customer_id}} </p>
+    <p> {{cart.quantity}} </p>
+    <p> {{cart.product_name}} </p>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">
+        <a href="/order" style="color: white;">Order</a>
+    </button>
 
 </body>
+
 </html>

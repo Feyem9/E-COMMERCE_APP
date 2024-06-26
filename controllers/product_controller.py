@@ -5,7 +5,7 @@ import imghdr
 import uuid
 from werkzeug.utils import secure_filename
 
-# from models.cart_model import Carts
+from models.cart_model import Carts
 from models.product_model import Products
 
 
@@ -135,7 +135,11 @@ def add_to_cart_post(id):
         return redirect(url_for('index_product'))
     quantity = request.form.get('quantity')
     customer_id = request.form.get('customer_id')
-    cart = Carts(quantity, customer_id, product_id) # type: ignore
+    print(quantity)
+    if quantity is None:
+        return {"error": "Quantity is required"}, 400
+    cart = Carts(int(quantity), customer_id, id) 
+    print(cart)
     db.session.add(cart)
     db.session.commit()
     return render_template('/carts/index_cart.html')

@@ -15,7 +15,7 @@ class Carts(db.Model):
         self.customer_id = customer_id
         self.product_id = product_id
     def __repr__(self):
-        return '<User %r>' % self.name
+        return '<User %r>' % self.id
     def serialize(self):
         return {
             'id': self.id,
