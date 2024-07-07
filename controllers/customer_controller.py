@@ -1,43 +1,72 @@
-from flask import abort, render_template , redirect , request , session , url_for 
+from flask import abort, render_template , redirect , request , session , url_for , jsonify , Blueprint , abort
 from werkzeug.security import generate_password_hash , check_password_hash 
 from models.customer_model import Customers
-from config import db 
-# ,mail , index
+from config import db
 from itsdangerous import URLSafeTimedSerializer
+from flask_login import  current_user
+from flask_login import LoginManager
+# from utility.mail import send_email
+from flask_mail import Message , Mail
+from flask import current_app
+
+mail = Mail()
+
+login_manager = LoginManager()
+@login_manager.user_loader
+def load_user(customer_id):
+    return Customers.query.get(int(customer_id))
 
 
-# app.MAIL_SERVER = MAIL_SERVER
-# app.MAIL_PORT = MAIL_PORT
-# app.MAIL_USERNAME = MAIL_USERNAME
-# app.MAIL_PASSWORD = MAIL_PASSWORD
-# app.MAIL_USE_SSL = MAIL_USE_SSL
-# app.MAIL_USE_TLS = MAIL_USE_TLS
-
-# mails = mail
 
 SECRET_KEY = '123'
 s = URLSafeTimedSerializer(SECRET_KEY)
+
+def send_email(to, subject, template, **kwargs):
+    with current_app.app_context():
+        msg = Message(subject='hello good to se you', recipients=[to], html=template, sender=(current_app.config['MAIL_DEFAULT_SENDER'],'e_commerce_app'))
+        mail.send(msg)
+def admin_required(f):
+    @wraps(f) #type:ignore
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or not current_user.is_admin():
+            abort(403)  
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 def home():
     return render_template('home.html')
 def register():
     return render_template('/customers/register.html')
 
+customer_bp = Blueprint('customer', __name__, url_prefix='/customers')
 def register_post():
     email = request.form.get('email')
     name = request.form.get('name')
     password = request.form.get('password')
     contact = request.form.get('contact')
     address = request.form.get('address')
-    print(email , address)
+    role = request.form.get('role')
+    if not all([email, name, password, contact, address,role]):
+        return redirect('/register?error=missing_data')
+    
+    print(email , address,role)
     customer = Customers.query.filter_by(email=email).first()
     if customer:
-        return redirect('/customers/register')
+        return redirect('/register?error=email_exists')
 
-    new_customer = Customers(email, name, generate_password_hash(password, salt_length=32), contact, address)
+    new_customer = Customers(email, name, generate_password_hash(password, salt_length=32), contact, address,role)
     db.session.add(new_customer)
     db.session.commit()
-    return redirect('/customers/login')
+
+    token = s.dumps(email, salt='email-confirm')
+    confirm_url = url_for('customer.confirm_email', token=token, _external=True)
+    html = render_template('email/confirm_email.html', name=name, confirm_url=confirm_url)
+
+    send_email(email, 'Confirmez votre inscription', html)
+
+    return redirect('/login?please check your email')
+    # return jsonify({'message': 'Customer registered successfully'}), 201
 def login():
     return render_template('/customers/login.html')
 
@@ -47,10 +76,10 @@ def login_post():
     customer = Customers.query.filter_by(email=email).first()
     # if customer and check_password_hash(customer.password, password):
     if customer != customer :
-        return redirect('/login' , message='please register before login')
+        return redirect('/login?error=register_first' , message='please register before login')
     elif check_password_hash(customer.password , password) == False:
-        return redirect('/customers/login')
-    # print(session)
+        return redirect('/login?error=incorrect_password')
+    print(session)
     session['customer']={"id" :customer.id,
      "name" :customer.name,
      "email" :customer.email,
@@ -66,11 +95,11 @@ def logout():
 
 def profile():
     if 'customer' not in session:
-        return redirect('/customers/login')
+        return redirect('/login')
     
-    # print(session.get('customer'))
+    print(session.get('customer'))
     customer_id = session.get('customer')['id']
-    # print(customer_id['id'])
+    print(customer_id['id'])
     customer = Customers.query.filter_by(id=customer_id).first()
  
     return render_template('/customers/profile.html', customer=customer)
@@ -92,8 +121,8 @@ def forgot_password_post():
         # return redirect('/login')
     return redirect('/forgot-password')
 
-def new_func(confirm_url):
-    html = render_template('activate.html', confirm_url=confirm_url)
+# def new_func(confirm_url):
+#     html = render_template('activate.html', confirm_url=confirm_url)
 
 
 def confirm_email(token):
@@ -107,7 +136,7 @@ def confirm_email(token):
     customer.confirmed = True
     db.session.add(customer)
     db.session.commit()
-    return redirect(url_for('login'))
+    return redirect(url_for('customer.login'))
 
 # def reset_password():
 #     return render_template('reset_password.html')
@@ -136,3 +165,4 @@ def confirm_email(token):
 #     db.session.add(customer)
 #     db.session.commit()
 #     return redirect(url_for('login'))
+#

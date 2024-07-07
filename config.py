@@ -1,16 +1,15 @@
 import os
 from flask_sqlalchemy import SQLAlchemy
-# from app import index , mail 
-# from flask_mail import Message
+from datetime import timedelta
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 
 
-# MESSAGE = Message
-# index.config.from_object('config')
-# mail.config.from_object('config')
 db = SQLAlchemy()
+
 SECRET_KEY = os.urandom(32)
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:Feyem.111@127.0.0.1:3306/e_commerce_app?charset=utf8mb4'
 SQLALCHEMY_TRACK_MODIFCATIONS = False
+JWT_SECRET_KEY = 'Feyem111'
 
 MAIL_SERVER= 'smtp.gmail.com'
 MAIL_PORT = 587
@@ -18,6 +17,7 @@ MAIL_USERNAME = 'feyemlionel@gmail.com'
 MAIL_PASSWORD = 'lujb edfm gnxt mkdy'
 MAIL_USE_TLS = True
 MAIL_USE_SSL = False
+MAIL_DEFAULT_SENDER = ('E-Commerce App', 'feyemlionel@gmail.com')  # Remplacez par votre nom et email d'envoi
 
 UPLOAD_EXTENSIONS = ['.jpg', '.png' , '.jpeg', '.avif']
 UPLOAD_PATH = "static/image_uploads/"

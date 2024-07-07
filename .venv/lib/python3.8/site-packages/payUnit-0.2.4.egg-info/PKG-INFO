@@ -1,0 +1,23 @@
+Metadata-Version: 2.1
+Name: payUnit
+Version: 0.2.4
+Summary: Python sdk for payUnit payments, including Mtn momo,Orange momo,Express Union
+Home-page: UNKNOWN
+Author: SevenGps
+Author-email: info@sevengps.com
+License: MIT
+Description: 
+        Change Log
+        ==========
+        
+        0.0.1 (28/09/2020)
+        ------------------
+        - First Release
+Keywords: payUnit,momo,payment
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: Microsoft :: Windows :: Windows 10
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Description-Content-Type: text/markdown

@@ -19,15 +19,51 @@
 <body>
     <div class="container-fluid text-center">
         <h1 class="text-ligth" style="color: white;">Product List</h1>
-        <a href="/product/add-product" style="color: white;" class="btn btn-info m-5">Add a Product</a>
+        <!-- <a href="/product/add-product" style="color: white;" class="btn btn-info m-5">Add a Product</a> -->
         <div class="row align-items-start">
-            <div class="col">
+            <div class="col-3">
                 {% for product in products %}
-                <div class="">
+                <div class="mb-5">
 
-                    <div class="product-card col-6 border border-warning bg-info">
+                    <div class="product-card border bg-secondary">
                         <img src="{{url_for('static', filename='image_uploads/' + show_image(product.picture))}}"
-                            alt="{{ product.name }}">
+                            alt="{{ product.name }}" class="img-fluid">
+                        <h2 class="" style="color: orange;">{{ product.name }}</h2>
+                        <div class="d-flex justify-content-center align-items-center container-fluid">
+                            <a href="/product/view-product/{{ product.id }}" class="btn btn-primary me-2 ms-5"
+                                style="color: white;">View</a>
+                            <a href="/product/update-product/{{ product.id }}" class="btn btn-primary ms-2 me-2 "
+                                style="color: white;">Update</a>
+                            <form action="/product/delete-product/{{ product.id }}" method="POST">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button class="btn btn-danger">delete</button>
+                            </form>
+                        </div>
+                        <div class=" justify-content-center align-items-center mb-5">
+                            <form action="/cart" method="POST" class="d-flex m-3">
+                                <div class="col-6">
+                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                    <input type="number" min="1" max="10000" class="form-control" name="quantity"
+                                        id="quantity" placeholder="quantity" />
+                                </div>
+                                <div class="col-6">
+                                    <button type="submit" class=" btn btn-success">Add to Cart</button>
+                                </div>
+                            </form>
+    
+                        </div>
+                    </div>
+
+                </div>
+                {% endfor %}
+            </div>
+            <div class="col-3">
+                {% for product in products %}
+                <div class="mb-5">
+
+                    <div class="product-card border bg-secondary">
+                        <img src="{{url_for('static', filename='image_uploads/' + show_image(product.picture))}}"
+                            alt="{{ product.name }}" class="img-fluid">
                         <h2 class="" style="color: orange;">{{ product.name }}</h2>
                         <div class="d-flex justify-content-center align-items-center">
                             <a href="/product/view-product/{{ product.id }}" class="btn btn-primary me-2 ms-5"
@@ -39,23 +75,97 @@
                                 <button class="btn btn-danger">delete</button>
                             </form>
                         </div>
+                        <div class="justify-content-center align-items-center mb-5">
+                            <form action="/product/add-to-cart-post/{{ product.id }}" method="POST" class="d-flex m-3">
+                                <div class="col-6">
+                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                    <input type="number" min="1" max="10000" class="form-control" name="quantity"
+                                        id="quantity" placeholder="quantity" />
+                                </div>
+                                <div class="col-6">
+                                    <button type="submit" class=" btn btn-success">Add to Cart</button>
+                                </div>
+                            </form>
+    
+                        </div>
                     </div>
-                    <div class="col-6 justify-content-center align-items-center">
-                        <form action="/product/add-to-cart-post/{{ product.id }}" method="POST" class="d-flex m-3">
-                            <div class="col-6">
-                                <input type="hidden" name="product_id" value="{{ product.id }}">
-                                <input type="number" min="1" max="10000" class="form-control" name="quantity"
-                                    id="quantity" placeholder="quantity" />
-                            </div>
-                            <div class="col-6">
-                                <button type="submit" class=" btn btn-success">Add to Cart</button>
-                            </div>
-                        </form>
 
-                    </div>
                 </div>
                 {% endfor %}
             </div>
+            <div class="col-3">
+                {% for product in products %}
+                <div class="mb-5">
+
+                    <div class="product-card border border- bg-secondary">
+                        <img src="{{url_for('static', filename='image_uploads/' + show_image(product.picture))}}"
+                            alt="{{ product.name }}" class="img-fluid">
+                        <h2 class="" style="color: orange;">{{ product.name }}</h2>
+                        <div class="d-flex justify-content-center align-items-center">
+                            <a href="/product/view-product/{{ product.id }}" class="btn btn-primary me-2 ms-5"
+                                style="color: white;">View</a>
+                            <a href="/product/update-product/{{ product.id }}" class="btn btn-primary ms-2 me-2 "
+                                style="color: white;">Update</a>
+                            <form action="/product/delete-product/{{ product.id }}" method="POST">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button class="btn btn-danger">delete</button>
+                            </form>
+                        </div>
+                        <div class=" justify-content-center align-items-center mb-5">
+                            <form action="/product/add-to-cart-post/{{ product.id }}" method="POST" class="d-flex m-3">
+                                <div class="col-6">
+                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                    <input type="number" min="1" max="10000" class="form-control" name="quantity"
+                                        id="quantity" placeholder="quantity" />
+                                </div>
+                                <div class="col-6">
+                                    <button type="submit" class=" btn btn-success">Add to Cart</button>
+                                </div>
+                            </form>
+    
+                        </div>
+                    </div>
+
+                </div>
+                {% endfor %}
+            </div>
+            <div class="col-3">
+                {% for product in products %}
+                <div class="mb-5">
+
+                    <div class="product-card border border- bg-secondary">
+                        <img src="{{url_for('static', filename='image_uploads/' + show_image(product.picture))}}"
+                            alt="{{ product.name }}" class="img-fluid">
+                        <h2 class="" style="color: orange;">{{ product.name }}</h2>
+                        <div class="d-flex justify-content-center align-items-center">
+                            <a href="/product/view-product/{{ product.id }}" class="btn btn-primary me-2 ms-5"
+                                style="color: white;">View</a>
+                            <a href="/product/update-product/{{ product.id }}" class="btn btn-primary ms-2 me-2 "
+                                style="color: white;">Update</a>
+                            <form action="/product/delete-product/{{ product.id }}" method="POST">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button class="btn btn-danger">delete</button>
+                            </form>
+                        </div>
+                        <div class="justify-content-center align-items-center mb-5">
+                            <form action="/product/add-to-cart-post/{{ product.id }}" method="POST" class="d-flex m-3">
+                                <div class="col-6">
+                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                    <input type="number" min="1" max="10000" class="form-control" name="quantity"
+                                        id="quantity" placeholder="quantity" />
+                                </div>
+                                <div class="col-6">
+                                    <button type="submit" class=" btn btn-success">Add to Cart</button>
+                                </div>
+                            </form>
+    
+                        </div>
+                    </div>
+
+                </div>
+                {% endfor %}
+            </div>
+            
 
         </div>
     </div>

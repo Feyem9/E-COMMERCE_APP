@@ -1,0 +1,78 @@
+<!-- templates/confirm_email.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Your Email</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            max-width: 150px;
+        }
+        .content {
+            text-align: center;
+        }
+        .content h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .content p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .content a {
+            display: inline-block;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .content a:hover {
+            background-color: #0056b3;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+        </div>
+        <div class="content">
+            <h1>Confirm Your Email</h1>
+            <p>Thank you for signing up with our store. To complete your registration, please confirm your email address by clicking the button below:</p>
+            <a href="{{ confirm_url }}">Confirm Email</a>
+            <p>If you did not create an account, no further action is required.</p>
+        </div>
+        <div class="footer">
+            <p>&copy; {{ current_year }} Your Store. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

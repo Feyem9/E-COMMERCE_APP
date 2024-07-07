@@ -1,55 +1,89 @@
+{% extends '/base.html' %}
+
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
 </head>
+
 <body>
 
-    <form action="/product/update-product/{{product.id}}" enctype="multipart/form-data" method="post">
-        <div class="mb-3">
-            <label for="name" class="form-label">Name</label>
-            <input
-                type="text"
-                class="form-control"
-                name="name"
-                id="name"
-                aria-describedby="Name"
-                placeholder="{{product.name}}"
-            />
+    <div class="container-fluid text-center justify-content-center align-items-center" style="color: orange;">
+
+        <div class="row">
+
+
+            <div class="col-3">
+                
+            </div>
+
+            <form action="/product/update-product/{{product.id}}" enctype="multipart/form-data" method="post" class="col-6">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" name="name" id="name" aria-describedby="Name"
+                        placeholder="{{product.name}}" />
+
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">description</label>
+                    <textarea class="form-control" name="description" id="description"
+                        rows="3">{{product.description}}</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="current_price" class="form-label">current price</label>
+                    <input type="number" min="0" max="1000000" step="0.01" class="form-control" name="current_price"
+                        id="current_price" placeholder="{{product.current_price}}" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="discount_price" class="form-label">discount price</label>
+                    <input type="number" min="0" max="1000000" step="0.01" class="form-control" name="discount_price"
+                        id="discount_price" placeholder="{{product.discount_price}}" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="quantity" class="form-label">quantity</label>
+                    <input type="number" min="1" max="1000000" class="form-control" name="quantity" id="quantity"
+                        placeholder="{{product.quantity}}" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="image" class="form-label">image</label>
+                    <input type="file" name="picture" accept="image/jpeg, image/png, image/avif"
+                        placeholder="{{url_for('static', filename='image_uploads/' + show_image(product.picture))}}"
+                        required />
+                </div>
+
+                <div class=" d-flex justify-content-center align-items-center">
+                    <a href="/product" class="btn btn-primary ms-5 me-5">Back</a>
+                    <button type="submit" class="btn btn-success me-5 ms-5">Submit</button>
+                </div>
+
+
+            </form>
+
+            <div class="col-3">
+
+            </div>
 
         </div>
 
-        <div class="mb-3">
-            <label for="description" class="form-label">description</label>
-            <textarea class="form-control" name="description" id="description" rows="3">{{product.description}}</textarea>
-        </div>
-
-        <div class="mb-3">
-            <label for="current_price" class="form-label">current price</label>
-            <input type="number" min="0" max="10000" step="0.01" class="form-control" name="current_price" id="current_price" placeholder="{{product.current_price}}"/>
-        </div>
-
-        <div class="mb-3">
-            <label for="discount_price" class="form-label">discount price</label>
-            <input type="number" min="0" max="10000" step="0.01" class="form-control" name="discount_price" id="discount_price" placeholder="{{product.discount_price}}"/>
-        </div>
-
-        <div class="mb-3">
-            <label for="quantity" class="form-label">quantity</label>
-            <input type="number" min="1" max="10000" class="form-control" name="quantity" id="quantity" placeholder="{{product.quantity}}"/>
-        </div>
-
-        <div class="mb-3">
-          <label for="image" class="form-label">image</label>
-          <input type="file" name="picture" accept="image/jpeg, image/png, image/avif" placeholder="{{url_for('static', filename='image_uploads/' + show_image(product.picture))}}" required />
-        </div>
-        
-        <button type="submit" class="btn btn-primary">Submit</button>
-        
-        
-    </form>
+    </div>
 
 </body>
+
 </html>
+
+{% endblock %}
