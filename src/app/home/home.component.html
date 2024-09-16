@@ -1,0 +1,35 @@
+<app-navbar></app-navbar>
+
+<div class="home-container">
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-text">
+        <h1>Welcome to TECH-MARKET</h1>
+        <p>Discover the best deals on our products!</p>
+        <button routerLink="product">Shop Now</button>
+      </div>
+    </section>
+  
+    <!-- Featured Products Section -->
+    <section class="featured-products">
+      <h2>Featured Products</h2>
+      <div class="product-grid">
+        <div *ngFor="let product of featuredProducts" class="product-item">
+          <img [src]="product.image" alt="{{ product.name }}">
+          <h3>{{ product.name }}</h3>
+          <p>{{ product.price | currency }}</p>
+          <button>Add to Cart</button>
+        </div>
+      </div>
+    </section>
+  
+    <!-- Promotions Section -->
+    <section class="promotions">
+      <h2>Exclusive Promotions</h2>
+      <div class="promotion-banner">
+        <p>Up to 50% off selected items!</p>
+        <button>Shop Now</button>
+      </div>
+    </section>
+  </div>
+  

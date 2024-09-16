@@ -1,0 +1,41 @@
+<mat-toolbar color="#fff">
+  <mat-icon>store</mat-icon>
+  <span>TECH market</span>
+  <span class="spacer"></span>
+  
+  <button mat-button [matMenuTriggerFor]="proMenu">products</button>
+  <mat-menu #proMenu="matMenu">
+      <button mat-menu-item routerLink="/product">Products</button>
+    </mat-menu>
+
+
+    
+    <button mat-button [matMenuTriggerFor]="catMenu">Categories</button>
+    <mat-menu #catMenu="matMenu">
+      <button mat-menu-item routerLink="/news">News</button>
+      <button mat-menu-item routerLink="/tablets">Tablets</button>
+      <button mat-menu-item routerLink="/feature">Feature</button>
+    </mat-menu>
+    
+    <button mat-button [matMenuTriggerFor]="helpMenu">Need help?</button>
+    <mat-menu #helpMenu="matMenu">
+      <button mat-menu-item>Store Locator</button>
+      <button mat-menu-item>Order Tracking</button>
+      <button mat-menu-item>FAQs</button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item>Call us: (+800) 1234 5678 90</button>
+      <button mat-menu-item>Email: info""company.com</button>
+    </mat-menu>
+  
+
+    <button mat-button [matMenuTriggerFor]="userMenu">Acount</button>
+    <mat-menu #userMenu="matMenu">
+      <button mat-button routerLink="/login">Log in</button>
+      <button mat-button routerLink="/register">Register</button>
+    </mat-menu>
+
+    <button mat-button routerLink="/cart">
+      <mat-icon>shopping_cart</mat-icon> My Cart (0 items - $0.00)
+    </button>
+  </mat-toolbar>
+  

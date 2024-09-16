@@ -1,0 +1,34 @@
+// Assure-toi que tu utilises une palette de couleurs personnalisée si nécessaire
+// @import "~@angular/material/theming";
+
+// Utiliser les couleurs primaires du thème
+mat-toolbar {
+  display: flex;
+  align-items: center;
+  height: 64px;
+  background: linear-gradient(45deg ,#df4979 , #e36b31);
+  color: #fff;
+  // background-color: mat-color($primary); // Couleur primaire du thème
+
+  .mat-icon {
+    margin-right: 8px;
+  }
+
+  .spacer {
+    flex: 1 1 auto;
+  }
+
+  button.mat-button {
+    margin: 0  8px;
+    color:#fff;
+  }
+}
+
+mat-menu {
+  min-width: 200px;
+  color: #fff;
+
+  mat-divider {
+    margin: 4px 0;
+  }
+}

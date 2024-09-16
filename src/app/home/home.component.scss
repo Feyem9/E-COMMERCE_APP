@@ -1,0 +1,130 @@
+.home-container {
+    .hero {
+      background-image: url("../../assets/istockphoto-1934523700-612x612.webp");
+      background-size: cover;
+      background-position: center;
+      padding: 100px 20px;
+      text-align: center;
+      color: white;
+  
+      .hero-text {
+        background: rgba(0, 0, 0, 0.6);
+        padding: 20px;
+        border-radius: 5px;
+  
+        h1 {
+          font-size: 48px;
+          margin-bottom: 10px;
+        }
+  
+        p {
+          font-size: 24px;
+          margin-bottom: 20px;
+        }
+  
+        button {
+          padding: 15px 30px;
+          background-color: #ff6347;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+  
+          &:hover {
+            background-color: #ff4500;
+          }
+        }
+      }
+    }
+  
+    .featured-products {
+      padding: 50px 0;
+      background-color: #f8f8f8;
+      text-align: center;
+  
+      h2 {
+        font-size: 36px;
+        margin-bottom: 20px;
+      }
+  
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+  
+        .product-item {
+          background-color: white;
+          padding: 20px;
+          border-radius: 10px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  
+          img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 15px;
+          }
+  
+          h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+          }
+  
+          p {
+            font-size: 18px;
+            color: #333;
+          }
+  
+          button {
+            padding: 10px 20px;
+            background-color: #1e90ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+  
+            &:hover {
+              background-color: #005fbb;
+            }
+          }
+        }
+      }
+    }
+  
+    .promotions {
+      padding: 50px 0;
+      background-color: #ff6347;
+      text-align: center;
+  
+      h2 {
+        font-size: 36px;
+        color: white;
+        margin-bottom: 20px;
+      }
+  
+      .promotion-banner {
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        display: inline-block;
+  
+        p {
+          font-size: 24px;
+          margin-bottom: 10px;
+        }
+  
+        button {
+          padding: 15px 30px;
+          background-color: #ff6347;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+  
+          &:hover {
+            background-color: #ff4500;
+          }
+        }
+      }
+    }
+  }
+  
