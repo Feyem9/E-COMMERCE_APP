@@ -1,4 +1,4 @@
-from flask import render_template , request  , redirect , url_for , session ,send_from_directory
+from flask import jsonify, render_template , request  , redirect , url_for , session ,send_from_directory
 from config import db , UPLOAD_EXTENSIONS , UPLOAD_PATH
 import os
 import imghdr
@@ -27,6 +27,16 @@ def validate_image(stream):
 
 def index_product():
     products = Products.query.all()
+    products_list = [{
+        "id": product.id,
+        "name": product.name,
+        "description": product.description,
+        "current_price": product.current_price,
+        "discount_price": product.discount_price,
+        "quantity": product.quantity,
+        "picture": product.picture
+    } for product in products]
+    return jsonify(products_list), 200
     return render_template('/products/index_product.html', products=products , title="products")
 
 def add_product():
@@ -42,6 +52,7 @@ def create():
   
     picture = request.files.get('picture')
     if picture is None:
+        return jsonify({"error": "no picture uploaded"}), 400
         return {"error": "No picture uploaded"}, 400
 
     
@@ -52,7 +63,7 @@ def create():
         
         if file_ext not in UPLOAD_EXTENSIONS:
             print(file_ext)
-        
+            return jsonify({"error": "File type not supported"}), 400
             return {"error": "File type not supported"}, 400
         
         existing_product = Products.query.filter_by(picture=filename).first()
@@ -62,11 +73,20 @@ def create():
 
         picture.save(os.path.join(UPLOAD_PATH, filename))
 
-    product = Products(name, description, current_price, discount_price, quantity, picture)
+    product = Products(name=name, description=description, current_price=current_price, discount_price=discount_price, quantity=quantity, picture=filename)
     print(picture)
     db.session.add(product)
     db.session.commit()
 
+    return jsonify({
+        "id" : product.id,
+        "name" : product.name,
+        "description": product.description,
+        "current_price": product.current_price,
+        "discount_price": product.discount_price,
+        "quantity": product.quantity,
+        "picture": product.picture
+    }),200
     return redirect('/product')
 
 def view_product(id):

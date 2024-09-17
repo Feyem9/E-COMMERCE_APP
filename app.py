@@ -1,9 +1,10 @@
 from flask import Flask , request , jsonify , session , redirect , url_for , current_app
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager 
 from flask_session import Session
 from flask_migrate import Migrate
 from flask_mail import Mail , Message
+from flask_cors import CORS
 
 from config import db, SECRET_KEY , MAIL_SERVER , MAIL_PORT, MAIL_USERNAME,MAIL_PASSWORD,MAIL_USE_SSL,MAIL_USE_TLS, MAIL_DEFAULT_SENDER
 
@@ -19,6 +20,7 @@ from routes.product_route import product
 
 db
 app = Flask(__name__)
+CORS(app)
 app.config.from_object('config')
 jwt = JWTManager(app)
 app.secret_key = SECRET_KEY
@@ -70,7 +72,7 @@ def show_image(value):
     if len(value) != 1:
         
         pics = value.split(' ')
-        return pics[1].replace("'","")
+        return pics[0].replace("'","")
     return ''
 
 app.jinja_env.globals.update(show_image=show_image)

@@ -5,7 +5,7 @@ from config import db
 from itsdangerous import URLSafeTimedSerializer
 from flask_login import  current_user
 from flask_login import LoginManager
-# from utility.mail import send_email
+from utility.mail import send_email
 from flask_mail import Message , Mail
 from flask import current_app
 

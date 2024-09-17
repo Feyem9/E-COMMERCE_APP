@@ -1,4 +1,4 @@
-#!/home/christ/Bureau/e-commerce/.venv/bin/python3
+#!/home/dongueu/Desktop/E-commerce/E-COMMERCE_APP/.venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
