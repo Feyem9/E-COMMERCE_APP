@@ -1,6 +1,6 @@
 .home-container {
     .hero {
-      background-image: url("../../assets/istockphoto-1934523700-612x612.webp");
+      background-image: url("../../../public/istockphoto-2049935950-612x612.webp");
       background-size: cover;
       background-position: center;
       padding: 100px 20px;
@@ -89,6 +89,65 @@
         }
       }
     }
+
+  //   .newsletter {
+  //     // padding: 50px 0;
+  //     background-color: #f8f8f8;
+  //     // text-align: left;
+      // display: grid;
+
+      .news {
+        // h2 {
+          font-size: 16px;
+          margin-bottom: 20px; 
+        // }
+        // p{
+        //   width: 50%;
+        // }
+        // display: column;
+      background-color: #f8f8f8;
+
+        
+    }
+    .content{
+      // padding: 50px 0;
+      background-color: #f8f8f8;
+      // text-align: left;
+      // display: flex;
+      // gap: 20px;
+
+      input{
+        padding: 10px 2Opx;
+        color: #f8f8f8;
+        border: none;
+        border-left: none;
+        border-top: none;
+        border-right: none;
+        border-bottom: #333 solid;
+        height: 3.5rem;
+        width: 25rem;
+        // border-radius: 5px;
+        &::placeholder{
+          border-left: none;
+          border-top: none;
+          border-right: none;
+        }
+      }
+
+      button {
+        padding: 10px 20px;
+        background-color: #1e90ff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-left: 1rem;
+
+        &:hover {
+          background-color: #005fbb;
+        }
+      }
+    }
   
     .promotions {
       padding: 50px 0;
@@ -127,4 +186,3 @@
       }
     }
   }
-  

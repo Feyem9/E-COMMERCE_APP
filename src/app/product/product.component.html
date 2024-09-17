@@ -1,1 +1,14 @@
-<p>product works!</p>
+<app-navbar></app-navbar>
+
+
+<div class="product-list">
+    <div *ngFor="let product of products" class="product-card">
+      <h2>{{ product.name }}</h2>
+      <p>{{ product.description }}</p>
+      <p>Price: {{ product.current_price }}</p>
+      <p>Discount: {{ product.discount_price }}</p>
+      <img [src]="'http://localhost:5000/static/image_uploads/' + product.picture" alt="Product Image">
+      <!-- <img [src]="'/static/uploads/' + product.picture" alt="{{ product.name }}" /> -->
+    </div>
+  </div>
+  

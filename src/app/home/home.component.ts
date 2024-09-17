@@ -16,12 +16,12 @@ export class HomeComponent implements OnInit {
     {
       name: 'Product 2',
       price: 39.99,
-      image: 'src/assets/40a01f385d06eb584d19f254704dc839.webp'
+      image: '../../assets/40a01f385d06eb584d19f254704dc839.webp'
     },
     {
       name: 'Product 3',
       price: 19.99,
-      image: 'src/assets/CAMON 20 Premier 5G_Six View_Day.webp'
+      image: '../../assets/CAMON 20 Premier 5G_Six View_Day.webp'
     }
   ];
 

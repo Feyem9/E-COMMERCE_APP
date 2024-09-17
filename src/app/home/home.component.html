@@ -1,35 +1,51 @@
 <app-navbar></app-navbar>
 
 <div class="home-container">
-    <!-- Hero Section -->
-    <section class="hero">
-      <div class="hero-text">
-        <h1>Welcome to TECH-MARKET</h1>
-        <p>Discover the best deals on our products!</p>
-        <button routerLink="product">Shop Now</button>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-text">
+      <h1>Welcome to TECH-MARKET</h1>
+      <p>Discover the best deals on our products!</p>
+      <button routerLink="product">Shop Now</button>
+    </div>
+  </section>
+
+  <!-- Featured Products Section -->
+  <section class="featured-products">
+    <h2>Featured Products</h2>
+    <div class="product-grid">
+      <div *ngFor="let product of featuredProducts" class="product-item">
+        <img [src]="product.image" alt="{{ product.name }}">
+        <h3>{{ product.name }}</h3>
+        <p>{{ product.price | currency }}</p>
+        <button>Add to Cart</button>
       </div>
-    </section>
-  
-    <!-- Featured Products Section -->
-    <section class="featured-products">
-      <h2>Featured Products</h2>
-      <div class="product-grid">
-        <div *ngFor="let product of featuredProducts" class="product-item">
-          <img [src]="product.image" alt="{{ product.name }}">
-          <h3>{{ product.name }}</h3>
-          <p>{{ product.price | currency }}</p>
-          <button>Add to Cart</button>
+    </div>
+  </section>
+
+  <!-- Newsletter Section -->
+  <section class="newsletter" style="display: flex; width: 100%; gap: 20rem;">
+        <div class="news" style="width: 50%;">
+          <h2>Newsletter</h2>
+          <p> Lorem, ipsum dolor sit amet consectetur adipisicing elit. Libero repellendus cupiditate eveniet
+            exercitationem
+            corporis sunt explicabo velit dignissimos dolor aliquam delectus pariatur veniam fugiat repellat alias natus
+            reiciendis, ipsam quis!</p>
         </div>
-      </div>
-    </section>
-  
-    <!-- Promotions Section -->
-    <section class="promotions">
-      <h2>Exclusive Promotions</h2>
-      <div class="promotion-banner">
-        <p>Up to 50% off selected items!</p>
-        <button>Shop Now</button>
-      </div>
-    </section>
-  </div>
-  
+        <div class="content" style="width: 50%;">
+          <form action="" method="post">
+            <input type="email" placeholder="enter your email">
+            <button type="submit">suscribe</button>
+          </form>
+        </div>
+  </section>
+
+  <!-- Promotions Section -->
+  <section class="promotions">
+    <h2>Exclusive Promotions</h2>
+    <div class="promotion-banner">
+      <p>Up to 50% off selected items!</p>
+      <button>Shop Now</button>
+    </div>
+  </section>
+</div>
