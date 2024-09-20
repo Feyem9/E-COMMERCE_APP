@@ -25,6 +25,7 @@ import { CartComponent } from './cart/cart.component';
 import { LoginComponent } from './customers/login/login.component';
 import { RegisterComponent } from './customers/register/register.component';
 import { HomeComponent } from './home/home.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -42,6 +43,7 @@ import { HomeComponent } from './home/home.component';
   ],
   imports: [
     BrowserModule,
+    ReactiveFormsModule,
     AppRoutingModule,  
     BrowserAnimationsModule,
     MatToolbarModule,

@@ -1,1 +1,88 @@
-<p>cart works!</p>
+<!-- <div class="cart-container">
+    <h2>Your Shopping Cart</h2>
+  
+    <div *ngIf="cartItems.length > 0; else emptyCart" class="cart-items">
+      <div *ngFor="let item of cartItems" class="cart-item">
+        <img [src]="item.image" alt="{{ item.name }}" class="cart-item-image" />
+        <div class="cart-item-info">
+          <h3 class="cart-item-name">{{ item.name }}</h3>
+          <p class="cart-item-price">Price: {{ item.price | currency }}</p>
+          <div class="cart-item-quantity">
+            <button (click)="decreaseQuantity(item)">-</button>
+            <span>{{ item.quantity }}</span>
+            <button (click)="increaseQuantity(item)">+</button>
+          </div>
+          <p class="cart-item-total">
+            Total: {{ (item.price * item.quantity) | currency }}
+          </p>
+          <button class="remove-item-btn" (click)="removeItem(item)">Remove</button>
+        </div>
+      </div>
+  
+      <div class="cart-summary">
+        <p>Total Items: {{ totalItems }}</p>
+        <p>Total Price: {{ totalPrice | currency }}</p>
+        <button class="checkout-btn" (click)="checkout()">Proceed to Checkout</button>
+      </div>
+    </div>
+  
+    <ng-template #emptyCart>
+      <p>Your cart is empty.</p>
+    </ng-template>
+  </div>
+   -->
+<!-- 
+   <div class="cart-container">
+    <h2>Mon Panier</h2>
+  
+    <div *ngIf="cartItems.length === 0">Votre panier est vide.</div>
+  
+    <div *ngFor="let item of cartItems" class="cart-item">
+      <div class="item-details">
+        <h4>{{ item.name }}</h4>
+        <p>Prix unitaire : {{ item.price | currency }}</p>
+        <p>Quantité : 
+          <button (click)="decreaseQuantity(item)">-</button>
+          {{ item.quantity }}
+          <button (click)="increaseQuantity(item)">+</button>
+        </p>
+        <p>Sous-total : {{ item.price * item.quantity | currency }}</p>
+      </div>
+      <button (click)="removeItem(item)">Supprimer</button>
+    </div>
+  
+    <div *ngIf="cartItems.length > 0" class="cart-summary">
+      <p>Nombre total d'articles : {{ totalItems }}</p>
+      <p>Total à payer : {{ totalPrice | currency }}</p>
+      <button (click)="checkout()">Payer</button>
+    </div>
+  </div>
+   -->
+
+   <div class="justify-content-center align-items-center mb-5">
+    <form [formGroup]="cartForm" (ngSubmit)="onSubmit()" class="d-flex m-3">
+      <div class="col-6">
+        <!-- Liaison entre le champ quantité et le formulaire réactif -->
+        <input type="hidden" formControlName="product_id" />
+        <input
+          type="number"
+          min="1"
+          max="10000"
+          class="form-control"
+          formControlName="quantity"
+          id="quantity"
+          placeholder="quantity"
+        />
+        <!-- Validation des erreurs -->
+        <div *ngIf="cartForm.controls['quantity'].invalid && cartForm.controls['quantity'].touched">
+          <small class="text-danger">Please enter a valid quantity between 1 and 10000.</small>
+        </div>
+      </div>
+      <div class="col-6">
+        <button type="submit" class="btn btn-success" [disabled]="cartForm.invalid">
+          Add to Cart
+        </button>
+      </div>
+    </form>
+  </div>
+  
