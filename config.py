@@ -18,5 +18,5 @@ MAIL_PASSWORD = 'lujb edfm gnxt mkdy'
 MAIL_USE_TLS = True
 MAIL_USE_SSL = False
 MAIL_DEFAULT_SENDER = ('E-Commerce App', 'feyemlionel@gmail.com')  # Remplacez par votre nom et email d'envoie
-UPLOAD_EXTENSIONS = ['.jpg', '.png' , '.jpeg', '.avif']
+UPLOAD_EXTENSIONS = ['.jpg', '.png' , '.jpeg' , '.avif' , '.webp']
 UPLOAD_PATH = "static/image_uploads/"

@@ -22,7 +22,7 @@ def validate_image(stream):
     format = imghdr.what(None, header)
     if not format:
         return None
-    return "." + (format if format != "jpeg" else ".jpeg") if format != "avif" else ".avif" if format != "png" else ".png"
+    return "." + (format if format != "jpeg" else ".jpeg") if format != "avif" else ".avif" if format != "png" else ".png" if format != "webp" else ".webp"
 
 
 def index_product():
