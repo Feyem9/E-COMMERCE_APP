@@ -1,0 +1,37 @@
+<div class="profile-container">
+  <div class="profile-card">
+    <div class="profile-header">
+      <img src="" alt="Avatar" class="avatar" />
+      <h2>{{ user.name }}</h2>
+      <p class="email">{{ user.email }}</p>
+    </div>
+
+    <div class="profile-details">
+      <div class="detail-item">
+        <label>Nom complet :</label>
+        <span>{{ user.name }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Email :</label>
+        <span>{{ user.email }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Téléphone :</label>
+        <span>{{ user.contact }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Adresse :</label>
+        <span>{{ user.address }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Rôle :</label>
+        <span>{{ user.role }}</span>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <button class="btn-edit">Modifier le profil</button>
+    </div>
+  </div>
+</div>
+

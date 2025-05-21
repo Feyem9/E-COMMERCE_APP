@@ -10,6 +10,8 @@ import { TransactionComponent } from './transaction/transaction.component';
 import { LoginComponent } from './customers/login/login.component';
 import { RegisterComponent } from './customers/register/register.component';
 import { HomeComponent } from './home/home.component';
+import { ProfileComponent } from './customers/profile/profile.component';
+import { PaymentSuccessComponent } from './payment-success/payment-success.component';
 
 const routes: Routes = [
   // {path : '' , component : NavbarComponent},
@@ -20,9 +22,11 @@ const routes: Routes = [
   {path : 'ordered' , component : OrderedComponent},
   {path : 'product' , component : ProductComponent},
   {path : 'transaction' , component : TransactionComponent},
+  {path : 'payment-success' , component : PaymentSuccessComponent},
   {path : 'login' , component : LoginComponent},
-  {path : 'register' , component : RegisterComponent}
-];
+  {path : 'register' , component : RegisterComponent},
+  {path : 'profile' , component : ProfileComponent}
+]; 
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

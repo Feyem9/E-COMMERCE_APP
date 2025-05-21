@@ -7,12 +7,38 @@
     "'http://localhost:5000/static/image_uploads/' + product.picture" 
     alt="Product Image" class="product-img">
     <div class="product-info">
-      <h2 class="product-name">{{ product.name }}</h2>
+      <h2 class="product-name">{{ product.product_name }}</h2>
       <!-- <p class="product-description">{{ product.description }}</p> -->
-      <p class="product-price"> <i class="fa-solid fa-dollar-sign"></i>price : {{ product.price }}</p>
+      <p class="product-price"> <i class="fa-solid fa-dollar-sign"></i>price : {{ product.current_price }} XAF</p>
       <p class="product-discount">Discount-price: {{ product.discount_price }}</p>
       <div class="add-to-cart">
-        <input type="submit" value="add-to-cart" routerLink="/cart">
+        <!-- <input type="submit" value="add-to-cart" routerLink="/cart"> -->
+        <div class="justify-content-center align-items-center mb-5">
+          <form [formGroup]="cartForm" (ngSubmit)="onSubmit()" class="d-flex m-3">
+            <div class="col-6">
+              <!-- Liaison entre le champ quantité et le formulaire réactif -->
+              <input type="hidden" formControlName="product_id" [value]="product.id"/>
+              <input
+                type="number"
+                min="1"
+                max="10000"
+                class="form-control"
+                formControlName="quantity"
+                id="quantity"
+                placeholder="quantity"       
+              />
+              <!-- Validation des erreurs -->
+              <!-- <div *ngIf="cartForm.controls['quantity'].invalid && cartForm.controls['quantity'].touched">
+                <small class="text-danger">Please enter a valid quantity between 1 and 10000.</small>
+              </div> -->
+            </div>           
+            <div class="col-6">
+              <button type="submit" class="btn btn-success" [disabled]="cartForm.invalid" (click)="selectProduct(product)">
+                Add to Cart
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div> 
     <!-- <img [src]="'/static/uploads/' + product.picture" alt="{{ product.name }}" /> -->

@@ -33,10 +33,13 @@
     <mat-menu #userMenu="matMenu">
       <button mat-button routerLink="/login">Log in</button>
       <button mat-button routerLink="/register">Register</button>
+      <button mat-button routerLink="/profile">Profile</button>
+      <button mat-button routerLink="/">Logout</button>
     </mat-menu>
 
     <button mat-button routerLink="/cart">
-      <mat-icon>shopping_cart</mat-icon> My Cart (0 items - $0.00)
-    </button>
+      <mat-icon>shopping_cart</mat-icon>
+      My Cart ({{ cartCount }} items in cart)
+          </button>
   </mat-toolbar>
   

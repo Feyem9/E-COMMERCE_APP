@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CartService } from '../services/cart.service';
-import { Product } from '../models/products';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Cart, Product } from '../models/products';
+import { FormBuilder, FormGroup, Validators , FormsModule} from '@angular/forms';
+import { TransactionService } from '../services/transaction.service';
 
 @Component({
   selector: 'app-cart',
@@ -10,19 +11,26 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class CartComponent  implements OnInit{
 
+
   cartForm!: FormGroup;
 
-  cartItems: Product[] = [];  // Liste des articles du panier
+  cartItems: Cart[] = [];  // Liste des articles du panier
   totalItems: number = 0;  // Nombre total d'articles dans le panier
   totalPrice: number = 0;  // Prix total du panier
+  total: number = 0;  // Prix total du panier
 
   constructor(private cartService: CartService ,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    formModule:FormsModule,
+    private transactionService:TransactionService
   ) {}
  
   ngOnInit(): void {
     this.loadCart();
+    this.calculateTotal();
+    this.cartService.clearCart(); 
 
+ 
       // Initialisation du formulaire réactif
   this.cartForm = this.fb.group({
     product_id: [''],  // Le champ caché product_id
@@ -36,81 +44,126 @@ export class CartComponent  implements OnInit{
   // Charger les articles du panier à partir du service
     loadCart(): void {
       this.cartService.getCartItems().subscribe(items => {
+        console.log('Données reçues dans le panier :', items);  // ⬅️ Vérifie ici
+
         this.cartItems = items;
         this.calculateTotal();
       });
     }
 
-  // Diminuer la quantité d'un article dans le panier
-  decreaseQuantity(item: Product): void {
+
+  decreaseQuantity(item: Cart): void {
     if (item.quantity > 1) {
-      item.quantity--;
-      this.cartService.updateCart(this.cartItems);  // Mettre à jour le panier
-      this.calculateTotal();
+      const newQuantity = item.quantity - 1;
+  
+      this.cartService.updateQuantity(item.id, newQuantity).subscribe(
+        res => {
+          item.quantity = res.new_quantity;
+          this.calculateTotal();
+        console.log('Quantité mise à jour avec succès sur le backend', res);
+
+        },
+        err => {
+          console.error('Erreur lors de la diminution de la quantité', err);
+        }
+      );
     }
   }
+  
+  increaseQuantity(item: Cart): void {
+    const newQuantity = item.quantity + 1;
+  
+    this.cartService.updateQuantity(item.id, newQuantity).subscribe(
+      res => {
+        item.quantity = res.new_quantity;
+        this.calculateTotal();
+        console.log('Quantité mise à jour avec succès sur le backend', res);
+        
+      },
+      err => {
+        console.error('Erreur lors de l’augmentation de la quantité', err);
+      }
+    );
+  }
+  
+  
 
-  // Augmenter la quantité d'un article dans le panier
-  increaseQuantity(item: Product): void {
-    item.quantity++;
-    this.cartService.updateCart(this.cartItems);  // Mettre à jour le panier
-    this.calculateTotal();
+  removeItem(item: Cart): void {
+    console.log('items', item.id);
+    
+    if (!item.id) {
+      console.error('ID du produit manquant');
+      return;
+    }
+    this.cartService.removeFromCart(item).subscribe({
+      next: updatedItems => {
+        this.cartItems = updatedItems;
+        this.calculateTotal();
+      },
+      error: err => {
+        console.error('Erreur lors de la suppression', err);
+      }
+    });
   }
 
-  // Supprimer un article du panier
-  removeItem(item: Product): void {
-    this.cartItems = this.cartItems.filter(cartItem => cartItem.id !== item.id);
-    this.cartService.updateCart(this.cartItems);  // Mettre à jour le panier
-    this.calculateTotal();
-  }
-
-  // Calculer le nombre total d'articles et le prix total du panier
-  calculateTotal(): void {
-    this.totalItems = this.cartItems.reduce((acc, item) => acc + item.quantity, 0);
-    this.totalPrice = this.cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  }
 
   // Procéder au paiement
   checkout(): void {
-    // Implémenter ici la logique de paiement
-    console.log('Proceeding to checkout...');
-    // Tu peux rediriger vers une page de paiement ou déclencher un service de paiement
+    const paymentData = {
+    total_amount: this.totalPrice,
+    currency: 'XAF',
+    return_url: "https://sf6lj8b2-4200.uks1.devtunnels.ms/payment-success",
+    notify_url:"https://webhook.site/d457b2f3-dd71-4f04-9af5-e2fcf3be8f34",
+    payment_country:"CM"
+
+  };
+
+  this.transactionService.initiatePayment(paymentData).subscribe({
+    next: (response) => {
+      if (response && response.payment_url) {
+        window.location.href = response.payment_url;
+      } else {
+        alert('Erreur de redirection vers PayUnit.');
+      }
+    },
+    error: (err:any) => {
+      console.error('Erreur paiement :', err);
+      alert('Erreur lors du paiement.');
+    },
+  });
   }
 
 // }
-// export class CartComponent {
-  // cartItems: Product[] = [];
-//   totalItems: number = 0;
-//   totalPrice: number = 0;
 
-//   constructor(private cartService: CartService) {}
+// cart.component.ts
+calculateTotal(): void {
+  this.total = 0;
+  let count = 0;
+  this.cartItems.forEach(item => {
+    this.total += item.current_price * item.quantity;
+    count += item.quantity;
+  });
 
-//   ngOnInit(): void {
-//     this.cartService.cartItems$.subscribe(items => {
-//       this.cartItems = items;
-//       this.calculateTotal();
-//     });
-  // }
+  this.totalPrice = this.cartItems.reduce((acc, item) => {
+    const price = Number(item.current_price) || 0;
+    const quantity = Number(item.quantity) || 0;
+    return acc + (price * quantity);
+  }, 0);
+  console.log('Total Price:', this.totalPrice);  
 
-//   calculateTotal(): void {
-//     this.totalItems = this.cartService.getTotalItems();
-//     this.totalPrice = this.cartService.getTotalPrice();
-//   }
-
-//   // Les autres méthodes comme decreaseQuantity, increaseQuantity, removeItem sont similaires
-
-
-
-
-// Gestionnaire de la soumission du formulaire
-onSubmit() {
-  if (this.cartForm.valid) {
-    const formData = this.cartForm.value;
-    console.log('Form Data:', formData);
-
-    // Vous pouvez envoyer les données au backend via un service HTTP ici
-    // Par exemple : this.cartService.addToCart(formData).subscribe(...);
-  }
+  this.cartService.updateCartCount(count); // Met à jour le total des items
+  
 }
+
+
+
+get showTotal(): string {
+  return this.totalPrice.toFixed(2);
+}
+
+payer() {
+    this.checkout();
+  }
+
 
 }

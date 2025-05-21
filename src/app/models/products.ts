@@ -1,9 +1,27 @@
 export interface Product {
+    product: any;
+    message: any;
     id: number;
-    name: string;
-    price: number;
+    product_id:number;
+    product_name: string;
+    current_price: number;
     quantity: number;
     discount_price: number;
     picture: string;
-    description: string;
+    product_description: string;
+    product_image:string;
+    description:string;
+  }
+
+
+  export interface Cart{
+    product_description: any;
+    product_name: any;
+    id: number;
+    picture:string;
+    description:string;
+    current_price:number;
+    quantity: number;
+    product_image:string;
+
   }

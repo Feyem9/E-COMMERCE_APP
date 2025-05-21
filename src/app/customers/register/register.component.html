@@ -1,62 +1,169 @@
-<div class="container-fluid">
-
-    <div class="row">
-
-        <div class="col-3">
-
-        </div>
-        <div class="col-6 text-center border border-5 border-dark" style="margin-top: 3rem;">
-
-            <h1 class="mt-3 fs-1">Register Page</h1> <br>
-            <form action="/register-post" method="post">    
-                <div class="mb-3">
-                    <label for="email" class="form-label float-start fs-2 fw-bold">Email address</label>
-                    <input type="email" name="email" class="form-control border border-2 border-dark" id="email"
-                        aria-describedby="email">
-                </div>
-
-                <div class="mb-3">
-                    <label for="name" class="form-label float-start fs-2 fw-bold">name</label>
-                    <input type="text" class="form-control border border-2 border-dark" id="name" name="name"
-                        aria-describedby="name">
-                </div>
-
-                <div class="mb-3">
-                    <label for="exampleInputPassword1" class="form-label float-start fs-2 fw-bold">Password</label>
-                    <input type="password" class="form-control border border-2 border-dark" id="exampleInputPassword1"
-                        name="password">
-                </div>
-
-                <div class="mb-3">
-                    <label for="contact" class="form-label float-start fs-2 fw-bold">contact</label>
-                    <input type="text" class="form-control border border-2 border-dark" id="contact" name="contact">
-                </div>
-
-                <div class="mb-3">
-                    <label for="address" class="form-label float-start fs-2 fw-bold">address</label>
-                    <input type="text" class="form-control border border-2 border-dark" id="address" name="address">
-                </div>
-
-                <div class="mb-3">
-                    <label for="role" class="form-label float-start fs-2 fw-bold">Role</label>
-                    <select class="form-select form-select-lg" name="role" id="role">
-                        <option selected>Customer</option>
-                        <option value="">Admin</option>
-                    </select>
-                </div>
-
-
-                <button type="submit" class="btn btn-info text-light mb-5">
-                    register
-                </button>
-
-            </form>
-
-        </div>
-        <div class="col-3">
-
-        </div>
-
+<!-- register.component.html -->
+<style>
+    /* Base sombre et centré */
+    html, body {
+      margin: 0;
+      height: 100%;
+      padding: 0;
+      background: #121212;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', sans-serif;
+    }
+  
+    /* Carte responsive */
+    .register-card {
+      background: #1e1e1e;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+      width: 90%;
+      max-width: 400px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid #2c2c2c;
+    }
+  
+    .register-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+    }
+  
+    .card-title {
+      margin: 0 0 1rem;
+      color: #f5f5f5;
+      text-align: center;
+      font-size: 1.8rem;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+    }
+  
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1rem;
+    }
+  
+    .form-group label {
+      color: #bbb;
+      margin-bottom: 0.25rem;
+      transition: color 0.2s ease;
+    }
+  
+    .form-group input,
+    .form-group select {
+      padding: 0.75rem;
+      border: none;
+      border-radius: 6px;
+      background: #2a2a2a;
+      color: #f0f0f0;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+  
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      background: #333;
+      box-shadow: 0 0 0 3px rgba(100, 149, 237, 0.5);
+    }
+  
+    .form-group label:hover {
+      color: #fff;
+    }
+  
+    .btn-submit {
+      width: 100%;
+      padding: 0.8rem;
+      background: linear-gradient(135deg, #4b6cb7, #182848);
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+  
+    .btn-submit:hover {
+      background: linear-gradient(135deg, #3a4a90, #0f1a3b);
+      transform: scale(1.02);
+    }
+  
+    @media (max-width: 480px) {
+      .register-card {
+        padding: 1.5rem;
+      }
+      .card-title {
+        font-size: 1.5rem;
+      }
+    }
+  
+    input:invalid {
+      box-shadow: 0 0 0 2px rgba(255, 69, 58, 0.7);
+    }
+  
+    .error {
+      color: #ff6b6b;
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+  </style>
+  
+  <form class="register-card" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <h2 class="card-title">Register</h2>
+  
+    <div class="form-group">
+      <label for="email">Email address</label>
+      <input id="email" type="email" formControlName="email" />
+      <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="error">
+        <div *ngIf="email?.errors?.['required']">Email is required.</div>
+        <div *ngIf="email?.errors?.['email']">Enter a valid email.</div>
+      </div>
     </div>
-
-</div>
+  
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input id="name" type="text" formControlName="name" />
+      <div *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="error">
+        <div *ngIf="name?.errors?.['required']">Name is required.</div>
+        <div *ngIf="name?.errors?.['minlength']">Name must be at least 2 characters.</div>
+      </div>
+    </div>
+  
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input id="password" type="password" formControlName="password" />
+      <div *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="error">
+        <div *ngIf="password?.errors?.['required']">Password is required.</div>
+        <div *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters.</div>
+      </div>
+    </div>
+  
+    <div class="form-group">
+      <label for="contact">Contact</label>
+      <input id="contact" type="text" formControlName="contact" />
+    </div>
+  
+    <div class="form-group">
+      <label for="address">Address</label>
+      <input id="address" type="text" formControlName="address" />
+    </div>
+  
+    <div class="form-group">
+      <label for="role">Role</label>
+      <select id="role" formControlName="role">
+        <option value="Customer">Customer</option>
+        <option value="Admin">Admin</option>
+      </select>
+    </div>
+  
+    <button type="submit" class="btn-submit" [disabled]="registerForm.invalid || isSubmitting">
+      {{ isSubmitting ? 'Registering...' : 'Register' }}
+    </button>
+  
+    <div class="text-center mt-4">
+      <p style="color: #bbb;">
+        Already have an account?
+        <a routerLink="/login" style="color: #4b6cb7;">Login</a>
+      </p>
+    </div>
+  </form>
+  
