@@ -1,16 +1,18 @@
-from flask import Blueprint
+from flask import Blueprint #type: ignore
 
-from controllers.customer_controller import home,register, register_post, login, login_post, logout, profile, forgot_password, forgot_password_post, confirm_email
+from controllers.customer_controller import register, login, check_session , logout, profile, forgot_password, confirm_email, reset_password,all_users
 
-cust_bp = Blueprint('customer', __name__)
+customer = Blueprint('customer', __name__)
 
-cust_bp.route('/' )(home)
-cust_bp.route('/register', methods=['GET'])(register)
-cust_bp.route('/register-post', methods=['POST'])(register_post)
-cust_bp.route('/login', methods=['GET'])(login)
-cust_bp.route('/login-post', methods=['POST'])(login_post)
-cust_bp.route('/logout')(logout)
-cust_bp.route('/profile' , methods=['GET'] ,strict_slashes=False)(profile)
-cust_bp.route('/forgot-password', methods=['GET'])(forgot_password)
-cust_bp.route('/forgot-password-post', methods=['POST'])(forgot_password_post)
-cust_bp.route('/confirm-email/<token>')(confirm_email)
+customer.route('/check-session', methods=['GET'] )(check_session)
+customer.route('/customer', methods=['GET'])(all_users)
+customer.route('/register', methods=['POST'])(register)
+customer.route('/login', methods=['POST'])(login)
+customer.route('/logout')(logout)
+customer.route('/profile' , methods=['GET'] ,strict_slashes=False)(profile)
+customer.route('/forgot-password', methods=['GET', 'POST'])(forgot_password)
+
+customer.route('/reset-password/<token>' , methods=['GET', 'POST'])(reset_password)
+customer.route('/confirm-email/<token>')(confirm_email)
+
+customer.route('/admin/users')(all_users)

@@ -1,12 +1,14 @@
-from flask import jsonify, render_template , request  , redirect , url_for , session ,send_from_directory
+from flask import jsonify, render_template , request  , redirect , url_for , session ,send_from_directory #type:ignore
 from config import db , UPLOAD_EXTENSIONS , UPLOAD_PATH
 import os
 import imghdr
 import uuid
-from werkzeug.utils import secure_filename
+from werkzeug.utils import secure_filename #type:ignore
 
 from models.cart_model import Carts
 from models.product_model import Products
+from flask_jwt_extended import jwt_required, get_jwt_identity #type:ignore
+
 
 
 
@@ -144,38 +146,81 @@ def search_product(id):
     return render_template('search_product.html', product=product)
 
 def add_to_cart(id):
-    product = Products.query.filter_by(id=id).first()
-    if not product:
-        return redirect(url_for('index_product'))
-    return render_template('/carts/index_cart.html', product=product)
 
-def add_to_cart_post(id):
     product = Products.query.filter_by(id=id).first()
     if not product:
         return redirect(url_for('index_product'))
     quantity = request.form.get('quantity')
     customer_id = request.form.get('customer_id')
-    print(quantity)
-    if quantity is None:
-        return {"error": "Quantity is required"}, 400
+    print(product.id)
     cart = Carts(int(quantity), customer_id, id) 
     print(cart)
+    print("Données reçues :", request.get_json())
     db.session.add(cart)
     db.session.commit()
-    return render_template('/carts/index_cart.html')
+    return jsonify({
+        "message": "Produit ajouté au panier",
+        "status":"success",
+        "product": {
+            "id": product.id,
+            "name": product.name,
+            "description": product.description,
+            "current_price": product.current_price,
+        }}), 200
+    
+    return render_template('/carts/index_cart.html', product=product)
 
-# def view_cart():
-#     if 'customer_id' not in session:
-#         return redirect('/login')
-#     customer_id = session.get('customer_id')
-#     carts = Carts.query.filter_by(customer_id=customer_id).all()
-#     return render_template('view_cart.html', carts=carts)
+@jwt_required()
+def add_to_cart_post(id):
+    # customer_id = get_jwt_identity()  # extrait depuis le token
+    # print("customer_id :", customer_id)
+    # if not customer_id:
+    #     return jsonify({'error': "L'ID du client est requis"}), 400
+    product = Products.query.filter_by(id=id).first()
+    if not product:
+        return jsonify({"error": "Produit introuvable"}), 404
 
-# def delete_cart(id):
-#     if request.method == 'POST':
-#         if request.form.get('delete'):
-#             cart = Carts.query.filter_by(id=id).first()
-#             db.session.delete(cart)
-#             db.session.commit()
-#             return redirect(url_for('view_cart'))
+    # Récupération des données JSON de la requête
+    data = request.get_json()
+    print("Données reçues :", data)
+
+    if not data:
+        return jsonify({"error": "Aucune donnée reçue"}), 400
+
+    quantity = data.get('quantity')
+    customer_id = data.get('customer_id')
+    print(quantity)
+
+    # Validation des données
+    if not quantity:
+        return jsonify({"error": "La quantité est requise"}), 400
+    if not customer_id:
+        return jsonify({"error": "L'ID du client est requis"}), 400
+
+    try:
+        product_name = product.name if product else None
+        if not product_name:
+            return jsonify({"error": "Le nom du produit est introuvable"}), 400
+        print(product_name)
+        cart = Carts(quantity=int(quantity),product_id=product.id , product_name=product.name , product_description=product.description , product_image=product.picture, current_price=product.current_price , customer_id=customer_id)
+        print(cart)
+        db.session.add(cart)
+        db.session.commit()
+
+        return jsonify({
+            "message": "Produit ajouté au panier",
+            "status": "success",
+            "product": {
+                "id": product.id,
+                "name": product.name,
+                "description": product.description,
+                "current_price": product.current_price,
+                "picture":product.picture,
+            }
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+
         

@@ -1,4 +1,4 @@
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func #type: ignore
 from config import db
 
 class Customers(db.Model):
@@ -9,6 +9,7 @@ class Customers(db.Model):
     contact = db.Column(db.String(200) , nullable=False)
     address = db.Column(db.String(500) , nullable=False)
     confirmed = db.Column(db.Boolean, default=False)
+    is_active = db.Column(db.Boolean , default=False)
     # city = db.Column(db.String(100))
     # country = db.Column(db.String(100))
     role = db.Column(db.String(20), nullable=False, default='user')  # 'user' or 'admin'

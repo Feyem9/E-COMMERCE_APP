@@ -1,26 +1,31 @@
-from flask import Flask , request , jsonify , session , redirect , url_for , current_app
-from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager 
+from flask import Flask , request , jsonify , session , redirect , url_for , current_app#type:ignore
+from flask_bcrypt import Bcrypt#type:ignore
+from flask_jwt_extended import JWTManager #type:ignore
 from flask_session import Session
-from flask_migrate import Migrate
-from flask_mail import Mail , Message
-from flask_cors import CORS
+from flask_migrate import Migrate#type:ignore
+from flask_mail import Mail , Message#type:ignore
+from flask_cors import CORS#type:ignore
 
 from config import db, SECRET_KEY , MAIL_SERVER , MAIL_PORT, MAIL_USERNAME,MAIL_PASSWORD,MAIL_USE_SSL,MAIL_USE_TLS, MAIL_DEFAULT_SENDER
 
+from models.cart_model import Carts
 from models.customer_model import Customers
 
-from routes.customer_route import cust_bp
+from routes.customer_route import customer
 from routes.cart_route import cart
-# from routes.categoriy_route import category
-# from routes.favorite_route import favorite
 from routes.order_route import order
 from routes.product_route import product
-# from routes.transaction_route import transaction
+from routes.transaction_route import transaction
 
-db
+# db
 app = Flask(__name__)
 CORS(app)
+
+# Autoriser CORS pour toutes les routes
+CORS(app, resources={r"/*": {"origins": "http://localhost:4200"}}, supports_credentials=True, methods=['GET', 'POST', 'OPTIONS' , 'DELETE' , 'PUT'], allow_headers=['Content-Type', 'Authorization'])
+
+
+# Configuration de l'application pour l'envoie des mails
 app.config.from_object('config')
 jwt = JWTManager(app)
 app.secret_key = SECRET_KEY
@@ -45,8 +50,8 @@ bcrypt = Bcrypt(app)
 
 
 from functools import wraps
-from flask import jsonify, abort
-from flask_login import current_user
+from flask import jsonify, abort#type:ignore
+from flask_login import current_user#type:ignore
 
 def admin_required(f):
     @wraps(f)
@@ -78,13 +83,12 @@ def show_image(value):
 app.jinja_env.globals.update(show_image=show_image)
 
 
-app.register_blueprint(cust_bp , url_prefix='/')
+
+app.register_blueprint(customer , url_prefix='/customer')
 app.register_blueprint(cart , url_prefix='/cart')
-# app.register_blueprint(category , url_prefix='/category')
-# app.register_blueprint(favorite , url_prefix='/favorite')
 app.register_blueprint(order , url_prefix='/order')
-app.register_blueprint(product , url_prefix='/product')
-# app.register_blueprint(transaction , url_prefix='/transaction')
+app.register_blueprint(product , url_prefix='/product') 
+app.register_blueprint(transaction , url_prefix='/transaction')
 
 # Gestion des erreurs 404
 @app.errorhandler(404)
@@ -122,11 +126,12 @@ def index():
 # })
 # payment.makePayment(5000)
 
+
 # routes/mail_test.py
 @app.route('/test-email')
 def test_email():
-    from flask import current_app
-    from flask_mail import Message
+    from flask import current_app#type:ignore
+    from flask_mail import Message#type:ignore
     msg = Message(
         subject='Test Email',
         recipients=['feyemlionel@gmail.com'],  # Remplacez par votre email de test
@@ -137,5 +142,42 @@ def test_email():
     return 'Email sent!'
 
 
+@app.route('/update-cart/<id>' ,methods=['POST'])
+def update_cart(id):
+    if request.method != 'POST':
+        return jsonify({'error': 'Méthode non autorisée'}), 405
+
+    cart = Carts.query.filter_by(id=id).first()
+    if not cart:
+        return jsonify({'error': 'Produit introuvable dans le panier.'}), 404
+
+    data = request.get_json()
+    if not data or 'quantity' not in data:
+        return jsonify({'error': 'Données de quantité manquantes'}), 400
+
+    try:
+        quantity = int(data['quantity'])
+        if quantity < 0:
+            return jsonify({'error': 'La quantité doit être un nombre positif'}), 400
+        
+        cart.quantity = quantity
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Quantité mise à jour avec succès.',
+            'new_quantity': cart.quantity
+        }), 200
+    except ValueError:
+        return jsonify({'error': 'La quantité doit être un nombre valide'}), 400
+
 if __name__ == '__main__':
     app.run(debug=True)
+    
+from flask import render_template, request, jsonify, current_app, url_for#type:ignore
+from werkzeug.security import generate_password_hash##type:ignore
+from itsdangerous import URLSafeTimedSerializer#type:ignore
+    
+    
+@app.route('/check-session')
+def check_session():
+    return jsonify(dict(session))

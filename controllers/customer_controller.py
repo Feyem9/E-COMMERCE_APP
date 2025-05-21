@@ -1,159 +1,242 @@
-from flask import abort, render_template , redirect , request , session , url_for , jsonify , Blueprint , abort
-from werkzeug.security import generate_password_hash , check_password_hash 
+from flask import Blueprint, render_template, redirect, request, session, url_for, jsonify, abort#type:ignore
+from werkzeug.security import generate_password_hash, check_password_hash#type:ignore
 from models.customer_model import Customers
 from config import db
-from itsdangerous import URLSafeTimedSerializer
-from flask_login import  current_user
-from flask_login import LoginManager
-# from utility.mail import send_email
-from flask_mail import Message , Mail
-from flask import current_app
+from itsdangerous import URLSafeTimedSerializer#type:ignore
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user#type:ignore
+from flask_mail import Message, Mail#type:ignore
+from flask import current_app#type:ignore
+from functools import wraps
+from flask_jwt_extended import create_access_token , jwt_required, get_jwt_identity , decode_token#type:ignore
+
+
+customer_bp = Blueprint('customer', __name__, url_prefix='/customers')
 
 mail = Mail()
-
 login_manager = LoginManager()
+s = URLSafeTimedSerializer('your-secret-key')  # Remplacez par une clé secrète sécurisée
+
 @login_manager.user_loader
 def load_user(customer_id):
     return Customers.query.get(int(customer_id))
 
+def send_email(to, subject, template):
 
-
-SECRET_KEY = '123'
-s = URLSafeTimedSerializer(SECRET_KEY)
-
-def send_email(to, subject, template, **kwargs):
     with current_app.app_context():
-        msg = Message(subject='hello good to se you', recipients=[to], html=template, sender=(current_app.config['MAIL_DEFAULT_SENDER'],'e_commerce_app'))
-        mail.send(msg)
+         msg = Message(subject='hello good to se you', recipients=[to], html=template, sender=(current_app.config['MAIL_DEFAULT_SENDER'],'e_commerce_app'))
+         mail.send(msg)
+
 def admin_required(f):
-    @wraps(f) #type:ignore
+    @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated or not current_user.is_admin():
-            abort(403)  
+            abort(403)
         return f(*args, **kwargs)
     return decorated_function
 
-
-def home():
-    return render_template('home.html')
+#
 def register():
+    if request.method == 'POST':
+        data = request.json if request.is_json else request.form
+
+        email = data.get('email', '').lower()
+        name = data.get('name')
+        password = data.get('password')
+        contact = data.get('contact')
+        address = data.get('address')
+        role = data.get('role', 'user')
+
+        current_app.logger.info(f"Données reçues : email={email}, name={name}, contact={contact}, address={address}, role={role}")
+        current_app.logger.info(f"Type de contenu : {request.content_type}")
+
+        # Vérification des champs requis
+        missing = [field for field in ['email', 'name', 'password', 'contact', 'address'] if not data.get(field)]
+        if missing:
+            current_app.logger.error(f"Données manquantes : {', '.join(missing)}")
+            return jsonify({'error': 'Données manquantes pour l\'inscription'}), 400
+
+        # Vérification de l'unicité de l'email
+        if Customers.query.filter_by(email=email).first():
+            return jsonify({'error': 'Cet email existe déjà'}), 400
+
+        # Création du nouvel utilisateur
+        new_customer = Customers(
+            email=email,
+            name=name,
+            password=generate_password_hash(password, method='pbkdf2:sha256'),
+            contact=contact,
+            address=address,
+            role=role
+        )
+        db.session.add(new_customer)
+        db.session.commit()
+
+        # Envoi de l'email de confirmation
+        s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        token = s.dumps(email, salt='email-confirm')
+        confirm_url = url_for('customer.confirm_email', token=token, _external=True)
+        html = render_template('email/confirm_email.html', name=name, confirm_url=confirm_url)
+        send_email(email, 'Confirmez votre inscription', html)
+
+        return jsonify({'message': 'Inscription réussie. Veuillez vérifier votre email.'}), 201
+
     return render_template('/customers/register.html')
 
-customer_bp = Blueprint('customer', __name__, url_prefix='/customers')
-def register_post():
-    email = request.form.get('email')
-    name = request.form.get('name')
-    password = request.form.get('password')
-    contact = request.form.get('contact')
-    address = request.form.get('address')
-    role = request.form.get('role')
-    if not all([email, name, password, contact, address,role]):
-        return redirect('/register?error=missing_data')
-    
-    print(email , address,role)
-    customer = Customers.query.filter_by(email=email).first()
-    if customer:
-        return redirect('/register?error=email_exists')
 
-    new_customer = Customers(email, name, generate_password_hash(password, salt_length=32), contact, address,role)
-    db.session.add(new_customer)
-    db.session.commit()
 
-    token = s.dumps(email, salt='email-confirm')
-    confirm_url = url_for('customer.confirm_email', token=token, _external=True)
-    html = render_template('email/confirm_email.html', name=name, confirm_url=confirm_url)
-
-    send_email(email, 'Confirmez votre inscription', html)
-
-    return redirect('/login?please check your email')
-    # return jsonify({'message': 'Customer registered successfully'}), 201
 def login():
-    return render_template('/customers/login.html')
+    data = request.get_json()
 
-def login_post():
-    email = request.form.get('email')
-    password = request.form.get('password')
+    email = data.get('email', '').lower()
+    password = data.get('password')
+
+    print("📩 Email:", email)
+    print("🔒 Password:", password)
+
     customer = Customers.query.filter_by(email=email).first()
-    # if customer and check_password_hash(customer.password, password):
-    if customer != customer :
-        return redirect('/login?error=register_first' , message='please register before login')
-    elif check_password_hash(customer.password , password) == False:
-        return redirect('/login?error=incorrect_password')
-    print(session)
-    session['customer']={"id" :customer.id,
-     "name" :customer.name,
-     "email" :customer.email,
-     "contact" :customer.contact,
-     "address" :customer.address
-    }
-    return redirect('/')
-    # return redirect('/')
-def logout():
-    if 'customer_id' in session:
-        session.pop('customer_id', None)
-    return redirect('/')
 
-def profile():
-    if 'customer' not in session:
-        return redirect('/login')
+    if not customer:
+        print("❌ Utilisateur non trouvé")
+        return jsonify({'error': 'Email ou mot de passe incorrect'}), 401
+
+    if not check_password_hash(customer.password, password):
+        print("❌ Mot de passe incorrect")
+        return jsonify({'error': 'Email ou mot de passe incorrect'}), 401
+
+    # ✅ Authentification réussie
+    token = create_access_token(identity=customer.id)
+    decoded = decode_token(token)
+    print('Token décodé:', decoded)
     
-    print(session.get('customer'))
-    customer_id = session.get('customer')['id']
-    print(customer_id['id'])
-    customer = Customers.query.filter_by(id=customer_id).first()
- 
-    return render_template('/customers/profile.html', customer=customer)
+    
+    # Date d'expiration en timestamp UNIX
+    exp_timestamp = decoded['exp']
+    print('Expiration timestamp:', exp_timestamp)
+    login_user(customer)  # si tu utilises flask-login
+
+    print("🎉 Connexion réussie pour :", customer.email)
+
+    return jsonify({
+        'access_token': token,
+        'user': {
+            'id': customer.id,
+            'email': customer.email,
+            'name': customer.name,
+            'role': customer.role
+        }
+    }), 200
+
+
+
+def check_session():
+    return jsonify(dict(session))
+
+
+# @customer_bp.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
 
 def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        customer = Customers.query.filter_by(email=email).first()
+        if customer:
+            token = s.dumps(email, salt='password-reset')
+            reset_url = url_for('customer.reset_password', token=token, _external=True)
+            html = render_template('email/reset_password.html', reset_url=reset_url)
+            send_email(email, 'Réinitialisation de mot de passe', html)
+            return jsonify({'message': 'Instructions envoyées par email'}), 200
+        return jsonify({'error': 'Email non trouvé'}), 404
+
     return render_template('/customers/forgot_password.html')
 
-def forgot_password_post():
-    # email = request.form.get('email')
-    # customer = Customers.query.filter_by(email=email).first()
-    # indexs = index
-    # return indexs
-    # if customer:
-    #     token = s.dumps(email, salt='email-confirm')
-    #     confirm_url = url_for('confirm_email', token=token, _external=True)
-    #     html = render_template('activate.html', confirm_url=confirm_url)
-    #     subject = "Please confirm your email"
-    #     # send_email(customer.email, subject, html)
-        # return redirect('/login')
-    return redirect('/forgot-password')
+# @customer_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    try:
+        email = s.loads(token, salt='password-reset', max_age=3600)
+    except:
+        return jsonify({'error': 'Le lien est invalide ou a expiré'}), 400
 
-# def new_func(confirm_url):
-#     html = render_template('activate.html', confirm_url=confirm_url)
+    if request.method == 'POST':
+        customer = Customers.query.filter_by(email=email).first()
+        if customer:
+            new_password = request.form.get('password')
+            customer.password = generate_password_hash(new_password, method='sha256')
+            db.session.commit()
+            return jsonify({'message': 'Mot de passe réinitialisé avec succès'}), 200
+        return jsonify({'error': 'Utilisateur non trouvé'}), 404
 
+    return render_template('/customers/reset_password.html', token=token)
 
+# @customer_bp.route('/confirm-email/<token>')
 def confirm_email(token):
     try:
         email = s.loads(token, salt='email-confirm', max_age=3600)
     except:
-        abort(404)
-    customer = Customers.query.filter_by(email=email).first_or_404()
-    if customer.confirmed:
-        return redirect(url_for('login'))
-    customer.confirmed = True
-    db.session.add(customer)
-    db.session.commit()
-    return redirect(url_for('customer.login'))
+        return jsonify({'error': 'Le lien de confirmation est invalide ou a expiré'}), 400
 
-# def reset_password():
-#     return render_template('reset_password.html')
+    customer = Customers.query.filter_by(email=email).first()
+    if customer:
+        if not customer.confirmed:
+            customer.confirmed = True
+            db.session.commit()
+            return jsonify({'message': 'Email confirmé avec succès'}), 200
+        return jsonify({'message': 'Email déjà confirmé'}), 200
+    return jsonify({'error': 'Utilisateur non trouvé'}), 404
 
-# def reset_password_post():
-#     email = request.form.get('email')
-#     customer = Customers.query.filter_by(email=email).first()
-#     if customer:
-#         token = s.dumps(email, salt='email-confirm')
-#         confirm_url = url_for('confirm_email', token=token, _external=True)
-#         html = render_template('activate.html', confirm_url=confirm_url)
-#         subject = "Please confirm your email"
-#         send_email(customer.email, subject, html)
-#         return redirect('/login')
-#     return redirect('/reset_password')
 
-# def reset_password_confirm(token):
+def all_users():
+    customers = Customers.query.all()
+    return jsonify([customer.to_dict() for customer in customers]), 200
+
+
+@jwt_required()
+def profile():
+    try:
+        customer_id = get_jwt_identity()  # récupère l'identité du token
+        customer = Customers.query.filter_by(id=customer_id).first()
+
+        if not customer:
+            return jsonify({'error': 'Customer not found'}), 404
+
+        customer_data = {
+            'id': customer.id,
+            'name': customer.name,
+            'email': customer.email,
+            'contact': customer.contact,
+            'address': customer.address,
+            'role': customer.role
+        }
+
+        return jsonify(customer_data), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# def forgot_password():
+#     return render_template('/customers/forgot_password.html')
+
+# def forgot_password_post():
+#     # email = request.form.get('email')
+#     # customer = Customers.query.filter_by(email=email).first()
+#     # indexs = index
+#     # return indexs
+#     # if customer:
+#     #     token = s.dumps(email, salt='email-confirm')
+#     #     confirm_url = url_for('confirm_email', token=token, _external=True)
+#     #     html = render_template('activate.html', confirm_url=confirm_url)
+#     #     subject = "Please confirm your email"
+#     #     # send_email(customer.email, subject, html)
+#         # return redirect('/login')
+#     return redirect('/forgot-password')
+
+# # def new_func(confirm_url):
+# #     html = render_template('activate.html', confirm_url=confirm_url)
+
+
+# def confirm_email(token):
 #     try:
 #         email = s.loads(token, salt='email-confirm', max_age=3600)
 #     except:
@@ -164,5 +247,33 @@ def confirm_email(token):
 #     customer.confirmed = True
 #     db.session.add(customer)
 #     db.session.commit()
-#     return redirect(url_for('login'))
-#
+#     return redirect(url_for('customer.login'))
+
+# # def reset_password():
+# #     return render_template('reset_password.html')
+
+# # def reset_password_post():
+# #     email = request.form.get('email')
+# #     customer = Customers.query.filter_by(email=email).first()
+# #     if customer:
+# #         token = s.dumps(email, salt='email-confirm')
+# #         confirm_url = url_for('confirm_email', token=token, _external=True)
+# #         html = render_template('activate.html', confirm_url=confirm_url)
+# #         subject = "Please confirm your email"
+# #         send_email(customer.email, subject, html)
+# #         return redirect('/login')
+# #     return redirect('/reset_password')
+
+# # def reset_password_confirm(token):
+# #     try:
+# #         email = s.loads(token, salt='email-confirm', max_age=3600)
+# #     except:
+# #         abort(404)
+# #     customer = Customers.query.filter_by(email=email).first_or_404()
+# #     if customer.confirmed:
+# #         return redirect(url_for('login'))
+# #     customer.confirmed = True
+# #     db.session.add(customer)
+# #     db.session.commit()
+# #     return redirect(url_for('login'))
+# #

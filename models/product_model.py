@@ -1,4 +1,4 @@
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func #type:ignore
 from config import db
 
 class Products(db.Model):
