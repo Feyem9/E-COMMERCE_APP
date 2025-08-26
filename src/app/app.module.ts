@@ -16,6 +16,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';    
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDivider } from "@angular/material/divider";
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
+import { MatCardModule } from '@angular/material/card';
 import { ProductComponent } from './product/product.component';
 import { CategoriesComponent } from './categories/categories.component';
 import { TransactionComponent } from './transaction/transaction.component';
@@ -57,6 +60,9 @@ import { PaymentSuccessComponent } from './payment-success/payment-success.compo
     MatMenuModule,
     MatSnackBarModule,
     MatDivider,
+    MatSidenavModule,
+    MatListModule,
+    MatCardModule,
     HttpClientModule,
     FormsModule
   ],

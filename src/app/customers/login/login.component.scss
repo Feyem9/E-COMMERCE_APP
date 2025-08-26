@@ -1,0 +1,127 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  padding: 0;
+  background: #121212;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+// 🎴 Carte de connexion
+.login-card {
+  background: #1e1e1e;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  width: 90%;
+  max-width: 400px;
+  border: 1px solid #2c2c2c;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+  }
+
+  .card-title {
+    margin-bottom: 1rem;
+    color: #f5f5f5;
+    text-align: center;
+    font-size: 1.8rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+
+    label {
+      color: #bbb;
+      margin-bottom: 0.25rem;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: #fff;
+      }
+    }
+
+    input,
+    select {
+      padding: 0.75rem;
+      border: none;
+      border-radius: 6px;
+      background: #2a2a2a;
+      color: #f0f0f0;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+
+      &:focus {
+        outline: none;
+        background: #333;
+        box-shadow: 0 0 0 3px rgba(100, 149, 237, 0.5);
+      }
+
+      &:invalid {
+        box-shadow: 0 0 0 2px rgba(255, 69, 58, 0.7);
+      }
+    }
+  }
+
+  .btn-submit {
+    width: 100%;
+    padding: 0.8rem;
+    background: linear-gradient(135deg, #4b6cb7, #182848);
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+
+    &:hover {
+      background: linear-gradient(135deg, #3a4a90, #0f1a3b);
+      transform: scale(1.02);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .error {
+    color: #ff6b6b;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+  }
+
+  .text-center {
+    text-align: center;
+
+    p {
+      color: #bbb;
+
+      a {
+        color: #4b6cb7;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+// 📱 Responsive pour petits écrans
+@media (max-width: 480px) {
+  .login-card {
+    padding: 1.5rem;
+
+    .card-title {
+      font-size: 1.5rem;
+    }
+  }
+}

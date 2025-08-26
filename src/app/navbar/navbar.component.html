@@ -8,10 +8,10 @@
     <button mat-menu-item routerLink="/">HOME</button>
       <button mat-menu-item routerLink="/product">Products</button>
     </mat-menu>
-
+     
 
     
-    <button mat-button [matMenuTriggerFor]="catMenu">Categories</button>
+    <button mat-button [matMenuTriggerFor]="catMenu">Categories</button> 
     <mat-menu #catMenu="matMenu">
       <button mat-menu-item routerLink="/news">News</button>
       <button mat-menu-item routerLink="/tablets">Tablets</button>
@@ -42,4 +42,77 @@
       My Cart ({{ cartCount }} items in cart)
           </button>
   </mat-toolbar>
-  
+   
+
+   <!-- <mat-toolbar color="#fff">
+  <button class="menu-icon mat-icon-button" (click)="sidenav.toggle()" aria-label="Toggle menu">
+    <mat-icon>menu</mat-icon>
+  </button>         
+
+  <mat-icon>store</mat-icon>
+  <span>TECH market</span>
+  <span class="spacer"></span>
+
+<nav class="nav-links">
+    <button mat-button routerLink="/">HOME</button>
+    <button mat-button routerLink="/categories">Categories</button>
+    <button mat-button routerLink="/help">Need help?</button>
+    <button mat-button routerLink="/account">Account</button>
+    <button mat-button routerLink="/cart">
+      <mat-icon>shopping_cart</mat-icon>
+      My Cart ({{ cartCount }} items)
+    </button>
+  </nav>
+</mat-toolbar>
+
+<mat-sidenav-container>
+  <mat-sidenav #sidenav mode="over" class="mobile-sidenav">
+    <mat-nav-list>
+      <mat-list-item>
+        <button mat-button routerLink="/" (click)="sidenav.close()">HOME</button>
+      </mat-list-item>
+      <mat-list-item>
+        <button mat-button routerLink="/product" (click)="sidenav.close()">Products</button>
+      </mat-list-item>
+      <mat-list-item>
+        <button mat-button routerLink="/news" (click)="sidenav.close()">News</button>
+      </mat-list-item>
+      <mat-list-item>
+        <button mat-button routerLink="/tablets" (click)="sidenav.close()">Tablets</button>
+      </mat-list-item>
+      <mat-list-item>
+        <button mat-button routerLink="/feature" (click)="sidenav.close()">Feature</button>
+      </mat-list-item>
+      <mat-list-item>
+        <button mat-button (click)="sidenav.close()">Store Locator</button>
+      </mat-list-item>
+      <mat-list-item>
+        <button mat-button (click)="sidenav.close()">Order Tracking</button>
+      </mat-list-item>
+      <mat-list-item>
+        <button mat-button (click)="sidenav.close()">FAQs</button>
+      </mat-list-item>
+      <mat-divider></mat-divider>
+      <mat-list-item>
+        <button mat-button routerLink="/login" (click)="sidenav.close()">Log in</button>
+      </mat-list-item>
+      <mat-list-item>
+        <button mat-button routerLink="/register" (click)="sidenav.close()">Register</button>
+      </mat-list-item>
+      <mat-list-item>
+        <button mat-button routerLink="/profile" (click)="sidenav.close()">Profile</button>
+      </mat-list-item>
+      <mat-list-item>
+        <button mat-button routerLink="/" (click)="sidenav.close()">Logout</button>
+      </mat-list-item>
+      <mat-list-item>
+        <button mat-button routerLink="/cart" (click)="sidenav.close()">
+          <mat-icon>shopping_cart</mat-icon> My Cart ({{ cartCount }} items)
+        </button>
+      </mat-list-item>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+  </mat-sidenav-content>
+</mat-sidenav-container> -->

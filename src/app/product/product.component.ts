@@ -68,6 +68,8 @@ onSubmit() {
     // 🔥 Récupérer l'ID client (depuis AuthService ou localStorage)
     const customerId = this.authService.getUserId(); // ou localStorage.getItem('user_id')
     if (customerId === null) {
+      console.log(customerId);
+      
   alert("Vous devez être connecté pour ajouter un produit au panier.");
   return;  // Stopper la fonction onSubmit
 }

@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component , ViewChild} from '@angular/core';
 import { CartService } from '../services/cart.service';
+import { MatSidenav } from '@angular/material/sidenav';
+
 
 @Component({
   selector: 'app-navbar',
@@ -9,6 +11,8 @@ import { CartService } from '../services/cart.service';
 export class NavbarComponent {
 
   cartCount = 0;
+
+   @ViewChild('sidenav') sidenav!: MatSidenav;
 
 constructor(private cartService: CartService) {}
 
