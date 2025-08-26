@@ -111,20 +111,6 @@ def index():
     mail.send(msg)
     return "Message sent ok!"
 
-# payment = payUnit({
-#     "apiUsername":'',
-#     "apiPassword":'',
-#     "api_key":'',
-#     "return_url": "",
-#     "notify_url":"",
-#     "mode": "",
-#     "name": "",
-#     "description": "",
-#     "purchaseRef": "",
-#     "currency": "",
-#    "transaction_id":  ""
-# })
-# payment.makePayment(5000)
 
 
 # routes/mail_test.py
