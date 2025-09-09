@@ -3,6 +3,7 @@ import { CartService } from '../services/cart.service';
 import { Cart, Product } from '../models/products';
 import { FormBuilder, FormGroup, Validators , FormsModule} from '@angular/forms';
 import { TransactionService } from '../services/transaction.service';
+  
 
 @Component({
   selector: 'app-cart',
@@ -24,9 +25,9 @@ export class CartComponent  implements OnInit{
     formModule:FormsModule,
     private transactionService:TransactionService
   ) {}
- 
+  
   ngOnInit(): void {
-    this.loadCart();
+    this.loadCart();    
     this.calculateTotal();
     this.cartService.clearCart(); 
 
