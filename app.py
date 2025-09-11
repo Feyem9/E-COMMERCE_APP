@@ -170,6 +170,6 @@ def check_session():
     return jsonify(dict(session))
 
 @app.route("/")
-def index():
+def indexs():
     return {"message": "Backend e-commerce API is running 🚀"}
 
