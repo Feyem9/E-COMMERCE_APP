@@ -28,4 +28,6 @@ SQLAlchemy==2.0.34
 typing_extensions==4.12.2
 urllib3==2.4.0
 Werkzeug==3.0.4
+qrcode==7.4.2
+
 gunicorn
