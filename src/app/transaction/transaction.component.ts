@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { TransactionService } from '../services/transaction.service';
+import { CartService } from '../services/cart.service';
 
 @Component({
   selector: 'app-transaction',
@@ -7,7 +8,7 @@ import { TransactionService } from '../services/transaction.service';
   styleUrl: './transaction.component.scss'
 })
 export class TransactionComponent {
-  constructor(private transactionService: TransactionService) {}
+  constructor(private transactionService: TransactionService, private cartService: CartService) { }
 
   payer() {
     const paymentData = {
@@ -17,18 +18,36 @@ export class TransactionComponent {
       // Ajoute d'autres champs si nécessaires
     };
 
-    this.transactionService.initiatePayment(paymentData).subscribe({
-      next: (response) => {
+    // this.transactionService.initiatePayment(paymentData).then((response: any)
+    //   => {
+    //     if (response && response.payment_url) {
+    //       window.location.href = response.payment_url; // Redirige vers la page de paiement PayUnit
+    //     } else {
+    //       alert('Erreur de redirection vers PayUnit.');
+    //     }
+    //   },
+    //   error: (err: any) => {
+    //     console.error('Erreur paiement :', err);
+    //     alert('Erreur lors du paiement.');
+    //   },
+    // }).catch((err: any) => {
+    //   console.error('Erreur inattendue :', err);
+    //   alert('Erreur inattendue lors du paiement.');
+    // });
+
+    this.transactionService.initiatePayment(paymentData)
+      .then((response: any) => {
         if (response && response.payment_url) {
-          window.location.href = response.payment_url; // Redirige vers la page de paiement PayUnit
+          window.location.href = response.payment_url;
+
+          this.cartService.clearCart();
         } else {
           alert('Erreur de redirection vers PayUnit.');
         }
-      },
-      error: (err) => {
+      })
+      .catch((err: any) => {
         console.error('Erreur paiement :', err);
         alert('Erreur lors du paiement.');
-      },
-    });
+      });
   }
 }

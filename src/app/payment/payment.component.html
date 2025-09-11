@@ -1,0 +1,16 @@
+<div class="payment">
+  <button (click)="startPayment()" [disabled]="loading">
+    {{ loading ? 'Traitement...' : 'Payer maintenant' }}
+  </button>
+
+  <div *ngIf="paymentUrl">
+    <p>Redirection vers PayUnit :</p>
+    <a [href]="paymentUrl" target="_blank">{{ paymentUrl }}</a>
+  </div>
+
+  <div *ngIf="qrCodeValue">
+    <p>Scannez ce QR Code pour confirmer :</p>
+    <qrcode [qrdata]="qrCodeValue" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
+  </div>
+</div>
+

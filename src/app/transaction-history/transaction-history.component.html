@@ -1,0 +1,16 @@
+<h3>Mon historique de transactions</h3>
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Montant</th>
+    <th>Devise</th>
+    <th>Statut</th>
+  </tr>
+  <tr *ngFor="let t of transactions">
+    <td>{{ t.transaction_id }}</td>
+    <td>{{ t.total_amount }}</td>
+    <td>{{ t.currency }}</td>
+    <td>{{ t.status }}</td>
+  </tr>
+</table>
+<p *ngIf="transactions.length === 0">Aucune transaction trouvée.</p>

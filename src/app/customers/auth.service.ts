@@ -76,13 +76,21 @@ export class AuthService {
 
     return this.http.get<any>(url, {
       headers
-        : new HttpHeaders({ 'Content-Type': 'application/json' , 'Authorization': `Bearer ${token}`}),
+        : new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }),
       withCredentials: false  // Assurez-vous d'inclure les informations d'authentification
     });
   }
 
   getUserId(): number | null {
-  const data = this.authSub.getValue();
-  return data?.user?.id || null;
-}
+    const data = this.authSub.subscribe(data => {
+      if (data?.user) {
+        console.log('User ID:', data.user.id);
+      }
+    });
+
+    console.log("data", data);
+
+    const id = localStorage.getItem('identity');
+    return id ? parseInt(id, 10) : null;
+  }
 }

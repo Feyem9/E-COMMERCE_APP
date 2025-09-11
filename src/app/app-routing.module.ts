@@ -15,18 +15,18 @@ import { PaymentSuccessComponent } from './payment-success/payment-success.compo
 
 const routes: Routes = [
   // {path : '' , component : NavbarComponent},
-  {path : '' , component : HomeComponent},
-  {path : 'cart' , component : CartComponent},
-  {path : 'categories' , component : CategoriesComponent},
-  {path : 'favorites' , component : FavoriteComponent},
-  {path : 'ordered' , component : OrderedComponent},
-  {path : 'product' , component : ProductComponent},
-  {path : 'transaction' , component : TransactionComponent},
-  {path : 'payment-success' , component : PaymentSuccessComponent},
-  {path : 'login' , component : LoginComponent},
-  {path : 'register' , component : RegisterComponent},
-  {path : 'profile' , component : ProfileComponent}
-]; 
+  { path: '', component: HomeComponent },
+  { path: 'cart', component: CartComponent },
+  { path: 'categories', component: CategoriesComponent },
+  { path: 'favorites', component: FavoriteComponent },
+  { path: 'ordered', component: OrderedComponent },
+  { path: 'product', component: ProductComponent },
+  { path: 'transaction', component: TransactionComponent },
+  { path: 'payment-success', component: PaymentSuccessComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: 'profile', component: ProfileComponent }
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
