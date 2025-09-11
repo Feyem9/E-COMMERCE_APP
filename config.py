@@ -2,7 +2,7 @@ import os
 from flask_sqlalchemy import SQLAlchemy# type: ignore 
 from datetime import timedelta
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity # type: ignore
-
+from flask_mail import Mail # type: ignore
 
 db = SQLAlchemy()
 
@@ -28,7 +28,17 @@ UPLOAD_PATH = "static/image_uploads/"
 
 PAYUNIT_BASE_URL = "https://gateway.payunit.net"
 PAYUNIT_INITIATE_URL = f"{PAYUNIT_BASE_URL}/api/gateway/initialize"
-PAUNIT_CONTENT_TYPE = "application/json"
+PAYUNIT_CONTENT_TYPE = "application/json"
 PAYUNIT_AUTHORIZATION ="Basic YWVmNjEzMTgtMGM1Ni00NzVlLTg1NDAtNWYyNWEwMTFmMzkxOjc2NDc2OGQyLTRjYjItNGQ1Ny1hMGVjLWFiZjg0YjAwYzI1Yg=="
 PAYUNIT_X_API_KEY ="sand_RX539gKTAipaIomZNk3qjAfr9lvQtK"
 PAYUNIT_MODE = "SANDBOX"
+
+# pour le paiement mobile money encore dans le cadre de payunit test
+# PAYUNIT_BASE_URL = "https://staging-gateway.payunit.net"
+# PAYUNIT_INITIATE_URL = f"{PAYUNIT_BASE_URL}/api/gateway/initialize"
+# PAYUNIT_CONTENT_TYPE = "application/json"
+# PAYUNIT_AUTHORIZATION ="Basic ZDE2MTFkMWQtNzFiNi00NzU4LWJmNTAtZWRjMTQ4OTdjZTJkOmZiZGViZDM5LWJiY2EtNDI4MC05MWNiLWM4ODA0ZTAwYjM4NA=="
+# PAYUNIT_X_API_KEY ="sand_SJ2Sa833YuShsKmLeHYxUT6TrWfCVN"
+# PAYUNIT_MODE = "SANDBOX"
+
+mail = Mail()

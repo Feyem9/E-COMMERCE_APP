@@ -6,7 +6,7 @@ from flask_migrate import Migrate#type:ignore
 from flask_mail import Mail , Message#type:ignore
 from flask_cors import CORS#type:ignore
 
-from config import db, SECRET_KEY , MAIL_SERVER , MAIL_PORT, MAIL_USERNAME,MAIL_PASSWORD,MAIL_USE_SSL,MAIL_USE_TLS, MAIL_DEFAULT_SENDER
+from config import db, SECRET_KEY , MAIL_SERVER , MAIL_PORT, MAIL_USERNAME,MAIL_PASSWORD,MAIL_USE_SSL,MAIL_USE_TLS, MAIL_DEFAULT_SENDER,mail
 
 from models.cart_model import Carts
 from models.customer_model import Customers
@@ -64,6 +64,7 @@ def admin_required(f):
 
 # Configuration pour Flask-SQLAlchemy
 db.init_app(app)
+mail.init_app(app)
 migrate = Migrate(app, db)
 
 def send_email(to, subject, template, **kwargs):

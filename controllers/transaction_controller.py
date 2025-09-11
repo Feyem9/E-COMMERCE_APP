@@ -1,9 +1,18 @@
 import json
 from flask import request, jsonify  #type:ignore Plus besoin de render_template ou redirect
-from config import db , PAYUNIT_AUTHORIZATION , PAUNIT_CONTENT_TYPE , PAYUNIT_BASE_URL , PAYUNIT_X_API_KEY , PAYUNIT_MODE , PAYUNIT_INITIATE_URL
+from config import db , PAYUNIT_AUTHORIZATION , PAYUNIT_CONTENT_TYPE , PAYUNIT_BASE_URL , PAYUNIT_X_API_KEY , PAYUNIT_MODE , PAYUNIT_INITIATE_URL, SECRET_KEY, mail
 from models.transaction_model import Transactions
 import requests
 import uuid
+from datetime import datetime, timedelta
+import qrcode # type: ignore
+import io
+import base64
+from flask import send_file # type: ignore
+import jwt
+from reportlab.lib.pagesizes import letter # type: ignore
+from reportlab.pdfgen import canvas # type: ignore 
+from flask_mail import Message # type: ignore
 
 # Récupérer toutes les transactions
 
@@ -156,7 +165,7 @@ def initiate_payment():
     headers = {
         "x-api-key": PAYUNIT_X_API_KEY,
         "mode": PAYUNIT_MODE,
-        "Content-Type": PAUNIT_CONTENT_TYPE,
+        "Content-Type": PAYUNIT_CONTENT_TYPE,
         "Authorization": PAYUNIT_AUTHORIZATION
     }
 
@@ -205,3 +214,87 @@ def initiate_payment():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# Génération d’un token sécurisé
+def generate_qr_token(transaction_id):
+    payload = {
+        "transaction_id": transaction_id,
+        "exp": datetime.utcnow() + timedelta(minutes=10)  # QR valide 10 min
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
+# Nouvelle route backend : Génération du QR Code
+def generate_qrcode(transaction_id):
+    transaction = Transactions.query.filter_by(transaction_id=transaction_id).first()
+    if not transaction:
+        return jsonify({"error": "Transaction non trouvée"}), 404
+
+    token = generate_qr_token(transaction_id)
+
+    qr_data = {
+        "transaction_id": transaction_id,
+        "token": token
+    }
+
+    # Générer le QR code en mémoire
+    qr_img = qrcode.make(json.dumps(qr_data))
+    img_io = io.BytesIO()
+    qr_img.save(img_io, "PNG")
+    img_io.seek(0)
+
+    return send_file(img_io, mimetype="image/png")
+
+def confirm_transaction():
+    data = request.get_json()
+    token = data.get("token")
+
+    if not token:
+        return jsonify({"error": "Token manquant"}), 400
+
+    try:
+        decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        transaction_id = decoded["transaction_id"]
+
+        transaction = Transactions.query.filter_by(transaction_id=transaction_id).first()
+        if not transaction:
+            return jsonify({"error": "Transaction non trouvée"}), 404
+
+        transaction.status = "paid"
+        db.session.commit()
+
+        return jsonify({"message": "Transaction validée avec succès", "transaction": transaction.serialize()}), 200
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "QR Code expiré"}), 400
+    except jwt.InvalidTokenError:
+        return jsonify({"error": "Token invalide"}), 400
+
+
+
+def generate_invoice_pdf(transaction):
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
+    c.drawString(100, 750, f"Facture N° {transaction.transaction_id}")
+    c.drawString(100, 720, f"Montant : {transaction.total_amount} {transaction.currency}")
+    c.drawString(100, 700, f"Statut : {transaction.status}")
+    c.drawString(100, 680, f"Date : {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}")
+    c.showPage()
+    c.save()
+    buffer.seek(0)
+    return buffer
+
+def send_invoice(transaction, client_email, admin_email="admin@museschool.com"):
+    pdf_buffer = generate_invoice_pdf(transaction)
+
+    msg = Message("Votre facture", recipients=[client_email, admin_email])
+    msg.body = f"Merci pour votre paiement. Facture N° {transaction.transaction_id}"
+    msg.attach(f"facture_{transaction.transaction_id}.pdf", "application/pdf", pdf_buffer.read())
+
+    mail.send(msg)
+    return jsonify({"message": "Facture envoyée par email"}), 200
+
+
+def user_transactions(user_id):
+    transactions = Transactions.query.filter_by(user_id=user_id).all()
+    return jsonify([t.serialize() for t in transactions]), 200
+
