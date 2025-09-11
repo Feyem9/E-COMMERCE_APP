@@ -70,7 +70,7 @@ onSubmit() {
     if (customerId === null) {
       console.log(customerId);
       
-  alert("Vous devez être connecté pour ajouter un produit au panier.");
+  alert("Vous devez être connecté pour ajouter un produit au panier."); 
   return;  // Stopper la fonction onSubmit
 }
 
