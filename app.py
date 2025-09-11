@@ -168,3 +168,8 @@ from itsdangerous import URLSafeTimedSerializer#type:ignore
 @app.route('/check-session')
 def check_session():
     return jsonify(dict(session))
+
+@app.route("/")
+def index():
+    return {"message": "Backend e-commerce API is running 🚀"}
+
