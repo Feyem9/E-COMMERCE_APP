@@ -7,8 +7,16 @@ from flask_jwt_extended import JWTManager, jwt_required, create_access_token, ge
 db = SQLAlchemy()
 
 SECRET_KEY = os.urandom(32)
-# Utiliser la variable d'environnement pour la production, sinon localhost pour dev
-SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'mysql+pymysql://root:hVUdZUzkAMYAODVYnwEfZXURecMByDkG@mysql.railway.internal:3306/railway?charset=utf8mb4')
+# Configuration de base de données avec fallback pour développement local
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    # Render utilise PostgreSQL, convertir l'URL si nécessaire
+    if DATABASE_URL.startswith('postgres://'):
+        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+    SQLALCHEMY_DATABASE_URI = DATABASE_URL
+else:
+    # Fallback: SQLite pour test rapide en production si pas de DATABASE_URL
+    SQLALCHEMY_DATABASE_URI = os.environ.get('FALLBACK_DB', 'sqlite:///test.db')
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 JWT_SECRET_KEY = 'Feyem111'
 JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
