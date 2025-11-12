@@ -1,10 +1,11 @@
-from flask import Flask , request , jsonify , session , redirect , url_for , current_app#type:ignore
-from flask_bcrypt import Bcrypt#type:ignore
-from flask_jwt_extended import JWTManager #type:ignore
+from flask import Flask , request , jsonify , session , redirect , url_for , current_app
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager 
 from flask_session import Session
-from flask_migrate import Migrate#type:ignore
-from flask_mail import Mail , Message#type:ignore
-from flask_cors import CORS#type:ignore
+from flask_migrate import Migrate
+from flask_mail import Mail , Message
+from flask_cors import CORS
+from cloudinary_config import configure_cloudinary
 
 from config import db, SECRET_KEY , MAIL_SERVER , MAIL_PORT, MAIL_USERNAME,MAIL_PASSWORD,MAIL_USE_SSL,MAIL_USE_TLS, MAIL_DEFAULT_SENDER
 
@@ -19,6 +20,7 @@ from routes.transaction_route import transaction
 
 # db
 app = Flask(__name__)
+configure_cloudinary()
 CORS(app)
 
 # Autoriser CORS pour toutes les routes

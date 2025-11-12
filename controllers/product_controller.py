@@ -1,13 +1,14 @@
-from flask import jsonify, render_template , request  , redirect , url_for , session ,send_from_directory #type:ignore
+from flask import jsonify, render_template , request  , redirect , url_for , session ,send_from_directory
 from config import db , UPLOAD_EXTENSIONS , UPLOAD_PATH
 import os
 import imghdr
 import uuid
-from werkzeug.utils import secure_filename #type:ignore
+from werkzeug.utils import secure_filename
+import cloudinary.uploader
 
 from models.cart_model import Carts
 from models.product_model import Products
-from flask_jwt_extended import jwt_required, get_jwt_identity #type:ignore
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
 
@@ -45,38 +46,32 @@ def add_product():
     return render_template('/products/add_product.html' , title='Add Product')
 
 def create():
-  
+
     name = request.form.get('name')
     description = request.form.get('description')
     current_price = request.form.get('current_price')
     discount_price = request.form.get('discount_price')
     quantity = request.form.get('quantity')
-  
+
     picture = request.files.get('picture')
     if picture is None:
         return jsonify({"error": "no picture uploaded"}), 400
-        return {"error": "No picture uploaded"}, 400
 
-    
     filename = secure_filename(picture.filename)
     if filename:
-        file_ext = os.path.splitext(filename)[
-            1]
-        
+        file_ext = os.path.splitext(filename)[1]
+
         if file_ext not in UPLOAD_EXTENSIONS:
-            print(file_ext)
             return jsonify({"error": "File type not supported"}), 400
-            return {"error": "File type not supported"}, 400
-        
-        existing_product = Products.query.filter_by(picture=filename).first()
-        if existing_product:
-            unique_str = str(uuid.uuid4())[:8]
-            filename = f"{unique_str}_{filename}"
 
-        picture.save(os.path.join(UPLOAD_PATH, filename))
+        # Upload to Cloudinary
+        try:
+            upload_result = cloudinary.uploader.upload(picture, folder="ecommerce_products")
+            picture_url = upload_result['secure_url']
+        except Exception as e:
+            return jsonify({"error": f"Upload failed: {str(e)}"}), 500
 
-    product = Products(name=name, description=description, current_price=current_price, discount_price=discount_price, quantity=quantity, picture=filename)
-    print(picture)
+    product = Products(name=name, description=description, current_price=current_price, discount_price=discount_price, quantity=quantity, picture=picture_url)
     db.session.add(product)
     db.session.commit()
 
@@ -89,7 +84,6 @@ def create():
         "quantity": product.quantity,
         "picture": product.picture
     }),200
-    return redirect('/product')
 
 def view_product(id):
     product = Products.query.filter_by(id=id).first()

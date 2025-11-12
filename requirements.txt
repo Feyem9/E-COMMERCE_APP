@@ -29,3 +29,4 @@ typing_extensions==4.12.2
 urllib3==2.4.0
 Werkzeug==3.0.4
 gunicorn
+cloudinary
