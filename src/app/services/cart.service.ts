@@ -9,9 +9,9 @@ import { AuthService } from '../customers/auth.service';
 })
 export class CartService {
 
-  private apiUrl = 'http://localhost:5000/product/add-to-cart-post/'; // L'URL de l'API Flask
-  private url = 'http://localhost:5000/cart'
-  private paymentUrl = 'http://localhost:5000/api/pay'; // Change selon ton URL
+  private apiUrl = 'https://e-commerce-app-1-islr.onrender.com/product/add-to-cart-post/'; // L'URL de l'API Flask
+  private url = 'https://e-commerce-app-1-islr.onrender.com/cart'
+  private paymentUrl = 'https://e-commerce-app-1-islr.onrender.com/api/pay'; // Change selon ton URL
 
   // BehaviorSubject est utilisé pour maintenir et observer l'état du panier
   private cartItemsSubject = new BehaviorSubject<Product[]>([]);
@@ -80,7 +80,7 @@ addToCart(formData: any, product: Product, customerId: number, errorHandler: (er
   }
 
   updateQuantity(id: number, newQuantity: number):  Observable<any> {
-    return this.http.put<any>(`http://localhost:5000/cart/update-cart/${id}`, { quantity: newQuantity });
+    return this.http.put<any>(`https://e-commerce-app-1-islr.onrender.com/cart/update-cart/${id}`, { quantity: newQuantity });
   }
 
   // Supprimer un produit du panier

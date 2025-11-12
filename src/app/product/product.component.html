@@ -3,8 +3,7 @@
 <div class="products-container">
   <div class="product-list"></div>
   <div *ngFor="let product of products" class="product-card">
-    <img [src]=
-    "'http://localhost:5000/static/image_uploads/' + product.picture" 
+    <img [src]="product.picture"
     alt="Product Image" class="product-img">
     <div class="product-info">
       <h2 class="product-name">{{ product.product_name }}</h2>
