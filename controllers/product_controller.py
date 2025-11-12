@@ -40,7 +40,6 @@ def index_product():
         "picture": product.picture
     } for product in products]
     return jsonify(products_list), 200
-    return render_template('/products/index_product.html', products=products , title="products")
 
 def add_product():
     return render_template('/products/add_product.html' , title='Add Product')

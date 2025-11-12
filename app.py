@@ -158,14 +158,9 @@ def update_cart(id):
     except ValueError:
         return jsonify({'error': 'La quantité doit être un nombre valide'}), 400
 
-if __name__ == '__main__':
-    app.run(debug=True)
-    
-from flask import render_template, request, jsonify, current_app, url_for#type:ignore
-from werkzeug.security import generate_password_hash##type:ignore
-from itsdangerous import URLSafeTimedSerializer#type:ignore
-    
-    
 @app.route('/check-session')
 def check_session():
     return jsonify(dict(session))
+
+if __name__ == '__main__':
+    app.run(debug=True)

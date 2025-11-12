@@ -7,9 +7,9 @@ from flask_jwt_extended import JWTManager, jwt_required, create_access_token, ge
 db = SQLAlchemy()
 
 SECRET_KEY = os.urandom(32)
-# SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:feyem111@127.0.0.1:3306/ecommerce_db?charset=utf8mb4'
-SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:hVUdZUzkAMYAODVYnwEfZXURecMByDkG@mysql.railway.internal:3306/railway?charset=utf8mb4'
-SQLALCHEMY_TRACK_MODIFCATIONS = False
+# Utiliser la variable d'environnement pour la production, sinon localhost pour dev
+SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'mysql+pymysql://root:hVUdZUzkAMYAODVYnwEfZXURecMByDkG@mysql.railway.internal:3306/railway?charset=utf8mb4')
+SQLALCHEMY_TRACK_MODIFICATIONS = False
 JWT_SECRET_KEY = 'Feyem111'
 JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
 
