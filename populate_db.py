@@ -1,12 +1,10 @@
 from app import app, db
 from models.product_model import Products
+import os
 
 def populate_products():
-    # Clear existing products
-    with app.app_context():
-        Products.query.delete()
-        db.session.commit()
-
+    """Peupler la base de données avec des produits de téléphones"""
+    
     phone_products = [
         {'name': 'iPhone 15 Pro', 'description': 'Latest iPhone with titanium design and A17 Pro chip', 'current_price': 1199.99, 'discount_price': 1099.99, 'quantity': 20, 'picture': 'https://res.cloudinary.com/dzqbzqgjw/image/upload/v1733000000/ecommerce/iphone15pro.jpg'},
         {'name': 'iPhone 15', 'description': 'Powerful iPhone with Dynamic Island and USB-C', 'current_price': 899.99, 'discount_price': 799.99, 'quantity': 30, 'picture': 'https://res.cloudinary.com/dzqbzqgjw/image/upload/v1733000001/ecommerce/iphone15.jpg'},
@@ -61,11 +59,36 @@ def populate_products():
     ]
 
     with app.app_context():
+        # Vérifier si des produits existent déjà
+        existing_count = Products.query.count()
+        print(f"📊 Produits existants: {existing_count}")
+        
+        if existing_count > 0:
+            print("⚠️  La base contient déjà des produits. Voulez-vous les remplacer ?")
+            # Pour ce script, on va ajouter sans supprimer
+            print("➕ Ajout des nouveaux produits...")
+        
+        success_count = 0
         for product_data in phone_products:
-            product = Products(**product_data)
-            db.session.add(product)
-        db.session.commit()
-        print(f"Added {len(phone_products)} phone products to the database.")
+            try:
+                # Vérifier si le produit existe déjà
+                existing = Products.query.filter_by(name=product_data['name']).first()
+                if not existing:
+                    product = Products(**product_data)
+                    db.session.add(product)
+                    success_count += 1
+                    print(f"✅ Ajouté: {product_data['name']}")
+                else:
+                    print(f"⏭️  Existe déjà: {product_data['name']}")
+            except Exception as e:
+                print(f"❌ Erreur avec {product_data['name']}: {str(e)}")
+        
+        try:
+            db.session.commit()
+            print(f"\n🎉 Succès! {success_count} nouveaux produits ajoutés sur {len(phone_products)} total.")
+        except Exception as e:
+            db.session.rollback()
+            print(f"❌ Erreur lors de la sauvegarde: {e}")
 
 if __name__ == '__main__':
     populate_products()
