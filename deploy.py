@@ -5,19 +5,36 @@ Ce script sera exécuté lors du déploiement sur Render
 """
 import os
 from flask import Flask
-from flask_migrate import upgrade
 
 def deploy():
     """Exécuter les déploiements."""
     
     # Importer l'app
-    from app import app
+    from app import app, db
     
     with app.app_context():
-        # Migrer la base de données vers la dernière révision
-        upgrade()
+        # Importer tous les modèles
+        from models.customer_model import Customers
+        from models.product_model import Products
+        from models.cart_model import Carts
+        from models.category_model import Categories
+        from models.favorite_model import Favorites
+        from models.order_model import Orders
+        from models.transaction_model import Transactions
         
-        print("✅ Déploiement terminé!")
+        print("🚀 Initialisation de la base de données PostgreSQL...")
+        
+        # Créer toutes les tables
+        db.create_all()
+        
+        print("✅ Déploiement terminé! Tables créées:")
+        print("  - customers")
+        print("  - products") 
+        print("  - carts")
+        print("  - categories")
+        print("  - favorites")
+        print("  - orders")
+        print("  - transactions")
 
 if __name__ == '__main__':
     deploy()
