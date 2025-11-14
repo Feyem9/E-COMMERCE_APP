@@ -1,4 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { Product } from '../models/products';
+import { ProductsService } from '../service/products.service';
+import { CartService } from '../services/cart.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -7,26 +11,59 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomeComponent implements OnInit {
 
-  featuredProducts = [
-    {
-      name: 'Product 1',
-      price: 29.99,
-      image: "../../assets/59510c60866aaae1a7034ceb0be5476c.webp" 
-    },
-    {
-      name: 'Product 2',
-      price: 39.99,
-      image: '../../assets/40a01f385d06eb584d19f254704dc839.webp'
-    },
-    {
-      name: 'Product 3',
-      price: 19.99,
-      image: '../../assets/CAMON 20 Premier 5G_Six View_Day.webp'
-    }
-  ];
+  featuredProducts: Product[] = [];
+  loading = false;
+  error: string | null = null;
 
-  constructor() { }
+  constructor(
+    private productsService: ProductsService,
+    private cartService: CartService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
-  } 
+    this.loadFeaturedProducts();
+  }
+
+  loadFeaturedProducts(): void {
+    this.loading = true;
+    this.error = null;
+    
+    this.productsService.getProducts().subscribe({
+      next: (products) => {
+        // Take first 6 products as featured
+        this.featuredProducts = products.slice(0, 6);
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading products:', error);
+        this.error = 'Erreur lors du chargement des produits';
+        this.loading = false;
+      }
+    });
+  }
+
+  addToCart(product: Product): void {
+    this.cartService.addToCart(product.id, 1).subscribe({
+      next: () => {
+        // Product added successfully, handled in service
+      },
+      error: (error) => {
+        console.error('Error adding to cart:', error);
+      }
+    });
+  }
+
+  navigateToProducts(): void {
+    this.router.navigate(['/product']);
+  }
+
+  navigateToProduct(productId: number): void {
+    this.router.navigate(['/product', productId]);
+  }
+
+  onNewsletterSubmit(): void {
+    // Newsletter subscription logic would go here
+    alert('Thank you for subscribing to our newsletter!');
+  }
 }

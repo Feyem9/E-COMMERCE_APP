@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProductsService } from '../service/products.service';
-import { Product } from '../models/products';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CartService } from '../services/cart.service';
-import { AuthService } from '../customers/auth.service';
+import { Product } from '../models/products';
 
 @Component({
   selector: 'app-product',
@@ -12,115 +11,150 @@ import { AuthService } from '../customers/auth.service';
 })
 export class ProductComponent implements OnInit {
   products: Product[] = [];
-  cartForm!: FormGroup;
-  selectedProduct!: Product;
-  selectProduct(product: Product): void {
-    this.selectedProduct = product;
-    console.log('Produit sélectionné:', product);
-
-    this.cartForm.patchValue({
-      product_id: product.id,
-      quantity: 1,
-      
-    });
-  }
-
-  // selectProduct! : Product ;
+  filteredProducts: Product[] = [];
+  loading = false;
+  error: string | null = null;
+  searchQuery = '';
+  sortBy = 'name';
+  sortOrder: 'asc' | 'desc' = 'asc';
+  currentPage = 1;
+  itemsPerPage = 12;
+  totalPages = 0;
 
   constructor(
     private productService: ProductsService,
     private cartService: CartService,
-    private fb: FormBuilder,
-    private authService: AuthService
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
-  
-
 
   ngOnInit(): void {
-    this.productService.getProducts().subscribe(
-      (data: Product[]) => {
-        this.products = data;
-      },
-      (error) => {
-        console.error('Erreur lors du chargement des produits', error);
+    this.loadProducts();
+    this.handleRouteParams();
+  }
+
+  private handleRouteParams(): void {
+    this.route.queryParams.subscribe(params => {
+      if (params['search']) {
+        this.searchQuery = params['search'];
+        this.searchProducts();
       }
-    );
-    this.cartForm = this.fb.group({
-      product_id: [''], // Le champ caché product_id
-      quantity: [
-        1, // Valeur par défaut
-        [Validators.required, Validators.min(1), Validators.max(10000)], // Validations pour la quantité
-      ],
     });
   }
 
+  loadProducts(): void {
+    this.loading = true;
+    this.error = null;
 
-
-onSubmit() {
-  function errorHandler(error: any): void {
-    console.error('Erreur lors de l\'appel à l\'API :', error);
-    alert('Une erreur est survenue lors de l\'ajout au panier.');
+    this.productService.getProducts().subscribe({
+      next: (data: Product[]) => {
+        this.products = data;
+        this.filteredProducts = [...data];
+        this.updatePagination();
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading products:', error);
+        this.error = 'Erreur lors du chargement des produits';
+        this.loading = false;
+      }
+    });
   }
 
-  if (this.cartForm.valid && this.selectedProduct) {
-    const formData = this.cartForm.value;
+  searchProducts(): void {
+    if (!this.searchQuery.trim()) {
+      this.filteredProducts = [...this.products];
+    } else {
+      const query = this.searchQuery.toLowerCase();
+      this.filteredProducts = this.products.filter(product =>
+        product.name.toLowerCase().includes(query) ||
+        product.description.toLowerCase().includes(query)
+      );
+    }
+    this.currentPage = 1;
+    this.updatePagination();
+  }
 
-    // 🔥 Récupérer l'ID client (depuis AuthService ou localStorage)
-    const customerId = this.authService.getUserId(); // ou localStorage.getItem('user_id')
-    if (customerId === null) {
-      console.log(customerId);
+  sortProducts(): void {
+    this.filteredProducts.sort((a, b) => {
+      let comparison = 0;
       
-  alert("Vous devez être connecté pour ajouter un produit au panier."); 
-  return;  // Stopper la fonction onSubmit
-}
-
-    this.cartService.addToCart(formData, this.selectedProduct, customerId, errorHandler).subscribe(
-      (response: any) => {
-        console.log('Réponse complète de l\'API:', response);
-
-        if (Array.isArray(response)) {
-          const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-          cart.push(response);
-          localStorage.setItem('cart', JSON.stringify(cart));
-
-          if (response.length > 0) {
-            const lastProduct = response[response.length - 1];
-            localStorage.setItem('lastApiResponseIndex', JSON.stringify(response.length - 1));
-            console.warn('Réponse tableau – dernier produit:', lastProduct);
-          } else {
-            alert('Réponse vide reçue.');
-          }
-        } else if (typeof response === 'object' && response !== null) {
-          const message = response.message ?? 'Message non disponible';
-          const addedProduct = response.product ?? {};
-
-          console.log('Message:', message);
-          console.log('Produit ajouté:', addedProduct);
-
-          if (Object.keys(addedProduct).length > 0) {
-            alert(`${message}: ${addedProduct.name} au prix de ${addedProduct.current_price}`);
-          } else {
-            console.warn('Produit mal formé dans la réponse.');
-          }
-        } else {
-          console.warn('Réponse inattendue de l\'API.');
-        }
-      },
-      (error) => {
-        console.log('Erreur serveur:', error);
-        alert('Erreur lors de la communication avec le serveur.');
+      switch (this.sortBy) {
+        case 'name':
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case 'price':
+          comparison = (a.discount_price || a.current_price) - (b.discount_price || b.current_price);
+          break;
+        case 'discount':
+          const discountA = a.current_price - (a.discount_price || a.current_price);
+          const discountB = b.current_price - (b.discount_price || b.current_price);
+          comparison = discountA - discountB;
+          break;
       }
-    );
-  } else {
-    if (!this.selectedProduct) {
-      alert('Aucun produit sélectionné.');
-    } else if (!this.cartForm.valid) {
-      alert('Formulaire invalide. Veuillez remplir tous les champs.');
+
+      return this.sortOrder === 'asc' ? comparison : -comparison;
+    });
+  }
+
+  updatePagination(): void {
+    this.totalPages = Math.ceil(this.filteredProducts.length / this.itemsPerPage);
+  }
+
+  get paginatedProducts(): Product[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.filteredProducts.slice(startIndex, endIndex);
+  }
+
+  get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+
+  changePage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
     }
   }
+
+  addToCart(product: Product, quantity: number = 1): void {
+    this.cartService.addToCart(product.id, quantity).subscribe({
+      next: () => {
+        // Success handled in service
+      },
+      error: (error) => {
+        console.error('Error adding to cart:', error);
+      }
+    });
+  }
+
+  viewProductDetails(product: Product): void {
+    // Navigate to product detail page (to be implemented)
+    console.log('View details for:', product.name);
+  }
+
+  getDiscountPercentage(product: Product): number {
+    if (product.discount_price && product.discount_price < product.current_price) {
+      return Math.round(((product.current_price - product.discount_price) / product.current_price) * 100);
+    }
+    return 0;
+  }
+
+  onSortChange(): void {
+    this.sortProducts();
+  }
+
+  toggleSortOrder(): void {
+    this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    this.sortProducts();
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.searchProducts();
+  }
+
+  retry(): void {
+    this.loadProducts();
+  }
 }
-
-
-}
-
-

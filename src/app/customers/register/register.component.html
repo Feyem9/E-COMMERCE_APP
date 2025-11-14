@@ -1,62 +1,131 @@
+<div class="register-container">
+  <!-- Background Animation -->
+  <div class="background-animation">
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="circle circle-3"></div>
+    <div class="circle circle-4"></div>
+  </div>
 
-  
   <form class="register-card" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-    <h2 class="card-title">Register</h2>
-  
-    <div class="form-group">
-      <label for="email">Email address</label>
-      <input id="email" type="email" formControlName="email" />
-      <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="error">
-        <div *ngIf="email?.errors?.['required']">Email is required.</div>
-        <div *ngIf="email?.errors?.['email']">Enter a valid email.</div>
+    <!-- Header avec icône et animation -->
+    <div class="card-header">
+      <div class="icon-container">
+        <i class="fas fa-user-plus"></i>
+      </div>
+      <h2 class="card-title">Create Account</h2>
+      <p class="card-subtitle">Join our tech community today</p>
+    </div>
+
+    <!-- Form Fields avec animations -->
+    <div class="form-container">
+      <div class="form-group">
+        <div class="input-container">
+          <i class="fas fa-envelope input-icon"></i>
+          <input 
+            id="email" 
+            type="email" 
+            formControlName="email" 
+            placeholder="Enter your email"
+            class="form-input" />
+          <label for="email" class="form-label">Email Address</label>
+        </div>
+        <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="error-message">
+          <i class="fas fa-exclamation-circle me-2"></i>
+          <span *ngIf="email?.errors?.['required']">Email is required</span>
+          <span *ngIf="email?.errors?.['email']">Enter a valid email address</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="input-container">
+          <i class="fas fa-user input-icon"></i>
+          <input 
+            id="name" 
+            type="text" 
+            formControlName="name" 
+            placeholder="Enter your name"
+            class="form-input" />
+          <label for="name" class="form-label">Full Name</label>
+        </div>
+        <div *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="error-message">
+          <i class="fas fa-exclamation-circle me-2"></i>
+          <span *ngIf="name?.errors?.['required']">Name is required</span>
+          <span *ngIf="name?.errors?.['minlength']">Name must be at least 2 characters</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="input-container">
+          <i class="fas fa-lock input-icon"></i>
+          <input 
+            id="password" 
+            type="password" 
+            formControlName="password" 
+            placeholder="Create a password"
+            class="form-input" />
+          <label for="password" class="form-label">Password</label>
+        </div>
+        <div *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="error-message">
+          <i class="fas fa-exclamation-circle me-2"></i>
+          <span *ngIf="password?.errors?.['required']">Password is required</span>
+          <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="input-container">
+          <i class="fas fa-phone input-icon"></i>
+          <input 
+            id="contact" 
+            type="tel" 
+            formControlName="contact" 
+            placeholder="Your phone number"
+            class="form-input" />
+          <label for="contact" class="form-label">Contact Number</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="input-container">
+          <i class="fas fa-home input-icon"></i>
+          <input 
+            id="address" 
+            type="text" 
+            formControlName="address" 
+            placeholder="Your address"
+            class="form-input" />
+          <label for="address" class="form-label">Address</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="select-container">
+          <i class="fas fa-user-tag input-icon"></i>
+          <select id="role" formControlName="role" class="form-select">
+            <option value="Customer">Customer</option>
+            <option value="Admin">Admin</option>
+          </select>
+          <label for="role" class="form-label">Account Type</label>
+        </div>
       </div>
     </div>
-  
-    <div class="form-group">
-      <label for="name">Name</label>
-      <input id="name" type="text" formControlName="name" />
-      <div *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="error">
-        <div *ngIf="name?.errors?.['required']">Name is required.</div>
-        <div *ngIf="name?.errors?.['minlength']">Name must be at least 2 characters.</div>
-      </div>
-    </div>
-  
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input id="password" type="password" formControlName="password" />
-      <div *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="error">
-        <div *ngIf="password?.errors?.['required']">Password is required.</div>
-        <div *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters.</div>
-      </div>
-    </div>
-  
-    <div class="form-group">
-      <label for="contact">Contact</label>
-      <input id="contact" type="text" formControlName="contact" />
-    </div>
-  
-    <div class="form-group">
-      <label for="address">Address</label>
-      <input id="address" type="text" formControlName="address" />
-    </div>
-  
-    <div class="form-group">
-      <label for="role">Role</label>
-      <select id="role" formControlName="role">
-        <option value="Customer">Customer</option>
-        <option value="Admin">Admin</option>
-      </select>
-    </div>
-  
+
+    <!-- Submit Button avec animation -->
     <button type="submit" class="btn-submit" [disabled]="registerForm.invalid || isSubmitting">
-      {{ isSubmitting ? 'Registering...' : 'Register' }}
+      <span class="btn-text">
+        <i class="fas" [ngClass]="isSubmitting ? 'fa-spinner fa-spin' : 'fa-user-plus'"></i>
+        {{ isSubmitting ? 'Creating Account...' : 'Create Account' }}
+      </span>
+      <div class="btn-ripple"></div>
     </button>
-  
-    <div class="text-center mt-4">
-      <p style="color: #bbb;">
+
+    <!-- Footer -->
+    <div class="card-footer">
+      <p class="login-link">
         Already have an account?
-        <a routerLink="/login" style="color: #4b6cb7;">Login</a>
+        <a routerLink="/login" class="login-anchor">Sign In</a>
       </p>
     </div>
   </form>
-  
+</div>

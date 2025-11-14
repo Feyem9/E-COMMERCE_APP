@@ -1,25 +1,142 @@
-import { Component , ViewChild} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 import { CartService } from '../services/cart.service';
-import { MatSidenav } from '@angular/material/sidenav';
-
+import { AuthService } from '../customers/auth.service';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.scss'
+  styleUrl: './navbar.component.scss',
+  animations: [
+    trigger('slideDown', [
+      transition(':enter', [
+        style({ transform: 'translateY(-100%)', opacity: 0 }),
+        animate('300ms ease-in-out', style({ transform: 'translateY(0%)', opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('300ms ease-in-out', style({ transform: 'translateY(-100%)', opacity: 0 }))
+      ])
+    ])
+  ]
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
 
   cartCount = 0;
+  favoriteCount = 0;
+  isLoggedIn = false;
+  userName = '';
+  searchQuery = '';
+  showSearch = false;
 
-   @ViewChild('sidenav') sidenav!: MatSidenav;
+  constructor(
+    private cartService: CartService,
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
-constructor(private cartService: CartService) {}
+  ngOnInit(): void {
+    // Subscribe to cart count changes
+    this.cartService.cartCount$.subscribe(count => {
+      this.cartCount = count;
+    });
 
-ngOnInit() {
-  this.cartService.cartCount$.subscribe(count => {
-    this.cartCount = count;
-  });
-}
+    // Subscribe to auth changes
+    this.authService.isLoggedIn$.subscribe(isLoggedIn => {
+      this.isLoggedIn = isLoggedIn;
+    });
 
+    this.authService.user$.subscribe(user => {
+      this.userName = user ? user.name : '';
+    });
+
+    // Check if user is logged in
+    this.checkLoginStatus();
+
+    // Load initial cart items count
+    this.cartService.loadCartItems();
+  }
+
+  checkLoginStatus(): void {
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('access_token') : null;
+    const user = typeof localStorage !== 'undefined' ? localStorage.getItem('user') : null;
+    
+    this.isLoggedIn = !!token;
+    if (user) {
+      try {
+        const userData = JSON.parse(user);
+        this.userName = userData.name || userData.email || 'User';
+      } catch (e) {
+        this.userName = 'User';
+      }
+    }
+  }
+
+  toggleSearch(): void {
+    this.showSearch = !this.showSearch;
+  }
+
+  onSearch(): void {
+    if (this.searchQuery.trim()) {
+      this.router.navigate(['/product'], { 
+        queryParams: { search: this.searchQuery.trim() } 
+      });
+      this.searchQuery = '';
+      this.showSearch = false;
+    }
+  }
+
+  logout(): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.cartService.clearCart().subscribe();
+        alert('You have been logged out successfully');
+      },
+      error: (error) => {
+        console.error('Error during logout:', error);
+        // Même en cas d'erreur, on déconnecte localement
+        this.cartService.clearCart().subscribe();
+        alert('You have been logged out successfully');
+      }
+    });
+  }
+
+  // Connexion temporaire pour les tests
+  loginTemp(): void {
+    // Utilise les credentials de test pour la démo
+    const testCredentials = {
+      email: 'test@example.com',
+      password: 'password'
+    };
+    
+    this.authService.login(testCredentials).subscribe({
+      next: (response) => {
+        alert('Connexion temporaire activée - Vous pouvez maintenant ajouter des produits au panier');
+      },
+      error: (error) => {
+        console.error('Erreur de connexion temporaire:', error);
+        // En cas d'erreur, on crée un token temporaire en localStorage
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('access_token', 'fake-token-for-testing');
+          localStorage.setItem('user_data', JSON.stringify({
+            id: 1,
+            email: 'test@example.com',
+            name: 'Test User'
+          }));
+          alert('Token temporaire créé pour les tests');
+          window.location.reload();
+        }
+      }
+    });
+  }
+
+  // Handle responsive navbar collapse
+  closeNavbar(): void {
+    const navbarToggler = document.querySelector('.navbar-toggler') as HTMLElement;
+    const navbarCollapse = document.querySelector('.navbar-collapse') as HTMLElement;
+    
+    if (navbarCollapse && navbarCollapse.classList.contains('show')) {
+      navbarToggler?.click();
+    }
+  }
 }

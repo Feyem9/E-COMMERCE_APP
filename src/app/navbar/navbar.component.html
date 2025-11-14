@@ -1,47 +1,231 @@
-<mat-toolbar color="#fff">
-  <mat-icon>store</mat-icon>
-  <span>TECH market</span>
-  <span class="spacer"></span>
-  
-  <button mat-button [matMenuTriggerFor]="proMenu">HOME</button>
-  <mat-menu #proMenu="matMenu">
-    <button mat-menu-item routerLink="/">HOME</button>
-      <button mat-menu-item routerLink="/product">Products</button>
-    </mat-menu>
-     
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
+  <div class="container">
+    <!-- Brand -->
+    <a class="navbar-brand fw-bold" routerLink="/">
+      <i class="fas fa-mobile-alt me-2 text-warning"></i>
+      <span class="text-gradient">TECH-MARKET</span>
+    </a>
 
-    
-    <button mat-button [matMenuTriggerFor]="catMenu">Categories</button> 
-    <mat-menu #catMenu="matMenu">
-      <button mat-menu-item routerLink="/news">News</button>
-      <button mat-menu-item routerLink="/tablets">Tablets</button>
-      <button mat-menu-item routerLink="/feature">Feature</button>
-    </mat-menu>
-    
-    <button mat-button [matMenuTriggerFor]="helpMenu">Need help?</button>
-    <mat-menu #helpMenu="matMenu">
-      <button mat-menu-item>Store Locator</button>
-      <button mat-menu-item>Order Tracking</button>
-      <button mat-menu-item>FAQs</button>
-      <mat-divider></mat-divider>
-      <button mat-menu-item>Call us: (+800) 1234 5678 90</button>
-      <button mat-menu-item>Email: info""company.com</button>
-    </mat-menu>
-  
+    <!-- Mobile toggle button -->
+    <button 
+      class="navbar-toggler" 
+      type="button" 
+      data-bs-toggle="collapse" 
+      data-bs-target="#navbarNav" 
+      aria-controls="navbarNav" 
+      aria-expanded="false" 
+      aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-    <button mat-button [matMenuTriggerFor]="userMenu">Acount</button>
-    <mat-menu #userMenu="matMenu">
-      <button mat-button routerLink="/login">Log in</button>
-      <button mat-button routerLink="/register">Register</button>
-      <button mat-button routerLink="/profile">Profile</button>
-      <button mat-button routerLink="/">Logout</button>
-    </mat-menu>
+    <!-- Navigation items -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+            <i class="fas fa-home me-1"></i>
+            Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/product" routerLinkActive="active">
+            <i class="fas fa-mobile-alt me-1"></i>
+            Products
+          </a>
+        </li>
+        <li class="nav-item dropdown">
+          <a 
+            class="nav-link dropdown-toggle" 
+            routerLink="/categories"
+            id="categoriesDropdown" 
+            role="button" 
+            data-bs-toggle="dropdown" 
+            aria-expanded="false">
+            <i class="fas fa-th-large me-1"></i>
+            Categories
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" routerLink="/categories/smartphones"><i class="fas fa-mobile me-2"></i>Smartphones</a></li>
+            <li><a class="dropdown-item" routerLink="/categories/tablets"><i class="fas fa-tablet me-2"></i>Tablets</a></li>
+            <li><a class="dropdown-item" routerLink="/categories/accessories"><i class="fas fa-headphones me-2"></i>Accessories</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" routerLink="/categories"><i class="fas fa-star me-2"></i>All Categories</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a 
+            class="nav-link dropdown-toggle" 
+            routerLink="/help" 
+            id="helpDropdown" 
+            role="button" 
+            data-bs-toggle="dropdown" 
+            aria-expanded="false">
+            <i class="fas fa-question-circle me-1"></i>
+            Help
+          </a> 
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" routerLink="/help/store-locator"><i class="fas fa-map-marker-alt me-2"></i>Store Locator</a></li>
+            <li><a class="dropdown-item" routerLink="/help/order-tracking"><i class="fas fa-truck me-2"></i>Order Tracking</a></li>
+            <li><a class="dropdown-item" routerLink="/help/faqs"><i class="fas fa-question me-2"></i>FAQs</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="tel:+18001234567890">
+              <i class="fas fa-phone me-2"></i>Call us: (+800) 1234 5678 90
+            </a></li>
+            <li><a class="dropdown-item" href="mailto:info&#64;company.com">
+              <i class="fas fa-envelope me-2"></i>info&#64;company.com
+            </a></li>
+          </ul>
+        </li>
+      </ul>
 
-    <button mat-button routerLink="/cart">
-      <mat-icon>shopping_cart</mat-icon>
-      My Cart ({{ cartCount }} items in cart)
+      <!-- Search bar -->
+      <form class="d-flex me-3" (ngSubmit)="onSearch()" *ngIf="showSearch">
+        <div class="input-group">
+          <input 
+            class="form-control" 
+            type="search" 
+            placeholder="Search products..."
+            [(ngModel)]="searchQuery"
+            name="search"
+            aria-label="Search">
+          <button class="btn btn-outline-warning" type="submit">
+            <i class="fas fa-search"></i>
           </button>
-  </mat-toolbar>
+        </div>
+      </form>
+
+      <!-- Right side actions -->
+      <ul class="navbar-nav">
+        <!-- Search toggle for mobile -->
+        <li class="nav-item d-lg-none">
+          <button 
+            class="nav-link btn btn-link" 
+            (click)="toggleSearch()"
+            aria-label="Toggle search">
+            <i class="fas fa-search"></i>
+          </button>
+        </li>
+
+        <!-- Authentication Links -->
+        <li class="nav-item" *ngIf="!isLoggedIn">
+          <a class="nav-link" routerLink="/login">
+            <i class="fas fa-sign-in-alt me-1"></i>
+            <span class="d-none d-md-inline">Login</span>
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="!isLoggedIn">
+          <a class="nav-link" routerLink="/register">
+            <i class="fas fa-user-plus me-1"></i>
+            <span class="d-none d-md-inline">Register</span>
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="isLoggedIn">
+          <a class="nav-link" routerLink="/profile">
+            <i class="fas fa-user me-1"></i>
+            <span class="d-none d-md-inline">Profile</span>
+          </a>
+        </li>
+
+        <!-- Favorites -->
+        <li class="nav-item" *ngIf="isLoggedIn">
+          <a class="nav-link position-relative" routerLink="/favorite">
+            <i class="fas fa-heart"></i>
+            <span class="visually-hidden">Favorites</span>
+            <span 
+              *ngIf="favoriteCount > 0" 
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              {{ favoriteCount }}
+              <span class="visually-hidden">items in favorites</span>
+            </span>
+          </a>
+        </li>
+
+        <!-- Cart -->
+        <li class="nav-item">
+          <a class="nav-link position-relative" routerLink="/cart">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="d-none d-md-inline ms-1">Cart</span>
+            <span 
+              *ngIf="cartCount > 0" 
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+              {{ cartCount }}
+              <span class="visually-hidden">items in cart</span>
+            </span>
+          </a>
+        </li>
+
+        <!-- Orders (for logged in users) -->
+        <li class="nav-item" *ngIf="isLoggedIn">
+          <a class="nav-link" routerLink="/orders">
+            <i class="fas fa-box me-1"></i>
+            <span class="d-none d-md-inline">Orders</span>
+          </a>
+        </li>
+
+        <!-- Logout button -->
+        <li class="nav-item" *ngIf="isLoggedIn">
+          <button class="nav-link btn btn-link" (click)="logout()">
+            <i class="fas fa-sign-out-alt me-1"></i>
+            <span class="d-none d-md-inline">Logout</span>
+          </button>
+        </li>
+
+        <!-- User account dropdown (simplified) -->
+        <li class="nav-item dropdown" *ngIf="isLoggedIn">
+          <a 
+            class="nav-link dropdown-toggle" 
+            href="#" 
+            id="accountDropdown" 
+            role="button" 
+            data-bs-toggle="dropdown" 
+            aria-expanded="false">
+            <i class="fas fa-user-circle me-1"></i>
+            <span class="d-none d-md-inline">{{ userName || 'Account' }}</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><h6 class="dropdown-header">Welcome, {{ userName }}!</h6></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item" routerLink="/profile">
+                <i class="fas fa-user me-2"></i>My Profile
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" routerLink="/orders">
+                <i class="fas fa-box me-2"></i>My Orders
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" routerLink="/favorite">
+                <i class="fas fa-heart me-2"></i>My Favorites
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul> 
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile search bar (when toggled) -->
+<div class="mobile-search d-lg-none" *ngIf="showSearch">
+  <div class="container py-3">
+    <form class="d-flex" (ngSubmit)="onSearch()">
+      <div class="input-group">
+        <input 
+          class="form-control" 
+          type="search" 
+          placeholder="Search products..."
+          [(ngModel)]="searchQuery"
+          name="search"
+          aria-label="Search">
+        <button class="btn btn-warning" type="submit">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
    
 
    <!-- <mat-toolbar color="#fff">
