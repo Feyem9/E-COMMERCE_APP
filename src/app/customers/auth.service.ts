@@ -27,10 +27,10 @@ export class AuthService {
   public authState$ = this.authSub.asObservable();
 
   // Observables pour le login status et user
-  private loggedInSub = new BehaviorSubject<boolean>(this.isAuthenticated());
+  private loggedInSub = new BehaviorSubject<boolean>(false);
   public isLoggedIn$ = this.loggedInSub.asObservable();
 
-  private userSub = new BehaviorSubject<any>(this.getCurrentUser());
+  private userSub = new BehaviorSubject<any>(null);
   public user$ = this.userSub.asObservable();
 
   constructor(private http: HttpClient) {

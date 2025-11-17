@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { CartService } from '../services/cart.service';
 import { AuthService } from '../customers/auth.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-navbar',
@@ -20,7 +22,7 @@ import { AuthService } from '../customers/auth.service';
     ])
   ]
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, OnDestroy {
 
   cartCount = 0;
   favoriteCount = 0;
@@ -28,6 +30,7 @@ export class NavbarComponent implements OnInit {
   userName = '';
   searchQuery = '';
   showSearch = false;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private cartService: CartService,
@@ -37,24 +40,35 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
     // Subscribe to cart count changes
-    this.cartService.cartCount$.subscribe((count: number) => {
-      this.cartCount = count;
-    });
+    this.cartService.cartCount$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((count: number) => {
+        this.cartCount = count;
+      });
 
     // Subscribe to auth changes
-    this.authService.isLoggedIn$.subscribe((isLoggedIn: boolean) => {
-      this.isLoggedIn = isLoggedIn;
-    });
+    this.authService.isLoggedIn$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((isLoggedIn: boolean) => {
+        this.isLoggedIn = isLoggedIn;
+      });
 
-    this.authService.user$.subscribe((user: any) => {
-      this.userName = user ? user.name : '';
-    });
+    this.authService.user$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((user: any) => {
+        this.userName = user ? user.name : '';
+      });
 
     // Check if user is logged in
     this.checkLoginStatus();
 
     // Load initial cart items count
     this.cartService.loadCartItems();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   checkLoginStatus(): void {
