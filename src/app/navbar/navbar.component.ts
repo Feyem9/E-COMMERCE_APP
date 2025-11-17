@@ -37,16 +37,16 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
     // Subscribe to cart count changes
-    this.cartService.cartCount$.subscribe(count => {
+    this.cartService.cartCount$.subscribe((count: number) => {
       this.cartCount = count;
     });
 
     // Subscribe to auth changes
-    this.authService.isLoggedIn$.subscribe(isLoggedIn => {
+    this.authService.isLoggedIn$.subscribe((isLoggedIn: boolean) => {
       this.isLoggedIn = isLoggedIn;
     });
 
-    this.authService.user$.subscribe(user => {
+    this.authService.user$.subscribe((user: any) => {
       this.userName = user ? user.name : '';
     });
 
@@ -92,7 +92,7 @@ export class NavbarComponent implements OnInit {
         this.cartService.clearCart().subscribe();
         alert('You have been logged out successfully');
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error during logout:', error);
         // Même en cas d'erreur, on déconnecte localement
         this.cartService.clearCart().subscribe();

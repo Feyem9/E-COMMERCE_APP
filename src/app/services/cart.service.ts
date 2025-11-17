@@ -346,5 +346,12 @@ export class CartService {
       console.error('Error clearing cart from storage:', error);
     }
   }
+
+  /**
+   * Met à jour le nombre d'articles dans le panier
+   */
+  public updateCartCount(count: number): void {
+    this.cartCountSubject.next(count);
+  }
 }
     

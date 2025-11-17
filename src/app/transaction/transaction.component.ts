@@ -18,36 +18,19 @@ export class TransactionComponent {
       // Ajoute d'autres champs si nécessaires
     };
 
-    // this.transactionService.initiatePayment(paymentData).then((response: any)
-    //   => {
-    //     if (response && response.payment_url) {
-    //       window.location.href = response.payment_url; // Redirige vers la page de paiement PayUnit
-    //     } else {
-    //       alert('Erreur de redirection vers PayUnit.');
-    //     }
-    //   },
-    //   error: (err: any) => {
-    //     console.error('Erreur paiement :', err);
-    //     alert('Erreur lors du paiement.');
-    //   },
-    // }).catch((err: any) => {
-    //   console.error('Erreur inattendue :', err);
-    //   alert('Erreur inattendue lors du paiement.');
-    // });
-
-    this.transactionService.initiatePayment(paymentData)
-      .then((response: any) => {
+    this.transactionService.initiatePayment(paymentData).subscribe({
+      next: (response: any) => {
         if (response && response.payment_url) {
           window.location.href = response.payment_url;
-
           this.cartService.clearCart();
         } else {
           alert('Erreur de redirection vers PayUnit.');
         }
-      })
-      .catch((err: any) => {
+      },
+      error: (err: any) => {
         console.error('Erreur paiement :', err);
         alert('Erreur lors du paiement.');
-      });
+      }
+    });
   }
 }

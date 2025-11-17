@@ -1,14 +1,13 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule, provideClientHydration } from '@angular/platform-browser';
 import { HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http';
-
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { NavbarComponent } from './navbar/navbar.component';
-import { QRCodeModule } from 'angularx-qrcode';
-
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -56,8 +55,10 @@ import { TransactionHistoryComponent } from './transaction-history/transaction-h
   ],
   imports: [
     BrowserModule,
-    QRCodeModule,
+    CommonModule,
+    RouterModule,
     ReactiveFormsModule,
+    FormsModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MatToolbarModule,
@@ -70,7 +71,6 @@ import { TransactionHistoryComponent } from './transaction-history/transaction-h
     MatListModule,
     MatCardModule,
     HttpClientModule,
-    FormsModule,
   ],
   providers: [
     provideClientHydration(),

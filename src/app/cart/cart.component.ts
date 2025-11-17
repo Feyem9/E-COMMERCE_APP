@@ -96,10 +96,9 @@ export class CartComponent implements OnInit {
       console.error('ID du produit manquant');
       return;
     }
-    this.cartService.removeFromCart(item).subscribe({
-      next: updatedItems => {
-        this.cartItems = updatedItems;
-        this.calculateTotal();
+    this.cartService.removeFromCart(item.id).subscribe({
+      next: () => {
+        this.loadCart();
       },
       error: err => {
         console.error('Erreur lors de la suppression', err);
@@ -118,18 +117,19 @@ export class CartComponent implements OnInit {
       payment_country: "CM"
 
     };
-    this.transactionService.initiatePayment(paymentData)
-      .then((response: any) => {
+    this.transactionService.initiatePayment(paymentData).subscribe(
+      (response: any) => {
         if (response && response.payment_url) {
           window.location.href = response.payment_url;
         } else {
           alert('Erreur de redirection vers PayUnit.');
         }
-      })
-      .catch((err: any) => {
+      },
+      (err: any) => {
         console.error('Erreur paiement :', err);
         alert('Erreur lors du paiement.');
-      });
+      }
+    );
   }
 
   // }
@@ -150,8 +150,8 @@ export class CartComponent implements OnInit {
     }, 0);
     console.log('Total Price:', this.totalPrice);
 
-    this.cartService.updateCartCount(count); // Met à jour le total des items
-
+    // Mettre à jour le nombre d'articles dans le panier
+    this.cartService.updateCartCount(this.cartItems.length);
   }
 
 

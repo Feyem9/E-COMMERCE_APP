@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import axios from 'axios';
 
 @Injectable({
   providedIn: 'root'
@@ -15,18 +14,15 @@ export class TransactionService {
   //   return this.http.post<any>(this.apiUrl, paymentData);
   // }
 
-  async initiatePayment(data: any) {
-    const response = await axios.post(`${this.API_URL}/payment`, data);
-    return response.data;
+  initiatePayment(data: any) {
+    return this.http.post<any>(`${this.API_URL}/payment`, data);
   }
 
-  async confirmTransaction(transactionId: string, token: string) {
-    const response = await axios.post(`${this.API_URL}/confirm/${transactionId}`, { token });
-    return response.data;
+  confirmTransaction(transactionId: string, token: string) {
+    return this.http.post<any>(`${this.API_URL}/confirm/${transactionId}`, { token });
   }
 
-  async getUserTransactions(userId: number) {
-    const response = await axios.get(`${this.API_URL}/user/${userId}`);
-    return response.data;
+  getUserTransactions(userId: number) {
+    return this.http.get<any>(`${this.API_URL}/user/${userId}`);
   }
 }

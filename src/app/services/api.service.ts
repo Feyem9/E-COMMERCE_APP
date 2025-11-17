@@ -26,7 +26,7 @@ export class ApiService {
   /**
    * Get method
    */
-  get<T>(endpoint: string): Observable<T> {
+  get<T>(endpoint: string): Observable<T> { 
     const headers = this.getAuthHeaders();
     const options = { headers };
     

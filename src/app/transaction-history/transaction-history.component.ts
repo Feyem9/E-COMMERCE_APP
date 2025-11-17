@@ -11,8 +11,15 @@ export class TransactionHistoryComponent {
 
   constructor(private transactionService: TransactionService) { }
 
-  async ngOnInit() {
+  ngOnInit() {
     const userId = 1; // récupéré depuis ton auth service
-    this.transactions = await this.transactionService.getUserTransactions(userId);
+    this.transactionService.getUserTransactions(userId).subscribe({
+      next: (data: any[]) => {
+        this.transactions = data;
+      },
+      error: (error: any) => {
+        console.error('Erreur lors du chargement des transactions', error);
+      }
+    });
   }
 }

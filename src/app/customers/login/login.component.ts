@@ -15,6 +15,7 @@ export class LoginComponent {
   loginForm!: FormGroup;
   errorMsg: string = '';
   isSubmitting: boolean = false;
+  showPassword: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -102,4 +103,8 @@ export class LoginComponent {
   // Helper getters for easy access in template
   get email() { return this.loginForm.get('email'); }
   get password() { return this.loginForm.get('password'); }
+
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
+  }
 }
