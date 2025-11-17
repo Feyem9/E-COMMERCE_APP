@@ -141,20 +141,20 @@ export class AuthService {
         : new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }),
       withCredentials: false  // Assurez-vous d'inclure les informations d'authentification
     });
-  }
+  } 
 
   getUserId(): number | null {
-    const data = this.authSub.subscribe(data => {
-      if (data?.user) {
-        console.log('User ID:', data.user.id);
-      }
-    });
-
-    console.log("data", data);
-
     if (typeof localStorage === 'undefined') {
       return null; // SSR environment
     }
+    
+    // Try to get from user object first
+    const user = this.userSub.value;
+    if (user?.id) {
+      return user.id;
+    }
+    
+    // Fallback to stored identity
     const id = localStorage.getItem('identity');
     return id ? parseInt(id, 10) : null;
   }
