@@ -20,6 +20,7 @@ export class ProductComponent implements OnInit {
   currentPage = 1;
   itemsPerPage = 12;
   totalPages = 0;
+  placeholderImage = 'assets/images/placeholder.svg';
 
   constructor(
     private productService: ProductsService,
@@ -156,5 +157,9 @@ export class ProductComponent implements OnInit {
 
   retry(): void {
     this.loadProducts();
+  }
+
+  onImageError(event: any): void {
+    event.target.src = this.placeholderImage;
   }
 }

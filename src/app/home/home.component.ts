@@ -14,6 +14,7 @@ export class HomeComponent implements OnInit {
   featuredProducts: Product[] = [];
   loading = false;
   error: string | null = null;
+  placeholderImage = 'assets/images/placeholder.svg';
 
   constructor(
     private productsService: ProductsService,
@@ -65,5 +66,9 @@ export class HomeComponent implements OnInit {
   onNewsletterSubmit(): void {
     // Newsletter subscription logic would go here
     alert('Thank you for subscribing to our newsletter!');
+  }
+
+  onImageError(event: any): void {
+    event.target.src = this.placeholderImage;
   }
 }
