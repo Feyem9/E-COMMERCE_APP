@@ -165,10 +165,9 @@ def add_to_cart(id):
 
 @jwt_required()
 def add_to_cart_post(id):
-    # customer_id = get_jwt_identity()  # extrait depuis le token
-    # print("customer_id :", customer_id)
-    # if not customer_id:
-    #     return jsonify({'error': "L'ID du client est requis"}), 400
+    from flask_jwt_extended import get_jwt_identity
+    from flask import current_app
+    
     product = Products.query.filter_by(id=id).first()
     if not product:
         return jsonify({"error": "Produit introuvable"}), 404
@@ -181,8 +180,15 @@ def add_to_cart_post(id):
         return jsonify({"error": "Aucune donnée reçue"}), 400
 
     quantity = data.get('quantity')
-    customer_id = data.get('customer_id')
-    print(quantity)
+    
+    # Essayer d'obtenir le customer_id depuis le JWT d'abord
+    try:
+        customer_id = get_jwt_identity()
+        print(f"Customer ID depuis JWT: {customer_id}")
+    except:
+        # Sinon, utiliser le customer_id envoyé dans les données
+        customer_id = data.get('customer_id')
+        print(f"Customer ID depuis les données: {customer_id}")
 
     # Validation des données
     if not quantity:
