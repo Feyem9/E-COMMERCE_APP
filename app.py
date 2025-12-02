@@ -92,6 +92,24 @@ app.register_blueprint(order , url_prefix='/order')
 app.register_blueprint(product , url_prefix='/product') 
 app.register_blueprint(transaction , url_prefix='/transaction')
 
+# Initialiser la base de données avec les données
+@app.before_request
+def initialize_db():
+    """Initialiser la base de données une seule fois au démarrage"""
+    if not hasattr(app, 'db_initialized'):
+        try:
+            with app.app_context():
+                from models.product_model import Products
+                existing_count = Products.query.count()
+                if existing_count == 0:
+                    print("🌱 Peuplement initial de la base de données...")
+                    from populate_db import populate_products
+                    populate_products()
+                app.db_initialized = True
+        except Exception as e:
+            print(f"⚠️  Erreur lors de l'initialisation de la BD: {e}")
+            app.db_initialized = True
+
 # Gestion des erreurs 404
 @app.errorhandler(404)
 def not_found(error):
