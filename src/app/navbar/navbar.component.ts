@@ -62,8 +62,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
     // Check if user is logged in
     this.checkLoginStatus();
 
-    // Load initial cart items count
-    this.cartService.loadCartItems();
+    // Load initial cart items count if user is authenticated
+    if (this.authService.isLoggedIn()) {
+      this.cartService.getCartItems()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe();
+    }
   }
 
   ngOnDestroy(): void {

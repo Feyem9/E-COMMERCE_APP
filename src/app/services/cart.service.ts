@@ -1,7 +1,7 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { catchError, map, tap, finalize } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, throwError, Subject } from 'rxjs';
+import { catchError, map, tap, finalize, shareReplay } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Cart, Product } from '../models/products';
 import { ApiService } from './api.service';
@@ -29,45 +29,23 @@ export class CartService {
   private errorSubject = new BehaviorSubject<string | null>(null);
   public error$ = this.errorSubject.asObservable();
 
+  // Cache and refresh trigger
+  private refreshTrigger$ = new Subject<void>();
+
   constructor(
     private http: HttpClient,
     private apiService: ApiService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    this.initializeCart();
-  }
-
-  /**
-   * Initialise le panier au démarrage
-   */
-  private initializeCart(): void {
-    // Charge d'abord depuis le localStorage
+    // Only load from storage, don't call API here to prevent cascading subscriptions
     this.loadCartFromStorage();
-    
-    // Puis synchronise avec l'API
-    this.loadCartItems();
   }
 
   /**
-   * Charge les articles du panier depuis l'API
+   * Charge les articles du panier depuis l'API avec cache
+   * This observable is cached with shareReplay to prevent multiple simultaneous requests
    */
-  loadCartItems(): void {
-    this.getCartItems().subscribe({
-      next: (items) => {
-        // La mise à jour est déjà gérée dans getCartItems()
-      },
-      error: (error) => {
-        console.error('Error loading cart items:', error);
-        this.setError('Impossible de charger le panier');
-      }
-    });
-  }
- 
-  /**
-   * Récupère les articles du panier depuis l'API
-   */
-  getCartItems(): Observable<Cart[]> {
-    // Si non authentifié, retourne un panier vide
+  private getCartItemsFromAPI(): Observable<Cart[]> {
     if (!this.apiService.isAuthenticated()) {
       this.updateCartState([]);
       return of([]);
@@ -75,9 +53,6 @@ export class CartService {
 
     this.loadingSubject.next(true);
     this.errorSubject.next(null);
-    
-    const headers = this.apiService.getAuthHeaders();
-    const options = { headers };
     
     return this.apiService.get<Cart[]>('/cart/').pipe(
       tap((items: Cart[]) => {
@@ -87,11 +62,18 @@ export class CartService {
       catchError(error => {
         console.error('Error getting cart items:', error);
         this.setError('Erreur lors de la récupération du panier');
-        // Retourne les données du localStorage en cas d'erreur
-        return of(this.cartItemsSubject.value); 
+        return of(this.cartItemsSubject.value);
       }),
-      finalize(() => this.loadingSubject.next(false))
+      finalize(() => this.loadingSubject.next(false)),
+      shareReplay(1) // Cache the result to prevent multiple API calls
     );
+  }
+  /**
+   * Returns cart items observable
+   * Only call when explicitly needed by components
+   */
+  getCartItems(): Observable<Cart[]> {
+    return this.getCartItemsFromAPI();
   }
 
   /**
@@ -122,8 +104,8 @@ export class CartService {
 
     return this.apiService.post<any>(`/product/add-to-cart-post/${productId}`, cartItem).pipe(
       tap((response) => {
-        // Recharge le panier après l'ajout
-        this.loadCartItems();
+        // Refresh cart without subscribing - let components handle their subscriptions
+        this.refreshTrigger$.next();
       }),
       catchError(error => {
         console.error('Error adding to cart:', error);
@@ -155,7 +137,8 @@ export class CartService {
 
     return this.apiService.put<any>(`/cart/update-cart/${cartId}`, { quantity: newQuantity }).pipe(
       tap(() => {
-        this.loadCartItems();
+        // Refresh cart without subscribing
+        this.refreshTrigger$.next();
       }),
       catchError(error => {
         console.error('Error updating quantity:', error);
@@ -183,7 +166,8 @@ export class CartService {
 
     return this.apiService.delete<any>(`/cart/delete-cart/${cartId}`).pipe(
       tap(() => {
-        this.loadCartItems();
+        // Refresh cart without subscribing
+        this.refreshTrigger$.next();
       }),
       catchError(error => {
         console.error('Error removing from cart:', error);
@@ -352,6 +336,13 @@ export class CartService {
    */
   public updateCartCount(count: number): void {
     this.cartCountSubject.next(count);
+  }
+
+  /**
+   * Gets refresh trigger for components that need to reload cart
+   */
+  getRefreshTrigger(): Observable<void> {
+    return this.refreshTrigger$.asObservable();
   }
 }
     

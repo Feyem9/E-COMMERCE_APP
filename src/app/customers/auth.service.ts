@@ -19,8 +19,8 @@ export interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  // Déclaration explicite de la base URL (pas d'environment)
-  private readonly apiBase = 'http://127.0.0.1:5000';
+  // Déclaration explicite de la base URL (production)
+  private readonly apiBase = 'https://e-commerce-app-1-islr.onrender.com';
 
   // Subject pour suivre l'état de l'authentification
   private authSub = new BehaviorSubject<AuthResponse | null>(null);

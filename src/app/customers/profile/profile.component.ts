@@ -1,14 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { User } from '../../models/user.model';
-
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit, OnDestroy {
   user: User = {
     id: 0,
     email: '',
@@ -18,6 +19,8 @@ export class ProfileComponent implements OnInit {
     address: '',
     role: ''
   };
+  private destroy$ = new Subject<void>();
+  private readonly apiBase = 'https://e-commerce-app-1-islr.onrender.com';
 
   constructor(private http: HttpClient) { }
 
@@ -56,7 +59,8 @@ export class ProfileComponent implements OnInit {
       'Content-Type': 'application/json'
     });
 
-    this.http.get<any>('http://localhost:5000/customer/profile', { headers })
+    this.http.get<any>(`${this.apiBase}/customer/profile`, { headers })
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data) => {
           this.user = data;
@@ -66,6 +70,11 @@ export class ProfileComponent implements OnInit {
           console.error('❌ Erreur lors du chargement du profil :', error);
         }
       });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
 }

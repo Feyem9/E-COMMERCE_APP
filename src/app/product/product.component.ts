@@ -1,15 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductsService } from '../service/products.service';
 import { CartService } from '../services/cart.service';
+import { ImageMapperService } from '../services/image-mapper.service';
 import { Product } from '../models/products';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-product',
   templateUrl: './product.component.html',
   styleUrl: './product.component.scss',
 })
-export class ProductComponent implements OnInit {
+export class ProductComponent implements OnInit, OnDestroy {
   products: Product[] = [];
   filteredProducts: Product[] = [];
   loading = false;
@@ -20,11 +23,13 @@ export class ProductComponent implements OnInit {
   currentPage = 1;
   itemsPerPage = 12;
   totalPages = 0;
-  placeholderImage = 'assets/images/placeholder.svg';
+  placeholderImage = '/assets/images/placeholder.svg';
+  private destroy$ = new Subject<void>();
 
   constructor(
     private productService: ProductsService,
     private cartService: CartService,
+    private imageMapper: ImageMapperService,
     private route: ActivatedRoute,
     private router: Router
   ) { }
@@ -35,31 +40,35 @@ export class ProductComponent implements OnInit {
   }
 
   private handleRouteParams(): void {
-    this.route.queryParams.subscribe(params => {
-      if (params['search']) {
-        this.searchQuery = params['search'];
-        this.searchProducts();
-      }
-    });
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        if (params['search']) {
+          this.searchQuery = params['search'];
+          this.searchProducts();
+        }
+      });
   }
 
   loadProducts(): void {
     this.loading = true;
     this.error = null;
 
-    this.productService.getProducts().subscribe({
-      next: (data: Product[]) => {
-        this.products = data;
-        this.filteredProducts = [...data];
-        this.updatePagination();
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error loading products:', error);
-        this.error = 'Erreur lors du chargement des produits';
-        this.loading = false;
-      }
-    });
+    this.productService.getProducts()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data: Product[]) => {
+          this.products = data;
+          this.filteredProducts = [...data];
+          this.updatePagination();
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error loading products:', error);
+          this.error = 'Erreur lors du chargement des produits';
+          this.loading = false;
+        }
+      });
   }
 
   searchProducts(): void {
@@ -119,14 +128,16 @@ export class ProductComponent implements OnInit {
   }
 
   addToCart(product: Product, quantity: number = 1): void {
-    this.cartService.addToCart(product.id, quantity).subscribe({
-      next: () => {
-        // Success handled in service
-      },
-      error: (error) => {
-        console.error('Error adding to cart:', error);
-      }
-    });
+    this.cartService.addToCart(product.id, quantity)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          // Success handled in service
+        },
+        error: (error) => {
+          console.error('Error adding to cart:', error);
+        }
+      });
   }
 
   viewProductDetails(product: Product): void {
@@ -161,5 +172,14 @@ export class ProductComponent implements OnInit {
 
   onImageError(event: any): void {
     event.target.src = this.placeholderImage;
+  }
+
+  getProductImage(product: Product): string {
+    return this.imageMapper.getImageUrl(product);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

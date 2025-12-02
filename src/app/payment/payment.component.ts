@@ -17,8 +17,8 @@ export class PaymentComponent {
     const data = {
       total_amount: 1000,
       currency: 'XAF',
-      return_url: 'http://localhost:4200/payment-success',
-      notify_url: 'http://127.0.0.1:5000/transactions/notify',
+      return_url: 'https://e-commerce-app-1-islr.onrender.com/payment-success',
+      notify_url: 'https://e-commerce-app-1-islr.onrender.com/transactions/notify',
       payment_country: 'CM'
     };
 

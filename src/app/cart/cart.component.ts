@@ -1,18 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CartService } from '../services/cart.service';
 import { Cart, Product } from '../models/products';
 import { FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
 import { TransactionService } from '../services/transaction.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-cart',
   templateUrl: './cart.component.html',
   styleUrl: './cart.component.scss'
 })
-export class CartComponent implements OnInit {
+export class CartComponent implements OnInit, OnDestroy {
 
 
   cartForm!: FormGroup;
+  private destroy$ = new Subject<void>();
 
   cartItems: Cart[] = [];  // Liste des articles du panier
   totalItems: number = 0;  // Nombre total d'articles dans le panier
@@ -44,12 +47,14 @@ export class CartComponent implements OnInit {
 
   // Charger les articles du panier à partir du service
   loadCart(): void {
-    this.cartService.getCartItems().subscribe(items => {
-      console.log('Données reçues dans le panier :', items);  // ⬅️ Vérifie ici
+    this.cartService.getCartItems()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(items => {
+        console.log('Données reçues dans le panier :', items);  // ⬅️ Vérifie ici
 
-      this.cartItems = items;
-      this.calculateTotal();
-    });
+        this.cartItems = items;
+        this.calculateTotal();
+      });
   }
 
 
@@ -57,34 +62,36 @@ export class CartComponent implements OnInit {
     if (item.quantity > 1) {
       const newQuantity = item.quantity - 1;
 
-      this.cartService.updateQuantity(item.id, newQuantity).subscribe(
-        res => {
-          item.quantity = res.new_quantity;
-          this.calculateTotal();
-          console.log('Quantité mise à jour avec succès sur le backend', res);
-
-        },
-        err => {
-          console.error('Erreur lors de la diminution de la quantité', err);
-        }
-      );
+      this.cartService.updateQuantity(item.id, newQuantity)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(
+          res => {
+            item.quantity = res.new_quantity;
+            this.calculateTotal();
+            console.log('Quantité mise à jour avec succès sur le backend', res);
+          },
+          err => {
+            console.error('Erreur lors de la diminution de la quantité', err);
+          }
+        );
     }
   }
 
   increaseQuantity(item: Cart): void {
     const newQuantity = item.quantity + 1;
 
-    this.cartService.updateQuantity(item.id, newQuantity).subscribe(
-      res => {
-        item.quantity = res.new_quantity;
-        this.calculateTotal();
-        console.log('Quantité mise à jour avec succès sur le backend', res);
-
-      },
-      err => {
-        console.error('Erreur lors de l’augmentation de la quantité', err);
-      }
-    );
+    this.cartService.updateQuantity(item.id, newQuantity)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(
+        res => {
+          item.quantity = res.new_quantity;
+          this.calculateTotal();
+          console.log('Quantité mise à jour avec succès sur le backend', res);
+        },
+        err => {
+          console.error('Erreur lors de l\'augmentation de la quantité', err);
+        }
+      );
   }
 
 
@@ -96,14 +103,16 @@ export class CartComponent implements OnInit {
       console.error('ID du produit manquant');
       return;
     }
-    this.cartService.removeFromCart(item.id).subscribe({
-      next: () => {
-        this.loadCart();
-      },
-      error: err => {
-        console.error('Erreur lors de la suppression', err);
-      }
-    });
+    this.cartService.removeFromCart(item.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.loadCart();
+        },
+        error: err => {
+          console.error('Erreur lors de la suppression', err);
+        }
+      });
   }
 
 
@@ -115,21 +124,22 @@ export class CartComponent implements OnInit {
       return_url: "https://sf6lj8b2-4200.uks1.devtunnels.ms/payment-success",
       notify_url: "https://webhook.site/d457b2f3-dd71-4f04-9af5-e2fcf3be8f34",
       payment_country: "CM"
-
     };
-    this.transactionService.initiatePayment(paymentData).subscribe(
-      (response: any) => {
-        if (response && response.payment_url) {
-          window.location.href = response.payment_url;
-        } else {
-          alert('Erreur de redirection vers PayUnit.');
+    this.transactionService.initiatePayment(paymentData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(
+        (response: any) => {
+          if (response && response.payment_url) {
+            window.location.href = response.payment_url;
+          } else {
+            alert('Erreur de redirection vers PayUnit.');
+          }
+        },
+        (err: any) => {
+          console.error('Erreur paiement :', err);
+          alert('Erreur lors du paiement.');
         }
-      },
-      (err: any) => {
-        console.error('Erreur paiement :', err);
-        alert('Erreur lors du paiement.');
-      }
-    );
+      );
   }
 
   // }
@@ -158,6 +168,11 @@ export class CartComponent implements OnInit {
 
   get showTotal(): string {
     return this.totalPrice.toFixed(2);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   payer() {

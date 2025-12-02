@@ -103,7 +103,7 @@
         <!-- Product Image -->
         <div class="card-img-wrapper position-relative">
           <img 
-            [src]="product.picture" 
+            [src]="getProductImage(product)" 
             [alt]="product.name" 
             class="card-img-top product-image"
             (error)="onImageError($event)"

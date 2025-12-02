@@ -5,8 +5,8 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class TransactionService {
-  //  private apiUrl = 'http://localhost:5000/transaction/payment'; // Change selon ton URL
-  private API_URL = 'http://localhost:5000/transaction'; // Base URL for transaction-related endpoints
+  //  private apiUrl = 'https://e-commerce-app-1-islr.onrender.com/transaction/payment'; // Production URL
+  private API_URL = 'https://e-commerce-app-1-islr.onrender.com/transaction'; // Base URL for transaction-related endpoints
 
   constructor(private http: HttpClient) { }
 
