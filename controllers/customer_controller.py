@@ -21,10 +21,18 @@ def load_user(customer_id):
     return Customers.query.get(int(customer_id))
 
 def send_email(to, subject, template):
-
     with current_app.app_context():
-         msg = Message(subject='hello good to se you', recipients=[to], html=template, sender=(current_app.config['MAIL_DEFAULT_SENDER'],'e_commerce_app'))
-         mail.send(msg)
+        try:
+            msg = Message(
+                subject=subject, 
+                recipients=[to], 
+                html=template, 
+                sender=current_app.config.get('MAIL_DEFAULT_SENDER', 'noreply@ecommerce.com')
+            )
+            mail.send(msg)
+            current_app.logger.info(f"Email sent to {to}")
+        except Exception as e:
+            current_app.logger.error(f"Error sending email to {to}: {str(e)}")
 
 def admin_required(f):
     @wraps(f)
