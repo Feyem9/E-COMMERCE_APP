@@ -1,18 +1,16 @@
-from flask import Blueprint, render_template, redirect, request, session, url_for, jsonify, abort#type:ignore
+from flask import Blueprint, render_template, redirect, request, session, url_for, jsonify, abort, current_app#type:ignore
 from werkzeug.security import generate_password_hash, check_password_hash#type:ignore
 from models.customer_model import Customers
 from config import db
 from itsdangerous import URLSafeTimedSerializer#type:ignore
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user#type:ignore
-from flask_mail import Message, Mail#type:ignore
-from flask import current_app#type:ignore
+from flask_mail import Message#type:ignore
 from functools import wraps
 from flask_jwt_extended import create_access_token , jwt_required, get_jwt_identity , decode_token#type:ignore
 
 
 customer_bp = Blueprint('customer', __name__, url_prefix='/customers')
 
-mail = Mail()
 login_manager = LoginManager()
 s = URLSafeTimedSerializer('your-secret-key')  # Remplacez par une clé secrète sécurisée
 
@@ -21,18 +19,24 @@ def load_user(customer_id):
     return Customers.query.get(int(customer_id))
 
 def send_email(to, subject, template):
-    with current_app.app_context():
-        try:
-            msg = Message(
-                subject=subject, 
-                recipients=[to], 
-                html=template, 
-                sender=current_app.config.get('MAIL_DEFAULT_SENDER', 'noreply@ecommerce.com')
-            )
-            mail.send(msg)
-            current_app.logger.info(f"Email sent to {to}")
-        except Exception as e:
-            current_app.logger.error(f"Error sending email to {to}: {str(e)}")
+    """Envoyer un email en utilisant la configuration Flask-Mail de l'app"""
+    try:
+        from flask_mail import Mail
+        mail_instance = current_app.extensions.get('mail')
+        if not mail_instance:
+            current_app.logger.warning("Flask-Mail not initialized in app.extensions")
+            return
+        
+        msg = Message(
+            subject=subject, 
+            recipients=[to], 
+            html=template, 
+            sender=current_app.config.get('MAIL_DEFAULT_SENDER', 'noreply@ecommerce.com')
+        )
+        mail_instance.send(msg)
+        current_app.logger.info(f"✅ Email sent to {to}")
+    except Exception as e:
+        current_app.logger.warning(f"⚠️ Error sending email to {to}: {str(e)}")
 
 def admin_required(f):
     @wraps(f)
