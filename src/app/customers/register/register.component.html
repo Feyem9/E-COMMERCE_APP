@@ -84,6 +84,10 @@
             class="form-input" />
           <label for="contact" class="form-label">Contact Number</label>
         </div>
+        <div *ngIf="contact?.invalid && (contact?.dirty || contact?.touched)" class="error-message">
+          <i class="fas fa-exclamation-circle me-2"></i>
+          <span *ngIf="contact?.errors?.['required']">Contact is required</span>
+        </div>
       </div>
 
       <div class="form-group">
@@ -96,6 +100,10 @@
             placeholder="Your address"
             class="form-input" />
           <label for="address" class="form-label">Address</label>
+        </div>
+        <div *ngIf="address?.invalid && (address?.dirty || address?.touched)" class="error-message">
+          <i class="fas fa-exclamation-circle me-2"></i>
+          <span *ngIf="address?.errors?.['required']">Address is required</span>
         </div>
       </div>
 
