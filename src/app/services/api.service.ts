@@ -2,7 +2,7 @@ import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, retry } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { AuthService } from '../customers/auth.service';
 
 @Injectable({
@@ -32,7 +32,6 @@ export class ApiService {
     
     return this.http.get<T>(`${this.baseUrl}${endpoint}`, options)
       .pipe(
-        retry(1),
         catchError(this.handleError)
       );
   }
@@ -48,7 +47,6 @@ export class ApiService {
     };
     return this.http.post<T>(`${this.baseUrl}${endpoint}`, data, mergedOptions)
       .pipe(
-        retry(1),
         catchError(this.handleError)
       );
   }
@@ -64,7 +62,6 @@ export class ApiService {
     };
     return this.http.put<T>(`${this.baseUrl}${endpoint}`, data, mergedOptions)
       .pipe(
-        retry(1),
         catchError(this.handleError)
       );
   }
@@ -80,7 +77,6 @@ export class ApiService {
     };
     return this.http.delete<T>(`${this.baseUrl}${endpoint}`, mergedOptions)
       .pipe(
-        retry(1),
         catchError(this.handleError)
       );
   }
