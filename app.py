@@ -21,11 +21,24 @@ from routes.transaction_route import transaction
 # db
 app = Flask(__name__)
 configure_cloudinary()
-CORS(app)
 
-# Autoriser CORS pour toutes les routes
-CORS(app, resources={r"/*": {"origins": "http://localhost:4200"}}, supports_credentials=True, methods=['GET', 'POST', 'OPTIONS' , 'DELETE' , 'PUT'], allow_headers=['Content-Type', 'Authorization'])
+# Configuration CORS - supporter local dev et production
+CORS(app, resources={r"/*": {
+    "origins": ["http://localhost:4200", "http://localhost:4201", "http://localhost:3000"],
+    "methods": ['GET', 'POST', 'OPTIONS', 'DELETE', 'PUT', 'PATCH'],
+    "allow_headers": ['Content-Type', 'Authorization'],
+    "supports_credentials": True,
+    "max_age": 3600
+}})
 
+# Ajouter headers de CORS pour toutes les réponses
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
+    response.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS,DELETE,PUT,PATCH'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
+    return response
 
 # Configuration de l'application pour l'envoie des mails
 app.config.from_object('config')
