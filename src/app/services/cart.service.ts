@@ -84,19 +84,31 @@ export class CartService {
       return throwError(() => new Error('La quantité doit être supérieure à 0'));
     }
 
-    // Vérifier si l'utilisateur est authentifié
-    if (!this.apiService.isAuthenticated()) {
-      this.setError('Vous devez vous connecter pour ajouter des articles au panier');
-      return throwError(() => new Error('Utilisateur non authentifié'));
-    }
-
+    // Vérifier si l'utilisateur est authentifié - optionnel pour l'ajout au panier local
+    // Les utilisateurs non authentifiés peuvent ajouter au panier local avant de se connecter
+    
     this.loadingSubject.next(true);
     this.errorSubject.next(null);
     
-    const cartItem = {
+    // Construire les données du panier
+    const cartItem: any = {
       product_id: productId,
       quantity: quantity
     };
+    
+    // Si l'utilisateur est authentifié, le backend extraira l'ID du JWT
+    // Sinon, ajouter l'ID client depuis le localStorage (session anonyme)
+    if (!this.apiService.isAuthenticated()) {
+      // Utiliser un ID de session pour les paniers anonymes
+      let sessionId = typeof localStorage !== 'undefined' ? localStorage.getItem('session_id') : null;
+      if (!sessionId) {
+        sessionId = 'guest_' + Math.random().toString(36).substr(2, 9);
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('session_id', sessionId);
+        }
+      }
+      cartItem.customer_id = sessionId;
+    }
 
     // Inclure les en-têtes d'authentification
     const headers = this.apiService.getAuthHeaders();
@@ -122,11 +134,6 @@ export class CartService {
   updateQuantity(cartId: number, newQuantity: number): Observable<any> {
     if (newQuantity <= 0) {
       return this.removeFromCart(cartId);
-    }
-
-    if (!this.apiService.isAuthenticated()) {
-      this.setError('Vous devez vous connecter pour modifier le panier');
-      return throwError(() => new Error('Utilisateur non authentifié'));
     }
 
     this.loadingSubject.next(true);
