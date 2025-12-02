@@ -60,7 +60,8 @@
                 [src]="getProductImage(product)" 
                 [alt]="product.name" 
                 class="card-img-top product-image"
-                (error)="onImageError($event)">
+                (error)="onImageError($event)"
+                loading="eager">
               <div class="discount-badge" *ngIf="product.discount_price < product.current_price">
                 <span class="badge bg-danger">
                   {{ ((product.current_price - product.discount_price) / product.current_price * 100 | number:'1.0-0') }}% OFF

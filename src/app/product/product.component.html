@@ -107,7 +107,7 @@
             [alt]="product.name" 
             class="card-img-top product-image"
             (error)="onImageError($event)"
-            loading="lazy">
+            [loading]="currentPage === 1 ? 'eager' : 'lazy'">
           
           <!-- Discount Badge -->
           <div 

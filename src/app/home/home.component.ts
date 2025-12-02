@@ -78,7 +78,21 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   onImageError(event: any): void {
-    event.target.src = this.placeholderImage;
+    // Set a CSS background instead of an image to avoid LCP issues
+    event.target.style.display = 'none';
+    event.target.parentElement.style.backgroundColor = '#e0e0e0';
+    event.target.parentElement.style.minHeight = '300px';
+    event.target.parentElement.style.display = 'flex';
+    event.target.parentElement.style.alignItems = 'center';
+    event.target.parentElement.style.justifyContent = 'center';
+    
+    // Add placeholder text
+    const placeholder = document.createElement('div');
+    placeholder.innerHTML = '📷 No Image Available';
+    placeholder.style.fontSize = '24px';
+    placeholder.style.color = '#999';
+    placeholder.style.textAlign = 'center';
+    event.target.parentElement.appendChild(placeholder);
   }
 
   getProductImage(product: Product): string {
