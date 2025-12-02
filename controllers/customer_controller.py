@@ -36,51 +36,73 @@ def admin_required(f):
 
 #
 def register():
-    if request.method == 'POST':
-        data = request.json if request.is_json else request.form
+    try:
+        if request.method == 'POST':
+            # Assurez-vous que les données sont bien en JSON
+            if not request.is_json:
+                current_app.logger.error("Content-Type n'est pas JSON")
+                return jsonify({'error': 'Content-Type must be application/json'}), 400
+            
+            data = request.get_json()
+            if not data:
+                current_app.logger.error("Pas de données JSON reçues")
+                return jsonify({'error': 'Pas de données reçues'}), 400
 
-        email = data.get('email', '').lower()
-        name = data.get('name')
-        password = data.get('password')
-        contact = data.get('contact')
-        address = data.get('address')
-        role = data.get('role', 'user')
+            email = data.get('email', '').strip().lower()
+            name = data.get('name', '').strip()
+            password = data.get('password', '')
+            contact = data.get('contact', '').strip()
+            address = data.get('address', '').strip()
+            role = data.get('role', 'user')
 
-        current_app.logger.info(f"Données reçues : email={email}, name={name}, contact={contact}, address={address}, role={role}")
-        current_app.logger.info(f"Type de contenu : {request.content_type}")
+            current_app.logger.info(f"Données reçues : email={email}, name={name}, contact={contact}, address={address}, role={role}")
 
-        # Vérification des champs requis
-        missing = [field for field in ['email', 'name', 'password', 'contact', 'address'] if not data.get(field)]
-        if missing:
-            current_app.logger.error(f"Données manquantes : {', '.join(missing)}")
-            return jsonify({'error': 'Données manquantes pour l\'inscription'}), 400
+            # Vérification des champs requis
+            missing = [field for field in ['email', 'name', 'password', 'contact', 'address'] if not data.get(field)]
+            if missing:
+                current_app.logger.error(f"Données manquantes : {', '.join(missing)}")
+                return jsonify({'error': 'Données manquantes pour l\'inscription'}), 400
 
-        # Vérification de l'unicité de l'email
-        if Customers.query.filter_by(email=email).first():
-            return jsonify({'error': 'Cet email existe déjà'}), 400
+            # Vérification de l'unicité de l'email
+            existing_user = Customers.query.filter_by(email=email).first()
+            if existing_user:
+                current_app.logger.error(f"Email déjà existant : {email}")
+                return jsonify({'error': 'Cet email existe déjà'}), 400
 
-        # Création du nouvel utilisateur
-        new_customer = Customers(
-            email=email,
-            name=name,
-            password=generate_password_hash(password, method='pbkdf2:sha256'),
-            contact=contact,
-            address=address,
-            role=role
-        )
-        db.session.add(new_customer)
-        db.session.commit()
+            # Création du nouvel utilisateur
+            new_customer = Customers(
+                email=email,
+                name=name,
+                password=generate_password_hash(password, method='pbkdf2:sha256'),
+                contact=contact,
+                address=address,
+                role=role
+            )
+            db.session.add(new_customer)
+            db.session.commit()
+            current_app.logger.info(f"Utilisateur créé avec succès : {email}")
 
-        # Envoi de l'email de confirmation
-        s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
-        token = s.dumps(email, salt='email-confirm')
-        confirm_url = url_for('customer.confirm_email', token=token, _external=True)
-        html = render_template('email/confirm_email.html', name=name, confirm_url=confirm_url)
-        send_email(email, 'Confirmez votre inscription', html)
+            # Envoi de l'email de confirmation (optionnel - ne pas bloquer si erreur)
+            try:
+                s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+                token = s.dumps(email, salt='email-confirm')
+                confirm_url = url_for('customer.confirm_email', token=token, _external=True)
+                html = render_template('email/confirm_email.html', name=name, confirm_url=confirm_url)
+                send_email(email, 'Confirmez votre inscription', html)
+                current_app.logger.info(f"Email de confirmation envoyé à : {email}")
+            except Exception as e:
+                current_app.logger.warning(f"Erreur lors de l'envoi d'email à {email} : {str(e)}")
 
-        return jsonify({'message': 'Inscription réussie. Veuillez vérifier votre email.'}), 201
+            return jsonify({'message': 'Inscription réussie. Veuillez vérifier votre email.'}), 201
 
-    return render_template('/customers/register.html')
+        # Pour les autres méthodes, retourner une erreur
+        return jsonify({'error': 'Méthode non autorisée'}), 405
+
+    except Exception as e:
+        db.session.rollback()
+        error_msg = f"Erreur lors de l'enregistrement : {str(e)}"
+        current_app.logger.error(error_msg, exc_info=True)
+        return jsonify({'error': 'Erreur lors de l\'enregistrement', 'details': str(e)}), 500
 
 
 

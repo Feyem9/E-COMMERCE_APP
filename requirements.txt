@@ -5,6 +5,7 @@ cachelib==0.13.0
 certifi==2025.4.26
 charset-normalizer==3.4.2
 click==8.1.7
+cloudinary==1.36.0
 Flask==3.0.3
 Flask-Bcrypt==1.0.1
 Flask-Cors==5.0.0
