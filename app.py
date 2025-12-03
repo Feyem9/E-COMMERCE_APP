@@ -24,7 +24,13 @@ configure_cloudinary()
 
 # Configuration CORS - supporter local dev et production
 CORS(app, resources={r"/*": {
-    "origins": ["http://localhost:4200", "http://localhost:4201", "http://localhost:3000"],
+    "origins": [
+        "http://localhost:4200",
+        "http://localhost:4201",
+        "http://localhost:3000",
+        "https://e-commerce-app-1-islr.onrender.com",
+        "https://*.onrender.com"
+    ],
     "methods": ['GET', 'POST', 'OPTIONS', 'DELETE', 'PUT', 'PATCH'],
     "allow_headers": ['Content-Type', 'Authorization'],
     "supports_credentials": True,
@@ -34,7 +40,21 @@ CORS(app, resources={r"/*": {
 # Ajouter headers de CORS pour toutes les réponses
 @app.after_request
 def add_cors_headers(response):
-    response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
+    origin = request.headers.get('Origin', '')
+    allowed_origins = [
+        "http://localhost:4200",
+        "http://localhost:4201",
+        "http://localhost:3000",
+        "https://e-commerce-app-1-islr.onrender.com",
+        "https://*.onrender.com"
+    ]
+
+    # Allow the specific origin if it's in our allowed list, otherwise use wildcard
+    if origin in allowed_origins:
+        response.headers['Access-Control-Allow-Origin'] = origin
+    else:
+        response.headers['Access-Control-Allow-Origin'] = '*'
+
     response.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS,DELETE,PUT,PATCH'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
     response.headers['Access-Control-Allow-Credentials'] = 'true'

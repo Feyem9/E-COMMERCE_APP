@@ -51,16 +51,30 @@ def register():
     try:
         if request.method != 'POST':
             return jsonify({'error': 'Method not allowed. Use POST.'}), 405
-        
+
         # Vérifier le Content-Type
         if not request.is_json:
-            current_app.logger.error(f"Invalid Content-Type: {request.content_type}")
-            return jsonify({'error': 'Content-Type must be application/json'}), 400
-        
+            try:
+                current_app.logger.error(f"Invalid Content-Type: {request.content_type}")
+            except:
+                pass
+            return jsonify({
+                'error': 'Content-Type must be application/json',
+                'details': f'Received Content-Type: {request.content_type}',
+                'required': 'application/json'
+            }), 400
+
         data = request.get_json()
         if data is None:
-            current_app.logger.error("get_json() returned None")
-            return jsonify({'error': 'Invalid JSON data'}), 400
+            try:
+                current_app.logger.error("get_json() returned None")
+            except:
+                pass
+            return jsonify({
+                'error': 'Invalid JSON data',
+                'details': 'Request body could not be parsed as JSON',
+                'received_data': str(request.data)
+            }), 400
 
         # Extraire les données avec des valeurs par défaut
         email = (data.get('email') or '').strip().lower()
@@ -70,7 +84,10 @@ def register():
         address = (data.get('address') or '').strip()
         role = (data.get('role') or 'user').strip().lower()
 
-        current_app.logger.info(f"Register attempt: email={email}, name={name}, role={role}")
+        try:
+            current_app.logger.info(f"Register attempt: email={email}, name={name}, role={role}")
+        except:
+            pass
 
         # Valider les champs requis
         if not email or not name or not password or not contact or not address:
@@ -80,15 +97,52 @@ def register():
             if not password: missing_fields.append('password')
             if not contact: missing_fields.append('contact')
             if not address: missing_fields.append('address')
-            
-            current_app.logger.warning(f"Missing fields: {missing_fields}")
-            return jsonify({'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
+
+            try:
+                current_app.logger.warning(f"Missing fields: {missing_fields}")
+            except:
+                pass
+            return jsonify({
+                'error': f'Missing required fields: {", ".join(missing_fields)}',
+                'missing_fields': missing_fields,
+                'received_data': {
+                    'email': email,
+                    'name': name,
+                    'password': '*****' if password else '',
+                    'contact': contact,
+                    'address': address,
+                    'role': role
+                }
+            }), 400
+
+        # Valider le format de l'email
+        if '@' not in email or '.' not in email:
+            return jsonify({
+                'error': 'Invalid email format',
+                'details': 'Email must contain @ and . characters',
+                'received_email': email
+            }), 400
+
+        # Valider la longueur du mot de passe
+        if len(password) < 6:
+            return jsonify({
+                'error': 'Password too short',
+                'details': 'Password must be at least 6 characters long',
+                'received_length': len(password)
+            }), 400
 
         # Vérifier que l'email n'existe pas déjà
         existing = Customers.query.filter(Customers.email == email).first()
         if existing:
-            current_app.logger.warning(f"Email already exists: {email}")
-            return jsonify({'error': 'Email already registered'}), 400
+            try:
+                current_app.logger.warning(f"Email already exists: {email}")
+            except:
+                pass
+            return jsonify({
+                'error': 'Email already registered',
+                'details': 'This email address is already in use',
+                'existing_email': email
+            }), 400
 
         # Hasher le mot de passe
         hashed_pw = generate_password_hash(password, method='pbkdf2:sha256')
@@ -140,8 +194,15 @@ def register():
     except Exception as e:
         db.session.rollback()
         error_msg = str(e)
-        current_app.logger.error(f"Registration error: {error_msg}", exc_info=True)
+        try:
+            current_app.logger.error(f"Registration error: {error_msg}", exc_info=True)
+        except:
+            pass
         return jsonify({'error': 'Registration failed', 'details': error_msg}), 500
+
+# Handle OPTIONS request for CORS preflight
+def register_options():
+    return jsonify({'message': 'CORS preflight successful'}), 200
 
 
 
