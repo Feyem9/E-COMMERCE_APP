@@ -1,16 +1,38 @@
 .profile-container {
   display: flex;
   justify-content: center;
-  margin-top: 50px;
+  margin-top: 80px; /* Increased margin to account for navbar height */
+  padding: 20px;
+  min-height: calc(100vh - 80px);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .profile-card {
   background: #fff;
-  padding: 30px;
+  padding: 30px; 
   border-radius: 16px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
   width: 500px;
   text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
 
   .profile-header {
     margin-bottom: 20px;
