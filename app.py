@@ -1,4 +1,5 @@
 from flask import Flask , request , jsonify , session , redirect , url_for , current_app
+import datetime
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager 
 from flask_session import Session
@@ -148,10 +149,19 @@ def initialize_db():
 def not_found(error):
     return jsonify({'error': 'Not found'}), 404
 
-# Exemple de gestion d'erreurs 500
+# Gestion améliorée des erreurs 500 avec détails
 @app.errorhandler(500)
 def internal_server_error(error):
-    return jsonify({'error': 'Internal Server Error'}), 500
+    try:
+        current_app.logger.error(f"Internal Server Error: {str(error)}", exc_info=True)
+    except:
+        pass
+    return jsonify({
+        'error': 'Internal Server Error',
+        'details': 'An unexpected error occurred on the server',
+        'status': 500,
+        'timestamp': datetime.datetime.now().isoformat()
+    }), 500
 
 @app.route('/mail')
 def index():
