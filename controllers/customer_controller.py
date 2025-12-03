@@ -49,6 +49,16 @@ def admin_required(f):
 #
 def register():
     try:
+        if request.method == 'OPTIONS':
+            # Handle CORS preflight request
+            response = jsonify({'message': 'CORS preflight successful'})
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            response.headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE, PATCH')
+            response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+            response.headers.add('Access-Control-Allow-Credentials', 'true')
+            response.headers.add('Access-Control-Max-Age', '3600')
+            return response, 200
+    
         if request.method != 'POST':
             return jsonify({'error': 'Method not allowed. Use POST.'}), 405
 
@@ -202,7 +212,13 @@ def register():
 
 # Handle OPTIONS request for CORS preflight
 def register_options():
-    return jsonify({'message': 'CORS preflight successful'}), 200
+    response = jsonify({'message': 'CORS preflight successful'})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE, PATCH')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    response.headers.add('Access-Control-Max-Age', '3600')
+    return response, 200
 
 
 
