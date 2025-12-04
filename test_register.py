@@ -5,7 +5,8 @@ import json
 
 # Configuration d'environnement pour test local
 os.environ['FLASK_ENV'] = 'development'
-os.environ['DATABASE_URL'] = 'postgresql://postgres:root@localhost:5432/ecommerce_see2'
+# Utiliser SQLite pour le test local au lieu de PostgreSQL
+os.environ['FALLBACK_DB'] = 'sqlite:///test.db'
 
 from app import app
 
