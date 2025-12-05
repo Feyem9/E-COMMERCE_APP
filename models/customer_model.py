@@ -19,13 +19,15 @@ class Customers(db.Model):
 
     def is_admin(self):
         return self.role == 'admin'
-    def __init__(self, email, name, password, contact, address,role):
+    def __init__(self, email, name, password, contact, address, role):
         self.email = email
         self.name = name
-        self.password =  password
+        self.password = password
         self.contact = contact
         self.address = address
         self.role = role  # 'user' or 'admin'
+        self.confirmed = False  # Initialize required fields
+        self.is_active = True   # Initialize required fields
         
     def __repr__(self):
         return '<User %r>' % self.name
