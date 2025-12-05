@@ -20,7 +20,8 @@ export interface AuthResponse {
 })
 export class AuthService {
   // Déclaration explicite de la base URL (production)
-  private readonly apiBase = 'https://e-commerce-app-1-islr.onrender.com';
+  // private readonly apiBase = 'https://e-commerce-app-0hnw.onrender.com';
+  private readonly apiBase = 'http://localhost:5000';
 
   // Subject pour suivre l'état de l'authentification
   private authSub = new BehaviorSubject<AuthResponse | null>(null);

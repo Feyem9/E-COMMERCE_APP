@@ -9,7 +9,8 @@ import { AuthService } from '../customers/auth.service';
   providedIn: 'root'
 })
 export class ApiService {
-  private readonly baseUrl = 'https://e-commerce-app-1-islr.onrender.com';
+  // private readonly baseUrl = 'https://e-commerce-app-0hnw.onrender.com';
+  private readonly baseUrl = 'http://localhost:5000';
   
   private httpOptions = {
     headers: new HttpHeaders({

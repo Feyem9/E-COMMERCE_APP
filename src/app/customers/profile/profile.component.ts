@@ -20,7 +20,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     role: ''
   };
   private destroy$ = new Subject<void>();
-  private readonly apiBase = 'https://e-commerce-app-1-islr.onrender.com';
+  // private readonly apiBase = 'https://e-commerce-app-0hnw.onrender.com';
+  private readonly apiBase = 'http://localhost:5000';
 
   constructor(private http: HttpClient) { }
 

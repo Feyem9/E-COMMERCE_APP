@@ -11,7 +11,11 @@ import { LoginComponent } from './customers/login/login.component';
 import { RegisterComponent } from './customers/register/register.component';
 import { HomeComponent } from './home/home.component';
 import { ProfileComponent } from './customers/profile/profile.component';
-import { PaymentSuccessComponent } from './payment-success/payment-success.component';
+import { PaymentSuccessComponent } from './payment/payment-success/payment-success.component';
+import { HelpComponent } from './help/help.component';
+import { OrderTrackingComponent } from './help/order-tracking.component';
+import { StoreLocatorComponent } from './help/store-locator.component';
+import { FaqsComponent } from './help/faqs.component';
 
 const routes: Routes = [
   // {path : '' , component : NavbarComponent},
@@ -25,7 +29,12 @@ const routes: Routes = [
   { path: 'payment-success', component: PaymentSuccessComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'profile', component: ProfileComponent }
+  { path: 'profile', component: ProfileComponent },
+  // Routes d'aide
+  { path: 'help', component: HelpComponent },
+  { path: 'help/order-tracking', component: OrderTrackingComponent },
+  { path: 'help/store-locator', component: StoreLocatorComponent },
+  { path: 'help/faqs', component: FaqsComponent }
 ];
 
 @NgModule({

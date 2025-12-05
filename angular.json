@@ -12,7 +12,7 @@
         },
         "@schematics/angular:directive": {
           "standalone": false
-        },
+        }, 
         "@schematics/angular:pipe": {
           "standalone": false
         }

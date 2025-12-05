@@ -14,11 +14,11 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar'; 
 import { MatDivider } from "@angular/material/divider";
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
-import { MatCardModule } from '@angular/material/card';
+import { MatCardModule } from '@angular/material/card'; 
 import { ProductComponent } from './product/product.component';
 import { CategoriesComponent } from './categories/categories.component';
 import { TransactionComponent } from './transaction/transaction.component';
@@ -31,7 +31,7 @@ import { HomeComponent } from './home/home.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { ProfileComponent } from './customers/profile/profile.component';
-import { PaymentSuccessComponent } from './payment-success/payment-success.component';
+import { PaymentSuccessComponent } from './payment/payment-success/payment-success.component';
 import { PaymentComponent } from './payment/payment.component';
 import { TransactionHistoryComponent } from './transaction-history/transaction-history.component';  // Ajoutez cette ligne pour le ngModel
 
@@ -40,10 +40,7 @@ import { TransactionHistoryComponent } from './transaction-history/transaction-h
     AppComponent,
     NavbarComponent,
     ProductComponent,
-    CategoriesComponent,
     TransactionComponent,
-    OrderedComponent,
-    FavoriteComponent,
     CartComponent,
     LoginComponent,
     RegisterComponent,

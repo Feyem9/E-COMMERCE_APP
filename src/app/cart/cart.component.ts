@@ -121,7 +121,7 @@ export class CartComponent implements OnInit, OnDestroy {
     const paymentData = {
       total_amount: this.totalPrice,
       currency: 'XAF',
-      return_url: "https://sf6lj8b2-4200.uks1.devtunnels.ms/payment-success",
+      return_url: "https://8kfjw7x2-4200.uks1.devtunnels.ms/payment-success",
       notify_url: "https://webhook.site/d457b2f3-dd71-4f04-9af5-e2fcf3be8f34",
       payment_country: "CM"
     };
@@ -184,4 +184,4 @@ export class CartComponent implements OnInit, OnDestroy {
     localStorage.removeItem(this.cartKey);
   }
 
-}
+} 

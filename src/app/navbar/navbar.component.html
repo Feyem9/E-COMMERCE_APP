@@ -128,11 +128,11 @@
 
         <!-- Favorites -->
         <li class="nav-item" *ngIf="isLoggedIn">
-          <a class="nav-link position-relative" routerLink="/favorite">
+          <a class="nav-link position-relative" routerLink="/favorites">
             <i class="fas fa-heart"></i>
             <span class="visually-hidden">Favorites</span>
-            <span 
-              *ngIf="favoriteCount > 0" 
+            <span
+              *ngIf="favoriteCount > 0"
               class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
               {{ favoriteCount }}
               <span class="visually-hidden">items in favorites</span>
@@ -156,7 +156,7 @@
 
         <!-- Orders (for logged in users) -->
         <li class="nav-item" *ngIf="isLoggedIn">
-          <a class="nav-link" routerLink="/orders">
+          <a class="nav-link" routerLink="/ordered">
             <i class="fas fa-box me-1"></i>
             <span class="d-none d-md-inline">Orders</span>
           </a>
@@ -191,12 +191,12 @@
               </a>
             </li>
             <li>
-              <a class="dropdown-item" routerLink="/orders">
+              <a class="dropdown-item" routerLink="/ordered">
                 <i class="fas fa-box me-2"></i>My Orders
               </a>
             </li>
             <li>
-              <a class="dropdown-item" routerLink="/favorite">
+              <a class="dropdown-item" routerLink="/favorites">
                 <i class="fas fa-heart me-2"></i>My Favorites
               </a>
             </li>

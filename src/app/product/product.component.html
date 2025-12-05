@@ -108,7 +108,7 @@
             class="card-img-top product-image"
             (error)="onImageError($event)"
             [loading]="currentPage === 1 ? 'eager' : 'lazy'">
-          
+           
           <!-- Discount Badge -->
           <div 
             *ngIf="getDiscountPercentage(product) > 0" 
@@ -121,7 +121,7 @@
           <!-- Quick Actions -->
           <div class="product-overlay position-absolute w-100 h-100 d-flex align-items-center justify-content-center">
             <button 
-              class="btn btn-primary me-2"
+              class="btn btn-primary me-2" 
               (click)="viewProductDetails(product)">
               <i class="fas fa-eye"></i>
             </button>

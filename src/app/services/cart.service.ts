@@ -11,7 +11,8 @@ import { ApiService } from './api.service';
 })
 export class CartService {
   private readonly CART_STORAGE_KEY = 'cart';
-  private apiUrl = 'https://e-commerce-app-1-islr.onrender.com';
+  // private apiUrl = 'https://e-commerce-app-0hnw.onrender.com';
+  private apiUrl = 'http://localhost:5000';
 
   // Cart items observable
   private cartItemsSubject = new BehaviorSubject<Cart[]>([]);

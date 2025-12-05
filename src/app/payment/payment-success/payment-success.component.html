@@ -1,0 +1,60 @@
+<div class="payment-success-container">
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Chargement des informations de transaction...</p>
+  </div>
+
+  <div *ngIf="!loading" class="payment-success-content">
+    <h2 class="success-title">Paiement traité avec succès !</h2>
+
+    <div class="transaction-info">
+      <h3>Détails de la transaction</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">ID de transaction:</span>
+          <span class="value">{{ transactionId }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Statut:</span>
+          <span class="value" [class.success]="transactionStatus === 'completed'" [class.pending]="transactionStatus === 'pending'">
+            {{ transactionStatus }}
+          </span> 
+        </div>
+        <div class="info-item">
+          <span class="label">Montant:</span>
+          <span class="value">{{ transactionAmount }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Passerelle:</span>
+          <span class="value">{{ transactionGateway }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="qrCodeValue" class="qr-validation-section">
+      <h3>Validation de votre transaction</h3>
+      <p>Merci pour votre achat ! Veuillez scanner ce QR code pour valider votre transaction.</p>
+
+      <div class="qr-code-container">
+        <img [src]="'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + qrCodeValue" alt="QR Code de validation" />
+        <p class="qr-instructions">Ce QR code contient votre ID de transaction unique. Scannez-le pour valider votre paiement.</p>
+      </div>
+
+      <!-- Message de validation -->
+      <div *ngIf="validationMessage" [class.validation-success]="validationSuccess" [class.validation-error]="!validationSuccess">
+        {{ validationMessage }}
+      </div>
+
+      <!-- Message de remerciement -->
+      <div class="thank-you-message">
+        <p>Nous apprécions votre confiance. Votre transaction sera validée après scan du QR code.</p>
+        <p>Vous recevrez une confirmation par email une fois la validation terminée.</p>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <a routerLink="/products" class="continue-shopping">Continuer vos achats</a>
+      <a routerLink="/profile" class="view-profile">Voir votre profil</a>
+    </div>
+  </div>
+</div>
