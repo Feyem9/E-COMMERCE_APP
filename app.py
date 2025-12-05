@@ -1,4 +1,5 @@
 from flask import Flask , request , jsonify , session , redirect , url_for , current_app
+import datetime
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager 
 from flask_session import Session
@@ -21,11 +22,44 @@ from routes.transaction_route import transaction
 # db
 app = Flask(__name__)
 configure_cloudinary()
-CORS(app)
 
-# Autoriser CORS pour toutes les routes
-CORS(app, resources={r"/*": {"origins": "http://localhost:4200"}}, supports_credentials=True, methods=['GET', 'POST', 'OPTIONS' , 'DELETE' , 'PUT'], allow_headers=['Content-Type', 'Authorization'])
+# Configuration CORS - supporter local dev et production
+CORS(app, resources={r"/*": {
+    "origins": [
+        "http://localhost:4200",
+        "http://localhost:4201",
+        "http://localhost:3000",
+        "https://e-commerce-app-1-islr.onrender.com",
+        "https://*.onrender.com"
+    ],
+    "methods": ['GET', 'POST', 'OPTIONS', 'DELETE', 'PUT', 'PATCH'],
+    "allow_headers": ['Content-Type', 'Authorization'],
+    "supports_credentials": True,
+    "max_age": 3600
+}})
 
+# Ajouter headers de CORS pour toutes les réponses
+@app.after_request
+def add_cors_headers(response):
+    origin = request.headers.get('Origin', '')
+    allowed_origins = [
+        "http://localhost:4200",
+        "http://localhost:4201",
+        "http://localhost:3000",
+        "https://e-commerce-app-1-islr.onrender.com",
+        "https://*.onrender.com"
+    ]
+
+    # Allow the specific origin if it's in our allowed list, otherwise use wildcard
+    if origin in allowed_origins:
+        response.headers['Access-Control-Allow-Origin'] = origin
+    else:
+        response.headers['Access-Control-Allow-Origin'] = '*'
+
+    response.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS,DELETE,PUT,PATCH'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
+    return response
 
 # Configuration de l'application pour l'envoie des mails
 app.config.from_object('config')
@@ -92,15 +126,42 @@ app.register_blueprint(order , url_prefix='/order')
 app.register_blueprint(product , url_prefix='/product') 
 app.register_blueprint(transaction , url_prefix='/transaction')
 
+# Initialiser la base de données avec les données
+@app.before_request
+def initialize_db():
+    """Initialiser la base de données une seule fois au démarrage"""
+    if not hasattr(app, 'db_initialized'):
+        try:
+            with app.app_context():
+                from models.product_model import Products
+                existing_count = Products.query.count()
+                if existing_count == 0:
+                    print("🌱 Peuplement initial de la base de données...")
+                    from populate_db import populate_products
+                    populate_products()
+                app.db_initialized = True
+        except Exception as e:
+            print(f"⚠️  Erreur lors de l'initialisation de la BD: {e}")
+            app.db_initialized = True
+
 # Gestion des erreurs 404
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'error': 'Not found'}), 404
 
-# Exemple de gestion d'erreurs 500
+# Gestion améliorée des erreurs 500 avec détails
 @app.errorhandler(500)
 def internal_server_error(error):
-    return jsonify({'error': 'Internal Server Error'}), 500
+    try:
+        current_app.logger.error(f"Internal Server Error: {str(error)}", exc_info=True)
+    except:
+        pass
+    return jsonify({
+        'error': 'Internal Server Error',
+        'details': 'An unexpected error occurred on the server',
+        'status': 500,
+        'timestamp': datetime.datetime.now().isoformat()
+    }), 500
 
 @app.route('/mail')
 def index():

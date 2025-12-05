@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-from controllers.order_conttroller import index ,view_order , update_order , place_order , delete_order 
+from controllers.order_controller import index ,view_order , update_order , place_order , delete_order 
 
 order = Blueprint('order', __name__)
 

@@ -1,18 +1,16 @@
-from flask import Blueprint, render_template, redirect, request, session, url_for, jsonify, abort#type:ignore
+from flask import Blueprint, render_template, redirect, request, session, url_for, jsonify, abort, current_app#type:ignore
 from werkzeug.security import generate_password_hash, check_password_hash#type:ignore
 from models.customer_model import Customers
 from config import db
 from itsdangerous import URLSafeTimedSerializer#type:ignore
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user#type:ignore
-from flask_mail import Message, Mail#type:ignore
-from flask import current_app#type:ignore
+from flask_mail import Message#type:ignore
 from functools import wraps
 from flask_jwt_extended import create_access_token , jwt_required, get_jwt_identity , decode_token#type:ignore
 
 
 customer_bp = Blueprint('customer', __name__, url_prefix='/customers')
 
-mail = Mail()
 login_manager = LoginManager()
 s = URLSafeTimedSerializer('your-secret-key')  # Remplacez par une clé secrète sécurisée
 
@@ -21,10 +19,24 @@ def load_user(customer_id):
     return Customers.query.get(int(customer_id))
 
 def send_email(to, subject, template):
-
-    with current_app.app_context():
-         msg = Message(subject='hello good to se you', recipients=[to], html=template, sender=(current_app.config['MAIL_DEFAULT_SENDER'],'e_commerce_app'))
-         mail.send(msg)
+    """Envoyer un email en utilisant la configuration Flask-Mail de l'app"""
+    try:
+        from flask_mail import Mail
+        mail_instance = current_app.extensions.get('mail')
+        if not mail_instance:
+            current_app.logger.warning("Flask-Mail not initialized in app.extensions")
+            return
+        
+        msg = Message(
+            subject=subject, 
+            recipients=[to], 
+            html=template, 
+            sender=current_app.config.get('MAIL_DEFAULT_SENDER', 'noreply@ecommerce.com')
+        )
+        mail_instance.send(msg)
+        current_app.logger.info(f"✅ Email sent to {to}")
+    except Exception as e:
+        current_app.logger.warning(f"⚠️ Error sending email to {to}: {str(e)}")
 
 def admin_required(f):
     @wraps(f)
@@ -36,51 +48,177 @@ def admin_required(f):
 
 #
 def register():
-    if request.method == 'POST':
-        data = request.json if request.is_json else request.form
+    try:
+        if request.method == 'OPTIONS':
+            # Handle CORS preflight request
+            response = jsonify({'message': 'CORS preflight successful'})
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            response.headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE, PATCH')
+            response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+            response.headers.add('Access-Control-Allow-Credentials', 'true')
+            response.headers.add('Access-Control-Max-Age', '3600')
+            return response, 200
+    
+        if request.method != 'POST':
+            return jsonify({'error': 'Method not allowed. Use POST.'}), 405
 
-        email = data.get('email', '').lower()
-        name = data.get('name')
-        password = data.get('password')
-        contact = data.get('contact')
-        address = data.get('address')
-        role = data.get('role', 'user')
+        # Vérifier le Content-Type
+        if not request.is_json:
+            try:
+                current_app.logger.error(f"Invalid Content-Type: {request.content_type}")
+            except:
+                pass
+            return jsonify({
+                'error': 'Content-Type must be application/json',
+                'details': f'Received Content-Type: {request.content_type}',
+                'required': 'application/json'
+            }), 400
 
-        current_app.logger.info(f"Données reçues : email={email}, name={name}, contact={contact}, address={address}, role={role}")
-        current_app.logger.info(f"Type de contenu : {request.content_type}")
+        data = request.get_json()
+        if data is None:
+            try:
+                current_app.logger.error("get_json() returned None")
+            except:
+                pass
+            return jsonify({
+                'error': 'Invalid JSON data',
+                'details': 'Request body could not be parsed as JSON',
+                'received_data': str(request.data)
+            }), 400
 
-        # Vérification des champs requis
-        missing = [field for field in ['email', 'name', 'password', 'contact', 'address'] if not data.get(field)]
-        if missing:
-            current_app.logger.error(f"Données manquantes : {', '.join(missing)}")
-            return jsonify({'error': 'Données manquantes pour l\'inscription'}), 400
+        # Extraire les données avec des valeurs par défaut
+        email = (data.get('email') or '').strip().lower()
+        name = (data.get('name') or '').strip()
+        password = data.get('password') or ''
+        contact = (data.get('contact') or '').strip()
+        address = (data.get('address') or '').strip()
+        role = (data.get('role') or 'user').strip().lower()
 
-        # Vérification de l'unicité de l'email
-        if Customers.query.filter_by(email=email).first():
-            return jsonify({'error': 'Cet email existe déjà'}), 400
+        try:
+            current_app.logger.info(f"Register attempt: email={email}, name={name}, role={role}")
+        except:
+            pass
 
-        # Création du nouvel utilisateur
+        # Valider les champs requis
+        if not email or not name or not password or not contact or not address:
+            missing_fields = []
+            if not email: missing_fields.append('email')
+            if not name: missing_fields.append('name')
+            if not password: missing_fields.append('password')
+            if not contact: missing_fields.append('contact')
+            if not address: missing_fields.append('address')
+
+            try:
+                current_app.logger.warning(f"Missing fields: {missing_fields}")
+            except:
+                pass
+            return jsonify({
+                'error': f'Missing required fields: {", ".join(missing_fields)}',
+                'missing_fields': missing_fields,
+                'received_data': {
+                    'email': email,
+                    'name': name,
+                    'password': '*****' if password else '',
+                    'contact': contact,
+                    'address': address,
+                    'role': role
+                }
+            }), 400
+
+        # Valider le format de l'email
+        if '@' not in email or '.' not in email:
+            return jsonify({
+                'error': 'Invalid email format',
+                'details': 'Email must contain @ and . characters',
+                'received_email': email
+            }), 400
+
+        # Valider la longueur du mot de passe
+        if len(password) < 6:
+            return jsonify({
+                'error': 'Password too short',
+                'details': 'Password must be at least 6 characters long',
+                'received_length': len(password)
+            }), 400
+
+        # Vérifier que l'email n'existe pas déjà
+        existing = Customers.query.filter(Customers.email == email).first()
+        if existing:
+            try:
+                current_app.logger.warning(f"Email already exists: {email}")
+            except:
+                pass
+            return jsonify({
+                'error': 'Email already registered',
+                'details': 'This email address is already in use',
+                'existing_email': email
+            }), 400
+
+        # Hasher le mot de passe
+        hashed_pw = generate_password_hash(password, method='pbkdf2:sha256')
+        
+        # Créer le nouvel utilisateur
         new_customer = Customers(
             email=email,
             name=name,
-            password=generate_password_hash(password, method='pbkdf2:sha256'),
+            password=hashed_pw,
             contact=contact,
             address=address,
             role=role
         )
+        
+        # Sauvegarder dans la base de données
         db.session.add(new_customer)
         db.session.commit()
+        current_app.logger.info(f"✅ Customer created successfully: {email}")
 
-        # Envoi de l'email de confirmation
-        s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
-        token = s.dumps(email, salt='email-confirm')
-        confirm_url = url_for('customer.confirm_email', token=token, _external=True)
-        html = render_template('email/confirm_email.html', name=name, confirm_url=confirm_url)
-        send_email(email, 'Confirmez votre inscription', html)
+        # Essayer d'envoyer un email de confirmation (optionnel)
+        try:
+            s = URLSafeTimedSerializer(current_app.config.get('SECRET_KEY', 'default-secret'))
+            token = s.dumps(email, salt='email-confirm')
+            confirm_url = url_for('customer.confirm_email', token=token, _external=True)
+            
+            # Ne pas utiliser render_template ici, créer le HTML directement
+            html = f"""
+            <html>
+                <body>
+                    <h2>Confirmez votre inscription</h2>
+                    <p>Cliquez sur le lien ci-dessous pour confirmer votre email:</p>
+                    <a href="{confirm_url}">Confirmer mon email</a>
+                </body>
+            </html>
+            """
+            
+            send_email(email, 'Confirmez votre inscription', html)
+            current_app.logger.info(f"Confirmation email sent to: {email}")
+        except Exception as e:
+            current_app.logger.warning(f"Could not send confirmation email to {email}: {str(e)}")
+            # Ne pas échouer l'inscription si l'email échoue
 
-        return jsonify({'message': 'Inscription réussie. Veuillez vérifier votre email.'}), 201
+        return jsonify({
+            'message': 'Registration successful',
+            'email': email,
+            'name': name
+        }), 201
 
-    return render_template('/customers/register.html')
+    except Exception as e:
+        db.session.rollback()
+        error_msg = str(e)
+        try:
+            current_app.logger.error(f"Registration error: {error_msg}", exc_info=True)
+        except:
+            pass
+        return jsonify({'error': 'Registration failed', 'details': error_msg}), 500
+
+# Handle OPTIONS request for CORS preflight
+def register_options():
+    response = jsonify({'message': 'CORS preflight successful'})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE, PATCH')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    response.headers.add('Access-Control-Max-Age', '3600')
+    return response, 200
 
 
 
