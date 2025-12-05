@@ -4,18 +4,19 @@ from config import db , PAYUNIT_AUTHORIZATION , PAUNIT_CONTENT_TYPE , PAYUNIT_BA
 from models.transaction_model import Transactions
 import requests
 import uuid
+from datetime import datetime
 
 # Récupérer toutes les transactions
 
 
 def generate_transaction_id():
-    return f"4478-{uuid.uuid4().hex[:6]}"  # par exemple : "4478-a1b2c3"
+    return f"4478-{uuid.uuid4().hex[:6]}"  # Revenir à 6 caractères qui fonctionnait
 def index():
     transactions = Transactions.query.all()
     return jsonify([transaction.serialize() for transaction in transactions]), 200
 
 # Récupérer une transaction par ID
-def view_transaction(transaction_id):
+def view_transaction(transaction_id): 
     transaction = Transactions.query.get(transaction_id)
     if not transaction:
         return jsonify({'error': 'Transaction non trouvée'}), 404
@@ -144,8 +145,12 @@ def initiate_payment():
     transaction_id = generate_transaction_id()
 
     # ✅ Étape 3 : Construire le payload pour PayUnit
+    # Convertir le montant en float et formater à 2 décimales pour éviter les problèmes de précision
+    amount = float(data['total_amount'])
+    formatted_amount = "{:.2f}".format(amount)
+
     payload = json.dumps({
-        "total_amount": data['total_amount'],
+        "total_amount": formatted_amount,
         "currency": data['currency'],
         "transaction_id": transaction_id,
         "return_url": data['return_url'],
@@ -163,6 +168,12 @@ def initiate_payment():
     print("🔁 Payload envoyé à PayUnit:", payload)
 
     try:
+        # Créer la table si elle n'existe pas (pour SQLite)
+        try:
+            db.create_all()
+        except Exception as e:
+            print(f"⚠️  Erreur lors de la création des tables: {e}")
+
         response = requests.post(PAYUNIT_INITIATE_URL, data=payload, headers=headers)
 
         print("Réponse PayUnit brut ➜", response.text)
@@ -172,30 +183,41 @@ def initiate_payment():
             result = response.json()
 
             # ✅ Étape 4 : Enregistrer la transaction dans la base
-            new_transaction = Transactions(
-                transaction_id=transaction_id,
-                total_amount=data['total_amount'],
-                currency=data['currency'],
-                status="pending",
-                redirect_url=result["data"].get("transaction_url")
-            )
-            db.session.add(new_transaction)
-            db.session.commit()
+            try:
+                new_transaction = Transactions(
+                    transaction_id=transaction_id,
+                    total_amount=data['total_amount'],
+                    currency=data['currency'],
+                    status="pending",
+                    redirect_url=result["data"].get("transaction_url")
+                )
+                db.session.add(new_transaction)
+                db.session.commit()
+                print("✅ Transaction enregistrée avec succès")
+            except Exception as e:
+                print(f"❌ Erreur lors de l'enregistrement de la transaction: {e}")
+                return jsonify({"error": f"Erreur de base de données: {str(e)}"}), 500
 
             # ✅ Étape 5 : Retourner la réponse au frontend
-            return jsonify({
-                "message": "Paiement initié avec succès.",
-                "payment_url": result["data"].get("transaction_url"),
-                "transaction_id": transaction_id,
-                "return_url": result["data"].get("t_url"),
-                "data": {
-                    "t_id": result["data"].get("t_id"),
-                    "t_sum": result["data"].get("t_sum"),
-                    "t_url": result["data"].get("t_url"),
-                    "transaction_id": result["data"].get("transaction_id"),
-                    "transaction_url": result["data"].get("transaction_url")
+            try:
+                response_data = {
+                    "message": "Paiement initié avec succès.",
+                    "payment_url": result["data"].get("transaction_url"),
+                    "transaction_id": transaction_id,
+                    "return_url": result["data"].get("t_url"),
+                    "data": {
+                        "t_id": result["data"].get("t_id"),
+                        "t_sum": result["data"].get("t_sum"),
+                        "t_url": result["data"].get("t_url"),
+                        "transaction_id": transaction_id,  # Utiliser notre transaction_id généré
+                        "transaction_url": result["data"].get("transaction_url")
+                    }
                 }
-            }), 200
+                print("✅ Réponse finale préparée:", response_data)
+                return jsonify(response_data), 200
+            except Exception as e:
+                print(f"❌ Erreur lors de la préparation de la réponse: {e}")
+                return jsonify({"error": f"Erreur de réponse: {str(e)}"}), 500
 
         else:
             return jsonify({
@@ -205,3 +227,33 @@ def initiate_payment():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# Endpoint pour valider une transaction via QR code
+def validate_transaction():
+    data = request.get_json()
+    qr_code = data.get('qr_code')
+
+    if not qr_code:
+        return jsonify({'error': 'QR code manquant'}), 400
+
+    # Rechercher la transaction par son ID (le QR code contient l'ID de transaction)
+    transaction = Transactions.query.filter_by(transaction_id=qr_code).first()
+
+    if not transaction:
+        return jsonify({'error': 'Transaction non trouvée'}), 404
+
+    # Vérifier que la transaction est en attente de validation
+    if transaction.status != 'pending':
+        return jsonify({'error': f'Transaction déjà {transaction.status}'}), 400
+
+    # Mettre à jour le statut de la transaction
+    transaction.status = 'completed'
+    db.session.commit()
+
+    return jsonify({
+        'message': 'Transaction validée avec succès',
+        'transaction_id': transaction.transaction_id,
+        'status': transaction.status,
+        'amount': transaction.total_amount,
+        'currency': transaction.currency
+    }), 200
