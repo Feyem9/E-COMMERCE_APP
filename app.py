@@ -18,6 +18,7 @@ from routes.cart_route import cart
 from routes.order_route import order
 from routes.product_route import product
 from routes.transaction_route import transaction
+from routes.category_route import category
 
 # db
 app = Flask(__name__)
@@ -125,6 +126,7 @@ app.register_blueprint(cart , url_prefix='/cart')
 app.register_blueprint(order , url_prefix='/order')
 app.register_blueprint(product , url_prefix='/product') 
 app.register_blueprint(transaction , url_prefix='/transaction')
+app.register_blueprint(category , url_prefix='/category')
 
 # Initialiser la base de données avec les données
 @app.before_request
