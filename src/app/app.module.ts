@@ -33,7 +33,8 @@ import { FormsModule } from '@angular/forms';
 import { ProfileComponent } from './customers/profile/profile.component';
 import { PaymentSuccessComponent } from './payment/payment-success/payment-success.component';
 import { PaymentComponent } from './payment/payment.component';
-import { TransactionHistoryComponent } from './transaction-history/transaction-history.component';  // Ajoutez cette ligne pour le ngModel
+import { TransactionHistoryComponent } from './transaction-history/transaction-history.component';
+import { FooterComponent } from './footer/footer.component';  // Ajoutez cette ligne pour le ngModel
 
 @NgModule({
   declarations: [
@@ -48,7 +49,8 @@ import { TransactionHistoryComponent } from './transaction-history/transaction-h
     ProfileComponent,
     PaymentSuccessComponent,
     PaymentComponent,
-    TransactionHistoryComponent
+    TransactionHistoryComponent,
+    FooterComponent
   ],
   imports: [
     BrowserModule,

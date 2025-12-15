@@ -1,16 +1,4 @@
-
-.app-shell {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-
-  &__content {
-    flex: 1 0 auto;
-  }
-}
-
 .app-footer {
-  flex-shrink: 0;
   background: #020617;
   color: #e5e7eb;
   padding: 2.5rem 0 1.5rem;
@@ -99,6 +87,15 @@
 @media (max-width: 768px) {
   .app-footer {
     padding-top: 2rem;
+
+    &__inner {
+      text-align: center;
+    }
+
+    &__social {
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
   }
 }
 

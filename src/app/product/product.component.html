@@ -1,19 +1,17 @@
 <app-navbar></app-navbar>
 
-<div class="container-fluid py-4">
+<div class="container-fluid py-4 products-page">
   <!-- Header Section -->
-  <div class="row mb-4">
+  <div class="row mb-4 header-section">
     <div class="col-12">
-      <div class="d-flex justify-content-between align-items-center flex-wrap">
-        <div>
-          <h1 class="display-6 fw-bold mb-0">
-            <i class="fas fa-mobile-alt text-primary me-3"></i>
-            Our Products
-          </h1>
-          <p class="text-muted mb-0">Discover our latest smartphones and devices</p>
-        </div>
-        <div class="d-flex gap-2">
-          <span class="badge bg-primary fs-6">
+      <div class="d-flex flex-column align-items-center text-center">
+        <h1 class="display-6 fw-bold mb-2">
+          <i class="fas fa-mobile-alt text-primary me-3"></i>
+          Our Products
+        </h1>
+        <p class="text-muted mb-3">Discover our latest smartphones and devices</p>
+        <div class="d-flex gap-2 justify-content-center">
+          <span class="badge product-count-badge">
             {{ filteredProducts.length }} {{ filteredProducts.length === 1 ? 'product' : 'products' }}
           </span>
         </div>
@@ -22,9 +20,9 @@
   </div>
 
   <!-- Filters and Search Section -->
-  <div class="row mb-4">
+  <div class="row mb-4 filters-section">
     <div class="col-12">
-      <div class="card shadow-sm">
+      <div class="card filter-card shadow-sm">
         <div class="card-body">
           <div class="row align-items-center">
             <!-- Search -->
@@ -41,7 +39,7 @@
                   (keyup.enter)="searchProducts()"
                   (input)="searchProducts()">
                 <button 
-                  class="btn btn-outline-secondary" 
+                  class="btn btn-outline-secondary search-clear-btn"
                   type="button"
                   *ngIf="searchQuery"
                   (click)="clearSearch()">
@@ -52,7 +50,7 @@
 
             <!-- Sort Controls -->
             <div class="col-md-6">
-              <div class="d-flex gap-2 justify-content-md-end">
+              <div class="d-flex gap-2 justify-content-md-end sort-controls">
                 <select 
                   class="form-select flex-grow-1"
                   [(ngModel)]="sortBy"
@@ -63,7 +61,7 @@
                   <option value="discount">Sort by Discount</option>
                 </select>
                 <button 
-                  class="btn btn-outline-primary"
+                  class="btn btn-outline-primary sort-toggle-btn"
                   (click)="toggleSortOrder()"
                   [title]="sortOrder === 'asc' ? 'Sort Descending' : 'Sort Ascending'">
                   <i class="fas" [ngClass]="sortOrder === 'asc' ? 'fa-sort-up' : 'fa-sort-down'"></i>
@@ -77,7 +75,7 @@
   </div>
 
   <!-- Loading State -->
-  <div *ngIf="loading" class="text-center py-5">
+  <div *ngIf="loading" class="text-center py-5 loading-state">
     <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
       <span class="visually-hidden">Loading...</span>
     </div>
@@ -85,20 +83,22 @@
   </div>
 
   <!-- Error State -->
-  <div *ngIf="error" class="alert alert-danger text-center" role="alert">
-    <i class="fas fa-exclamation-triangle me-2"></i>
-    {{ error }}
-    <button class="btn btn-outline-danger ms-3" (click)="retry()">
-      <i class="fas fa-redo me-1"></i>
-      Retry
-    </button>
+  <div *ngIf="error" class="error-state">
+    <div class="alert alert-danger text-center" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      {{ error }}
+      <button class="btn btn-outline-danger ms-3 retry-btn" (click)="retry()">
+        <i class="fas fa-redo me-1"></i>
+        Retry
+      </button>
+    </div>
   </div>
 
   <!-- Products Grid -->
-  <div *ngIf="!loading && !error" class="row g-4 mb-4">
+  <div *ngIf="!loading && !error" class="row g-5 mb-5">
     <div 
       *ngFor="let product of paginatedProducts" 
-      class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+      class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
       <div class="card h-100 product-card shadow-sm">
         <!-- Product Image -->
         <div class="card-img-wrapper position-relative">
@@ -108,12 +108,12 @@
             class="card-img-top product-image"
             (error)="onImageError($event)"
             [loading]="currentPage === 1 ? 'eager' : 'lazy'">
-           
+            
           <!-- Discount Badge -->
           <div 
             *ngIf="getDiscountPercentage(product) > 0" 
-            class="position-absolute top-0 end-0 m-2">
-            <span class="badge bg-danger fs-6">
+            class="discount-badge">
+            <span class="badge">
               -{{ getDiscountPercentage(product) }}%
             </span>
           </div>
@@ -121,12 +121,12 @@
           <!-- Quick Actions -->
           <div class="product-overlay position-absolute w-100 h-100 d-flex align-items-center justify-content-center">
             <button 
-              class="btn btn-primary me-2" 
+              class="btn view-btn me-2"
               (click)="viewProductDetails(product)">
               <i class="fas fa-eye"></i>
             </button>
             <button 
-              class="btn btn-success"
+              class="btn cart-btn"
               (click)="addToCart(product)">
               <i class="fas fa-cart-plus"></i>
             </button>
@@ -145,12 +145,12 @@
           <!-- Pricing -->
           <div class="pricing mb-3">
             <div class="d-flex align-items-center">
-              <span class="h5 text-success fw-bold me-2">
+              <span class="current-price">
                 {{ (product.discount_price || product.current_price) | currency:'EUR':'symbol':'1.2-2' }}
               </span>
               <span 
                 *ngIf="product.discount_price && product.discount_price < product.current_price" 
-                class="text-decoration-line-through text-muted small">
+                class="original-price">
                 {{ product.current_price | currency:'EUR':'symbol':'1.2-2' }}
               </span>
             </div>
@@ -163,9 +163,9 @@
               <span 
                 class="small"
                 [ngClass]="{
-                  'text-success': product.quantity > 10,
-                  'text-warning': product.quantity <= 10 && product.quantity > 0,
-                  'text-danger': product.quantity === 0
+                  'in-stock': product.quantity > 10,
+                  'low-stock': product.quantity <= 10 && product.quantity > 0,
+                  'out-of-stock': product.quantity === 0
                 }">
                 {{ product.quantity > 0 ? product.quantity + ' in stock' : 'Out of stock' }}
               </span>
@@ -173,11 +173,11 @@
           </div>
 
           <!-- Actions -->
-          <div class="mt-auto">
+          <div class="product-actions mt-auto">
             <div class="row g-2">
               <div class="col-8">
                 <button 
-                  class="btn btn-primary w-100"
+                  class="btn add-to-cart-btn w-100"
                   [disabled]="product.quantity === 0"
                   (click)="addToCart(product)">
                   <i class="fas fa-cart-plus me-1"></i>
@@ -187,7 +187,7 @@
               <div class="col-4">
                 <div class="input-group input-group-sm">
                   <button 
-                    class="btn btn-outline-secondary"
+                    class="btn quantity-btn"
                     type="button"
                     (click)="addToCart(product, 1)"
                     [disabled]="product.quantity === 0">
@@ -203,18 +203,18 @@
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!loading && !error && filteredProducts.length === 0" class="text-center py-5">
+  <div *ngIf="!loading && !error && filteredProducts.length === 0" class="text-center py-5 empty-state">
     <i class="fas fa-search fa-3x text-muted mb-3"></i>
     <h4 class="text-muted">No products found</h4>
     <p class="text-muted">Try adjusting your search criteria</p>
-    <button class="btn btn-primary" (click)="clearSearch()">
+    <button class="btn btn-primary show-all-btn" (click)="clearSearch()">
       <i class="fas fa-redo me-2"></i>
       Show all products
     </button>
   </div>
 
   <!-- Pagination -->
-  <div *ngIf="!loading && !error && totalPages > 1" class="row">
+  <div *ngIf="!loading && !error && totalPages > 1" class="row pagination-section">
     <div class="col-12">
       <nav aria-label="Products pagination">
         <ul class="pagination justify-content-center">
@@ -249,7 +249,7 @@
         </ul>
       </nav>
 
-      <div class="text-center text-muted">
+      <div class="text-center text-muted pagination-info">
         <small>
           Showing {{ ((currentPage - 1) * itemsPerPage) + 1 }} to 
           {{ currentPage * itemsPerPage > filteredProducts.length ? filteredProducts.length : currentPage * itemsPerPage }} of 

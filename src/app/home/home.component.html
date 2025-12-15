@@ -1,4 +1,4 @@
-<app-navbar></app-navbar>
+ <app-navbar></app-navbar>
 
 <div class="home-container">
   <!-- Hero Section -->
@@ -24,6 +24,50 @@
         </div>
       </div>
     </div> 
+  </section>
+
+  <!-- Highlights Section -->
+  <section class="highlights py-5">
+    <div class="container">
+      <div class="row justify-content-center text-center mb-4">
+        <div class="col-lg-8">
+          <h2 class="fw-bold mb-3">Why shop with TECH-MARKET?</h2>
+          <p class="text-muted mb-0">
+            Enjoy the best prices, fast delivery and dedicated support for all your tech needs.
+          </p>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="highlight-card h-100 text-center p-4">
+            <div class="highlight-icon mb-3">
+              <i class="fas fa-shipping-fast"></i>
+            </div>
+            <h5 class="mb-2">Fast & secure delivery</h5>
+            <p class="text-muted mb-0">Receive your smartphone anywhere quickly and safely.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="highlight-card h-100 text-center p-4">
+            <div class="highlight-icon mb-3">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <h5 class="mb-2">Secure payments</h5>
+            <p class="text-muted mb-0">All transactions are encrypted and 100% secure.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="highlight-card h-100 text-center p-4">
+            <div class="highlight-icon mb-3">
+              <i class="fas fa-headset"></i>
+            </div>
+            <h5 class="mb-2">Customer support</h5>
+            <p class="text-muted mb-0">Our team is available to help you at any time.</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- Featured Products Section -->
@@ -112,6 +156,35 @@
     </div>
   </section>
 
+  <!-- Popular Categories Section -->
+  <section class="popular-categories py-5">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="fw-bold mb-3">Popular Categories</h2>
+        <p class="text-muted mb-0">Browse by category to quickly find what you need.</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-3 col-sm-6" *ngFor="let cat of ['Smartphones', 'Accessories', 'Tablets', 'Wearables']">
+          <div class="category-card h-100 text-center p-4">
+            <div class="category-icon mb-3">
+              <i class="fas" [ngClass]="{
+                'fa-mobile-alt': cat === 'Smartphones',
+                'fa-headphones': cat === 'Accessories',
+                'fa-tablet-alt': cat === 'Tablets',
+                'fa-watch-smart': cat === 'Wearables'
+              }"></i>
+            </div>
+            <h5 class="mb-2">{{ cat }}</h5>
+            <button class="btn btn-outline-primary btn-sm rounded-pill" (click)="navigateToProducts()">
+              Explore
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Newsletter Section -->
   <section class="newsletter py-5 bg-primary text-white">
     <div class="container">
@@ -163,3 +236,5 @@
     </div>
   </section>
 </div>
+
+<app-footer></app-footer>

@@ -1,302 +1,167 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
-  <div class="container">
-    <!-- Brand -->
-    <a class="navbar-brand fw-bold" routerLink="/">
-      <i class="fas fa-mobile-alt me-2 text-warning"></i>
-      <span class="text-gradient">TECH-MARKET</span>
-    </a>
+<nav class="app-navbar navbar navbar-expand-lg navbar-dark main-navbar">
+  <div class="container app-navbar__inner">
+    <!-- Brand + Toggler -->
+    <div class="app-navbar__brand-row">
+      <a class="app-navbar__brand" routerLink="/">
+        <span class="app-navbar__brand-mark">TM</span>
+        <span class="app-navbar__brand-text">
+          <span class="app-navbar__brand-title">TECH-MARKET</span>
+          <span class="app-navbar__brand-subtitle d-none d-md-inline">Premium Tech & Accessories</span>
+        </span>
+      </a>
 
-    <!-- Mobile toggle button -->
-    <button 
-      class="navbar-toggler" 
-      type="button" 
-      data-bs-toggle="collapse" 
-      data-bs-target="#navbarNav" 
-      aria-controls="navbarNav" 
-      aria-expanded="false" 
-      aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+      <button
+        class="navbar-toggler app-navbar__toggler border-0"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#mainNavbar"
+        aria-controls="mainNavbar"
+        aria-expanded="false"
+        aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
 
-    <!-- Navigation items -->
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-            <i class="fas fa-home me-1"></i>
-            Home
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/product" routerLinkActive="active">
-            <i class="fas fa-mobile-alt me-1"></i>
-            Products
-          </a>
-        </li>
-        <li class="nav-item dropdown">
-          <a 
-            class="nav-link dropdown-toggle" 
-            routerLink="/categories"
-            id="categoriesDropdown" 
-            role="button" 
-            data-bs-toggle="dropdown" 
-            aria-expanded="false">
-            <i class="fas fa-th-large me-1"></i>
-            Categories
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" routerLink="/categories/smartphones"><i class="fas fa-mobile me-2"></i>Smartphones</a></li>
-            <li><a class="dropdown-item" routerLink="/categories/tablets"><i class="fas fa-tablet me-2"></i>Tablets</a></li>
-            <li><a class="dropdown-item" routerLink="/categories/accessories"><i class="fas fa-headphones me-2"></i>Accessories</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" routerLink="/categories"><i class="fas fa-star me-2"></i>All Categories</a></li>
+    <!-- Content -->
+    <div class="collapse navbar-collapse app-navbar__content" id="mainNavbar">
+      <div class="app-navbar__layout">
+        <!-- Left: Navigation -->
+        <div class="app-navbar__nav">
+          <ul class="app-navbar__nav-list">
+            <li class="app-navbar__nav-item">
+              <a
+                class="app-navbar__nav-link"
+                routerLink="/"
+                routerLinkActive="app-navbar__nav-link--active"
+                [routerLinkActiveOptions]="{ exact: true }">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+              </a>
+            </li>
+
+            <li class="app-navbar__nav-item">
+              <a
+                class="app-navbar__nav-link"
+                routerLink="/product"
+                routerLinkActive="app-navbar__nav-link--active">
+                <i class="fas fa-store"></i>
+                <span>Shop</span>
+              </a>
+            </li>
+
+            <li class="app-navbar__nav-item dropdown">
+              <a
+                class="app-navbar__nav-link dropdown-toggle"
+                routerLink="/categories"
+                routerLinkActive="app-navbar__nav-link--active"
+                id="categoriesDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">
+                <i class="fas fa-th-large"></i>
+                <span>Categories</span>
+              </a>
+
+              <ul class="dropdown-menu app-navbar__dropdown" aria-labelledby="categoriesDropdown">
+                <li>
+                  <a class="dropdown-item" routerLink="/categories/smartphones">
+                    <i class="fas fa-mobile me-2"></i>
+                    <span>Smartphones</span>
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" routerLink="/categories/tablets">
+                    <i class="fas fa-tablet me-2"></i>
+                    <span>Tablets</span>
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" routerLink="/categories/accessories">
+                    <i class="fas fa-headphones me-2"></i>
+                    <span>Accessories</span>
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" routerLink="/categories">
+                    <i class="fas fa-star me-2"></i>
+                    <span>All Categories</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
           </ul>
-        </li>
-        <li class="nav-item dropdown">
-          <a 
-            class="nav-link dropdown-toggle" 
-            routerLink="/help" 
-            id="helpDropdown" 
-            role="button" 
-            data-bs-toggle="dropdown" 
-            aria-expanded="false">
-            <i class="fas fa-question-circle me-1"></i>
-            Help
-          </a> 
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" routerLink="/help/store-locator"><i class="fas fa-map-marker-alt me-2"></i>Store Locator</a></li>
-            <li><a class="dropdown-item" routerLink="/help/order-tracking"><i class="fas fa-truck me-2"></i>Order Tracking</a></li>
-            <li><a class="dropdown-item" routerLink="/help/faqs"><i class="fas fa-question me-2"></i>FAQs</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="tel:+18001234567890">
-              <i class="fas fa-phone me-2"></i>Call us: (+800) 1234 5678 90
-            </a></li>
-            <li><a class="dropdown-item" href="mailto:info&#64;company.com">
-              <i class="fas fa-envelope me-2"></i>info&#64;company.com
-            </a></li>
-          </ul>
-        </li>
-      </ul>
-
-      <!-- Search bar -->
-      <form class="d-flex me-3" (ngSubmit)="onSearch()" *ngIf="showSearch">
-        <div class="input-group">
-          <input 
-            class="form-control" 
-            type="search" 
-            placeholder="Search products..."
-            [(ngModel)]="searchQuery"
-            name="search"
-            aria-label="Search">
-          <button class="btn btn-outline-warning" type="submit">
-            <i class="fas fa-search"></i>
-          </button>
         </div>
-      </form>
 
-      <!-- Right side actions -->
-      <ul class="navbar-nav">
-        <!-- Search toggle for mobile -->
-        <li class="nav-item d-lg-none">
-          <button 
-            class="nav-link btn btn-link" 
-            (click)="toggleSearch()"
-            aria-label="Toggle search">
-            <i class="fas fa-search"></i>
-          </button>
-        </li>
+        <!-- Center: Search bar -->
+        <div class="app-navbar__search">
+          <form class="app-navbar__search-form" (ngSubmit)="onSearch()">
+            <div class="app-navbar__search-icon">
+              <i class="fas fa-search"></i>
+            </div>
+            <input
+              type="search"
+              class="app-navbar__search-input"
+              placeholder="Search for phones, tablets, accessories..."
+              [(ngModel)]="searchQuery"
+              name="search"
+              aria-label="Search products" />
+            <button class="app-navbar__search-button d-none d-sm-inline-flex" type="submit">
+              Search
+            </button>
+          </form>
+        </div>
 
-        <!-- Authentication Links -->
-        <li class="nav-item" *ngIf="!isLoggedIn">
-          <a class="nav-link" routerLink="/login">
-            <i class="fas fa-sign-in-alt me-1"></i>
-            <span class="d-none d-md-inline">Login</span>
-          </a>
-        </li>
-        <li class="nav-item" *ngIf="!isLoggedIn">
-          <a class="nav-link" routerLink="/register">
-            <i class="fas fa-user-plus me-1"></i>
-            <span class="d-none d-md-inline">Register</span>
-          </a>
-        </li>
-        <li class="nav-item" *ngIf="isLoggedIn">
-          <a class="nav-link" routerLink="/profile">
-            <i class="fas fa-user me-1"></i>
-            <span class="d-none d-md-inline">Profile</span>
-          </a>
-        </li>
-
-        <!-- Favorites -->
-        <li class="nav-item" *ngIf="isLoggedIn">
-          <a class="nav-link position-relative" routerLink="/favorites">
-            <i class="fas fa-heart"></i>
-            <span class="visually-hidden">Favorites</span>
-            <span
-              *ngIf="favoriteCount > 0"
-              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-              {{ favoriteCount }}
-              <span class="visually-hidden">items in favorites</span>
-            </span>
-          </a>
-        </li>
-
-        <!-- Cart -->
-        <li class="nav-item">
-          <a class="nav-link position-relative" routerLink="/cart">
-            <i class="fas fa-shopping-cart"></i>
-            <span class="d-none d-md-inline ms-1">Cart</span>
-            <span 
-              *ngIf="cartCount > 0" 
-              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
-              {{ cartCount }}
-              <span class="visually-hidden">items in cart</span>
-            </span>
-          </a>
-        </li>
-
-        <!-- Orders (for logged in users) -->
-        <li class="nav-item" *ngIf="isLoggedIn">
-          <a class="nav-link" routerLink="/ordered">
-            <i class="fas fa-box me-1"></i>
-            <span class="d-none d-md-inline">Orders</span>
-          </a>
-        </li>
-
-        <!-- Logout button -->
-        <li class="nav-item" *ngIf="isLoggedIn">
-          <button class="nav-link btn btn-link" (click)="logout()">
-            <i class="fas fa-sign-out-alt me-1"></i>
-            <span class="d-none d-md-inline">Logout</span>
-          </button>
-        </li>
-
-        <!-- User account dropdown (simplified) -->
-        <li class="nav-item dropdown" *ngIf="isLoggedIn">
-          <a 
-            class="nav-link dropdown-toggle" 
-            href="#" 
-            id="accountDropdown" 
-            role="button" 
-            data-bs-toggle="dropdown" 
-            aria-expanded="false">
-            <i class="fas fa-user-circle me-1"></i>
-            <span class="d-none d-md-inline">{{ userName || 'Account' }}</span>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><h6 class="dropdown-header">Welcome, {{ userName }}!</h6></li>
-            <li><hr class="dropdown-divider"></li>
-            <li>
-              <a class="dropdown-item" routerLink="/profile">
-                <i class="fas fa-user me-2"></i>My Profile
+        <!-- Right: User / Favorites / Cart -->
+        <div class="app-navbar__actions">
+          <!-- Auth -->
+          <ng-container *ngIf="!isLoggedIn; else loggedInBlock">
+            <div class="app-navbar__auth">
+              <a class="app-navbar__btn app-navbar__btn--ghost" routerLink="/login">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Login</span>
               </a>
-            </li>
-            <li>
-              <a class="dropdown-item" routerLink="/ordered">
-                <i class="fas fa-box me-2"></i>My Orders
+              <a class="app-navbar__btn app-navbar__btn--primary" routerLink="/register">
+                <i class="fas fa-user-plus"></i>
+                <span>Sign up</span>
               </a>
-            </li>
-            <li>
-              <a class="dropdown-item" routerLink="/favorites">
-                <i class="fas fa-heart me-2"></i>My Favorites
+            </div>
+          </ng-container>
+
+          <ng-template #loggedInBlock>
+            <div class="app-navbar__user">
+              <a class="app-navbar__user-link" routerLink="/profile">
+                <i class="fas fa-user-circle"></i>
+                <span class="d-none d-md-inline">{{ userName || 'Account' }}</span>
               </a>
-            </li>
-          </ul>
-        </li>
-      </ul> 
+              <button class="app-navbar__btn app-navbar__btn--outline" type="button" (click)="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="d-none d-md-inline">Logout</span>
+              </button>
+            </div>
+          </ng-template>
+
+          <!-- Icons -->
+          <div class="app-navbar__icon-group">
+            <a class="app-navbar__icon" routerLink="/favorites" *ngIf="isLoggedIn">
+              <i class="fas fa-heart"></i>
+              <span class="visually-hidden">Favorites</span>
+              <span *ngIf="favoriteCount > 0" class="app-navbar__badge bg-danger">
+                {{ favoriteCount }}
+              </span>
+            </a>
+
+            <a class="app-navbar__icon" routerLink="/cart">
+              <i class="fas fa-shopping-cart"></i>
+              <span class="visually-hidden">Cart</span>
+              <span *ngIf="cartCount > 0" class="app-navbar__badge bg-primary">
+                {{ cartCount }}
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </nav>
 
-<!-- Mobile search bar (when toggled) -->
-<div class="mobile-search d-lg-none" *ngIf="showSearch">
-  <div class="container py-3">
-    <form class="d-flex" (ngSubmit)="onSearch()">
-      <div class="input-group">
-        <input 
-          class="form-control" 
-          type="search" 
-          placeholder="Search products..."
-          [(ngModel)]="searchQuery"
-          name="search"
-          aria-label="Search">
-        <button class="btn btn-warning" type="submit">
-          <i class="fas fa-search"></i>
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-   
-
-   <!-- <mat-toolbar color="#fff">
-  <button class="menu-icon mat-icon-button" (click)="sidenav.toggle()" aria-label="Toggle menu">
-    <mat-icon>menu</mat-icon>
-  </button>         
-
-  <mat-icon>store</mat-icon>
-  <span>TECH market</span>
-  <span class="spacer"></span>
-
-<nav class="nav-links">
-    <button mat-button routerLink="/">HOME</button>
-    <button mat-button routerLink="/categories">Categories</button>
-    <button mat-button routerLink="/help">Need help?</button>
-    <button mat-button routerLink="/account">Account</button>
-    <button mat-button routerLink="/cart">
-      <mat-icon>shopping_cart</mat-icon>
-      My Cart ({{ cartCount }} items)
-    </button>
-  </nav>
-</mat-toolbar>
-
-<mat-sidenav-container>
-  <mat-sidenav #sidenav mode="over" class="mobile-sidenav">
-    <mat-nav-list>
-      <mat-list-item>
-        <button mat-button routerLink="/" (click)="sidenav.close()">HOME</button>
-      </mat-list-item>
-      <mat-list-item>
-        <button mat-button routerLink="/product" (click)="sidenav.close()">Products</button>
-      </mat-list-item>
-      <mat-list-item>
-        <button mat-button routerLink="/news" (click)="sidenav.close()">News</button>
-      </mat-list-item>
-      <mat-list-item>
-        <button mat-button routerLink="/tablets" (click)="sidenav.close()">Tablets</button>
-      </mat-list-item>
-      <mat-list-item>
-        <button mat-button routerLink="/feature" (click)="sidenav.close()">Feature</button>
-      </mat-list-item>
-      <mat-list-item>
-        <button mat-button (click)="sidenav.close()">Store Locator</button>
-      </mat-list-item>
-      <mat-list-item>
-        <button mat-button (click)="sidenav.close()">Order Tracking</button>
-      </mat-list-item>
-      <mat-list-item>
-        <button mat-button (click)="sidenav.close()">FAQs</button>
-      </mat-list-item>
-      <mat-divider></mat-divider>
-      <mat-list-item>
-        <button mat-button routerLink="/login" (click)="sidenav.close()">Log in</button>
-      </mat-list-item>
-      <mat-list-item>
-        <button mat-button routerLink="/register" (click)="sidenav.close()">Register</button>
-      </mat-list-item>
-      <mat-list-item>
-        <button mat-button routerLink="/profile" (click)="sidenav.close()">Profile</button>
-      </mat-list-item>
-      <mat-list-item>
-        <button mat-button routerLink="/" (click)="sidenav.close()">Logout</button>
-      </mat-list-item>
-      <mat-list-item>
-        <button mat-button routerLink="/cart" (click)="sidenav.close()">
-          <mat-icon>shopping_cart</mat-icon> My Cart ({{ cartCount }} items)
-        </button>
-      </mat-list-item>
-    </mat-nav-list>
-  </mat-sidenav>
-
-  <mat-sidenav-content>
-  </mat-sidenav-content>
-</mat-sidenav-container> -->
