@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';  // pour les requêtes HTTP :contentReference[oaicite:0]{index=0}
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Register, Login } from '../models/user.model'
+import { environment } from '../../environment/environment';
 
 
 export interface AuthResponse {
@@ -20,8 +21,7 @@ export interface AuthResponse {
 })
 export class AuthService {
   // Déclaration explicite de la base URL (production)
-  // private readonly apiBase = 'https://e-commerce-app-0hnw.onrender.com';
-  private readonly apiBase = 'http://localhost:5000';
+  private readonly apiBase = environment.apiUrl;
 
   // Subject pour suivre l'état de l'authentification
   private authSub = new BehaviorSubject<AuthResponse | null>(null);

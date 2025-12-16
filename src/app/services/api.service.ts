@@ -5,12 +5,13 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AuthService } from '../customers/auth.service';
 
+import { environment } from '../../environment/environment';
+
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  // private readonly baseUrl = 'https://e-commerce-app-0hnw.onrender.com';
-  private readonly baseUrl = 'http://localhost:5000';
+  private readonly baseUrl = environment.apiUrl;
   
   private httpOptions = {
     headers: new HttpHeaders({

@@ -5,14 +5,14 @@ import { catchError, map, tap, finalize, shareReplay } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Cart, Product } from '../models/products';
 import { ApiService } from './api.service';
+import { environment } from '../../environment/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CartService {
   private readonly CART_STORAGE_KEY = 'cart';
-  // private apiUrl = 'https://e-commerce-app-0hnw.onrender.com';
-  private apiUrl = 'http://localhost:5000';
+  private apiUrl = environment.apiUrl;
 
   // Cart items observable
   private cartItemsSubject = new BehaviorSubject<Cart[]>([]);
