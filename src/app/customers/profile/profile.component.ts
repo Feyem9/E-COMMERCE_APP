@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { User } from '../../models/user.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { environment } from '../../../environment/environment';
 
 @Component({
   selector: 'app-profile',
@@ -21,7 +22,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   };
   private destroy$ = new Subject<void>();
   // private readonly apiBase = 'https://e-commerce-app-0hnw.onrender.com';
-  private readonly apiBase = 'http://localhost:5000';
+  private readonly apiBase = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 

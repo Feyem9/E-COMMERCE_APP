@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '../../environment/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -7,7 +8,7 @@ import { Injectable } from '@angular/core';
 export class TransactionService {
   //  private apiUrl = 'https://e-commerce-app-1-islr.onrender.com/transaction/payment'; // Production URL
   // private API_URL = 'https://e-commerce-app-0hnw.onrender.com/transaction'; // Base URL for transaction-related endpoints
-  private API_URL = 'http://localhost:5000/transaction'; // Base URL for transaction-related endpoints
+  private API_URL = `${environment.apiUrl}/transaction`; // Base URL for transaction-related endpoints
 
   constructor(private http: HttpClient) { }
 
