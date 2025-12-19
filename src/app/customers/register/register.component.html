@@ -12,7 +12,7 @@
     <div class="card-header">
       <div class="icon-container">
         <i class="fas fa-user-plus"></i>
-      </div> 
+      </div>
       <h2 class="card-title">Create Account</h2>
       <p class="card-subtitle">Join our tech community today</p>
     </div>
@@ -22,12 +22,7 @@
       <div class="form-group">
         <div class="input-container">
           <i class="fas fa-envelope input-icon"></i>
-          <input 
-            id="email" 
-            type="email" 
-            formControlName="email" 
-            placeholder="Enter your email"
-            class="form-input" />
+          <input id="email" type="email" formControlName="email" placeholder=" " class="form-input" />
           <label for="email" class="form-label">Email Address</label>
         </div>
         <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="error-message">
@@ -40,12 +35,7 @@
       <div class="form-group">
         <div class="input-container">
           <i class="fas fa-user input-icon"></i>
-          <input 
-            id="name" 
-            type="text" 
-            formControlName="name" 
-            placeholder="Enter your name"
-            class="form-input" />
+          <input id="name" type="text" formControlName="name" placeholder=" " class="form-input" />
           <label for="name" class="form-label">Full Name</label>
         </div>
         <div *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="error-message">
@@ -58,12 +48,7 @@
       <div class="form-group">
         <div class="input-container">
           <i class="fas fa-lock input-icon"></i>
-          <input 
-            id="password" 
-            type="password" 
-            formControlName="password" 
-            placeholder="Create a password"
-            class="form-input" />
+          <input id="password" type="password" formControlName="password" placeholder=" " class="form-input" />
           <label for="password" class="form-label">Password</label>
         </div>
         <div *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="error-message">
@@ -76,12 +61,7 @@
       <div class="form-group">
         <div class="input-container">
           <i class="fas fa-phone input-icon"></i>
-          <input 
-            id="contact" 
-            type="tel" 
-            formControlName="contact" 
-            placeholder="Your phone number"
-            class="form-input" />
+          <input id="contact" type="tel" formControlName="contact" placeholder=" " class="form-input" />
           <label for="contact" class="form-label">Contact Number</label>
         </div>
         <div *ngIf="contact?.invalid && (contact?.dirty || contact?.touched)" class="error-message">
@@ -93,12 +73,7 @@
       <div class="form-group">
         <div class="input-container">
           <i class="fas fa-home input-icon"></i>
-          <input 
-            id="address" 
-            type="text" 
-            formControlName="address" 
-            placeholder="Your address"
-            class="form-input" />
+          <input id="address" type="text" formControlName="address" placeholder=" " class="form-input" />
           <label for="address" class="form-label">Address</label>
         </div>
         <div *ngIf="address?.invalid && (address?.dirty || address?.touched)" class="error-message">
