@@ -7,6 +7,7 @@ from flask_migrate import Migrate
 from flask_mail import Mail , Message
 from flask_cors import CORS
 from cloudinary_config import configure_cloudinary
+from extensions import limiter
 
 from config import db, SECRET_KEY , MAIL_SERVER , MAIL_PORT, MAIL_USERNAME,MAIL_PASSWORD,MAIL_USE_SSL,MAIL_USE_TLS, MAIL_DEFAULT_SENDER
 
@@ -30,8 +31,11 @@ CORS(app, resources={r"/*": {
         "http://localhost:4200",
         "http://localhost:4201",
         "http://localhost:3000",
+        "https://market-jet.vercel.app",  # Production frontend
+        "https://staging-market.vercel.app",  # Staging frontend
+        "https://e-commerce-app-git-staging-christians-projects-9c9bef59.vercel.app",  # Staging auto-URL
         "https://e-commerce-app-1-islr.onrender.com",
-        "https://*.onrender.com"
+        "https://*.vercel.app"  # All Vercel apps (wildcards supported)
     ],
     "methods": ['GET', 'POST', 'OPTIONS', 'DELETE', 'PUT', 'PATCH'],
     "allow_headers": ['Content-Type', 'Authorization'],
@@ -47,19 +51,26 @@ def add_cors_headers(response):
         "http://localhost:4200",
         "http://localhost:4201",
         "http://localhost:3000",
-        "https://e-commerce-app-1-islr.onrender.com",
-        "https://*.onrender.com"
+        "https://market-jet.vercel.app",
+        "https://staging-market.vercel.app",
+        "https://e-commerce-app-git-staging-christians-projects-9c9bef59.vercel.app",
+        "https://e-commerce-app-1-islr.onrender.com"
     ]
 
-    # Allow the specific origin if it's in our allowed list, otherwise use wildcard
-    if origin in allowed_origins:
+    # Check for Vercel deployment URLs (pattern matching)
+    is_vercel = origin.endswith('.vercel.app')
+    
+    # Allow the specific origin if it's in our allowed list or is a Vercel deployment
+    if origin in allowed_origins or is_vercel:
         response.headers['Access-Control-Allow-Origin'] = origin
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
     else:
-        response.headers['Access-Control-Allow-Origin'] = '*'
-
+        # No wildcard with credentials - reject or allow without credentials
+        response.headers['Access-Control-Allow-Origin'] = origin if origin else '*'
+        # Don't set credentials header if origin not whitelisted
+    
     response.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS,DELETE,PUT,PATCH'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
-    response.headers['Access-Control-Allow-Credentials'] = 'true'
     return response
 
 # Configuration de l'application pour l'envoie des mails
@@ -82,6 +93,11 @@ app.config['SESSION_PERMANENT'] = False
 Session(app)
 
 bcrypt = Bcrypt(app)
+
+# ============================================
+# RATE LIMITING
+# ============================================
+limiter.init_app(app)
 
 # Configuration pour Flask-Login
 
