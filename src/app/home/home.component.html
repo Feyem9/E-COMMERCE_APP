@@ -1,5 +1,13 @@
  <app-navbar></app-navbar>
 
+<!-- TEST SENTRY (à retirer en production) -->
+<div class="alert alert-warning text-center m-3" role="alert">
+  <strong>🧪 Mode Développement</strong> 
+  <button class="btn btn-danger btn-sm ms-3" (click)="throwTestError()">
+    <i class="fas fa-bug me-2"></i>Test Sentry Error
+  </button>
+</div>
+
 <div class="home-container">
   <!-- Hero Section -->
   <section class="hero bg-gradient-primary text-white py-5">

@@ -1,0 +1,21 @@
+{
+    "validUser": {
+        "email": "test@example.com",
+        "password": "password123",
+        "name": "Test User",
+        "contact": "1234567890",
+        "address": "123 Test Street"
+    },
+    "admin": {
+        "email": "admin@example.com",
+        "password": "admin123",
+        "name": "Admin User"
+    },
+    "newUser": {
+        "name": "New Test User",
+        "email": "newuser@example.com",
+        "password": "NewPass123!",
+        "contact": "9876543210",
+        "address": "456 New Avenue"
+    }
+}

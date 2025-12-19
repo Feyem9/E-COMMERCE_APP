@@ -51,5 +51,6 @@ export class OrderTrackingComponent {
     this.orderData = null;
     this.orderNumber = '';
     this.email = '';
+    this.loading = false;
   }
 }

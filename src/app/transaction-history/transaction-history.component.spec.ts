@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { TransactionHistoryComponent } from './transaction-history.component';
 
@@ -8,7 +9,8 @@ describe('TransactionHistoryComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [TransactionHistoryComponent]
+      declarations: [TransactionHistoryComponent],
+      imports: [HttpClientTestingModule]
     })
     .compileComponents();
 

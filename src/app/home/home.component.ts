@@ -6,6 +6,7 @@ import { ImageMapperService } from '../services/image-mapper.service';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import * as Sentry from "@sentry/angular";
 
 @Component({
   selector: 'app-home',
@@ -97,6 +98,17 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   getProductImage(product: Product): string {
     return this.imageMapper.getImageUrl(product);
+  }
+
+  // ============================================
+  // TEST SENTRY
+  // ============================================
+  throwTestError(): void {
+    // Envoyer un log avant de lancer l'erreur
+    Sentry.captureMessage('Test Sentry - Bouton test cliqué depuis home', 'info');
+    
+    // Lancer une erreur de test
+    throw new Error("🎉 Sentry Test Error - Ça fonctionne parfaitement !");
   }
 
   ngOnDestroy(): void {

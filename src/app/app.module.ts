@@ -1,8 +1,9 @@
-import { NgModule } from '@angular/core';
+import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule, provideClientHydration } from '@angular/platform-browser';
 import { HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import * as Sentry from "@sentry/angular";
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -74,7 +75,18 @@ import { FooterComponent } from './footer/footer.component';  // Ajoutez cette l
   providers: [
     provideClientHydration(),
     provideAnimationsAsync(),
-    provideHttpClient(withFetch())  // Configure HttpClient pour utiliser fetch
+    provideHttpClient(withFetch()),  // Configure HttpClient pour utiliser fetch
+    
+    // ============================================
+    // SENTRY ERROR HANDLER
+    // ============================================
+    {
+      provide: ErrorHandler,
+      useValue: Sentry.createErrorHandler({
+        showDialog: false, // Ne pas afficher de dialogue aux utilisateurs
+        logErrors: true,   // Logger les erreurs dans la console
+      }),
+    },
   ],
   bootstrap: [AppComponent]
 })

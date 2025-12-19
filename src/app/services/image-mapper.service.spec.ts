@@ -21,7 +21,7 @@ describe('ImageMapperService', () => {
   });
 
   it('should get local image for partial match', () => {
-    const product: Product = { id: 1, name: 'Samsung Galaxy S24', description: '', current_price: 1000, discount_price: 900, quantity: 10, picture: '' };
+    const product: Product = { id: 1, name: 'Samsung Galaxy S24 Ultra Special Edition', description: '', current_price: 1000, discount_price: 900, quantity: 10, picture: '' };
     const image = service.getLocalImage(product);
     expect(image).toBe('/samsung.avif');
   });

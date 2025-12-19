@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from './navbar.component';
 import { CartService } from '../services/cart.service';
 import { AuthService } from '../customers/auth.service';
@@ -32,7 +33,8 @@ describe('NavbarComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
-        BrowserAnimationsModule
+        BrowserAnimationsModule,
+        FormsModule
       ],
       declarations: [NavbarComponent],
       providers: [
@@ -119,16 +121,17 @@ describe('NavbarComponent', () => {
     expect(window.alert).toHaveBeenCalledWith('Connexion temporaire activée - Vous pouvez maintenant ajouter des produits au panier');
   });
 
-  it('should handle loginTemp error', () => {
-    const loginSpy = spyOn(authServiceMock, 'login').and.returnValue(of({ error: 'error' }));
-    spyOn(localStorage, 'setItem');
+  it('should handle loginTemp success', () => {
+    const loginSpy = spyOn(authServiceMock, 'login').and.returnValue(of({ access_token: 'test-token', user: { id: 1, email: 'test@example.com' } }));
     spyOn(window, 'alert');
 
     component.loginTemp();
 
-    expect(loginSpy).toHaveBeenCalled();
-    expect(localStorage.setItem).toHaveBeenCalled();
-    expect(window.alert).toHaveBeenCalledWith('Token temporaire créé pour les tests');
+    expect(loginSpy).toHaveBeenCalledWith({
+      email: 'test@example.com',
+      password: 'password'
+    });
+    expect(window.alert).toHaveBeenCalledWith('Connexion temporaire activée - Vous pouvez maintenant ajouter des produits au panier');
   });
 
   it('should close navbar if it is open', () => {
