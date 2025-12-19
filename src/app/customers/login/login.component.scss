@@ -70,10 +70,23 @@
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  25% { transform: translateY(-15px) rotate(90deg); }
-  50% { transform: translateY(-8px) rotate(180deg); }
-  75% { transform: translateY(-20px) rotate(270deg); }
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  25% {
+    transform: translateY(-15px) rotate(90deg);
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(180deg);
+  }
+
+  75% {
+    transform: translateY(-20px) rotate(270deg);
+  }
 }
 
 .login-card {
@@ -105,6 +118,7 @@
     opacity: 0;
     transform: translateY(50px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -152,8 +166,15 @@
 }
 
 @keyframes iconPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 .form-container {
@@ -191,8 +212,8 @@
     outline: none;
 
     &::placeholder {
-      color: #a0aec0;
-      opacity: 0.8;
+      color: transparent; // Hide placeholder
+      opacity: 0;
     }
 
     &:focus {
@@ -200,19 +221,28 @@
       box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
       transform: translateY(-2px);
 
-      + .form-label {
-        transform: translateY(-8px) scale(0.85);
+      +.form-label {
+        transform: translateY(-32px) scale(0.85);
+        color: #667eea;
+        opacity: 1;
+      }
+
+      ~.input-icon {
         color: #667eea;
       }
 
-      ~ .input-icon {
-        color: #667eea;
+      &::placeholder {
+        color: #a0aec0;
+        opacity: 0.6;
       }
     }
 
-    &:not(:placeholder-shown) + .form-label {
-      transform: translateY(-8px) scale(0.85);
+    // Show label when input has value
+    &:not(:placeholder-shown)+.form-label,
+    &:valid+.form-label {
+      transform: translateY(-32px) scale(0.85);
       color: #4a5568;
+      opacity: 1;
     }
   }
 
@@ -229,6 +259,7 @@
     transition: all 0.3s ease;
     pointer-events: none;
     z-index: 1;
+    opacity: 0; // Start hidden
   }
 
   .password-toggle {
@@ -270,6 +301,7 @@
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -313,7 +345,7 @@
       }
     }
 
-    .checkbox:checked + .checkmark {
+    .checkbox:checked+.checkmark {
       background: #667eea;
       border-color: #667eea;
 
