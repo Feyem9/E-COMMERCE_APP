@@ -6,10 +6,10 @@
     "devCommand": "ng serve --port $PORT",
     "framework": "angular",
     "installCommand": "npm install --legacy-peer-deps",
-    "routes": [
+    "rewrites": [
         {
-            "src": "/(.*)",
-            "dest": "/index.html"
+            "source": "/(.*)",
+            "destination": "/index.html"
         }
     ],
     "headers": [
