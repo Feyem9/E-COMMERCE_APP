@@ -19,11 +19,16 @@ Sentry.init({
     Sentry.replayIntegration(),
   ],
   
-  // Performance Monitoring (100% des transactions en dev)
-  tracesSampleRate: 1.0, // 100% pour dev, mettre 0.5 en production
+  // Performance Monitoring (50% en production)
+  tracesSampleRate: 0.5, // 50% en production pour optimiser performance
   
   // Configurer les URLs pour le tracing distribué
-  tracePropagationTargets: ["localhost", /^https:\/\/yourserver\.io\/api/],
+  tracePropagationTargets: [
+    "localhost",
+    "https://market-jet.vercel.app",
+    "https://staging-market.vercel.app",
+    /^https:\/\/theck-market\.onrender\.com\/api/
+  ],
   
   // Session Replay
   replaysSessionSampleRate: 0.1, // 10% des sessions normales
@@ -32,8 +37,8 @@ Sentry.init({
   // Logs activés
   enableLogs: true,
   
-  // Environnement (changer selon le cas)
-  environment: "development", // ou "production", "staging"
+  // Environnement production
+  environment: "production", // Production ready!
   
   // Filtrer certaines erreurs (optionnel)
   beforeSend(event) {
