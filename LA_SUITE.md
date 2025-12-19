@@ -226,7 +226,7 @@ jobs:
 - [ ] Tester rollback
 - [ ] Préparer support utilisateurs
 - [ ] Page de status/maintenance
-
+                                                          
 ##### **Jour 5 : GO LIVE ! 🚀**
 - [ ] Déploiement production
 - [ ] Monitoring actif 24/7
