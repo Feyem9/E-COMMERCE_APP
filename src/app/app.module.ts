@@ -35,7 +35,9 @@ import { ProfileComponent } from './customers/profile/profile.component';
 import { PaymentSuccessComponent } from './payment/payment-success/payment-success.component';
 import { PaymentComponent } from './payment/payment.component';
 import { TransactionHistoryComponent } from './transaction-history/transaction-history.component';
-import { FooterComponent } from './footer/footer.component';  // Ajoutez cette ligne pour le ngModel
+import { FooterComponent } from './footer/footer.component';
+import { MaintenanceComponent } from './maintenance/maintenance.component';
+import { StatusComponent } from './status/status.component';  // Ajoutez cette ligne pour le ngModel
 
 @NgModule({
   declarations: [
@@ -51,7 +53,9 @@ import { FooterComponent } from './footer/footer.component';  // Ajoutez cette l
     PaymentSuccessComponent,
     PaymentComponent,
     TransactionHistoryComponent,
-    FooterComponent
+    FooterComponent,
+    MaintenanceComponent,
+    StatusComponent
   ],
   imports: [
     BrowserModule,
