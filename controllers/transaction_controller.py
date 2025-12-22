@@ -5,8 +5,38 @@ from models.transaction_model import Transactions
 import requests
 import uuid
 from datetime import datetime
+from math import radians, cos, sin, asin, sqrt
 
 # Récupérer toutes les transactions
+from math import radians, cos, sin, asin, sqrt
+
+# ✅ Calcul de distance GPS (formule Haversine)
+def calculate_distance(lat1, lon1, lat2, lon2):
+    """
+    Calcule la distance en km entre deux points GPS
+    lat1, lon1: Position client
+    lat2, lon2: Position entrepôt/point de livraison
+    """
+    if not all([lat1, lon1, lat2, lon2]):
+        return None
+    
+    try:
+        # Convertir en radians
+        lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+        
+        # Formule Haversine
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+        a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+        c = 2 * asin(sqrt(a))
+        
+        # Rayon de la Terre en km
+        km = 6371 * c
+        return round(km, 2)
+    except Exception as e:
+        print(f"⚠️ Erreur calcul distance: {e}")
+        return None
+
 
 
 def generate_transaction_id():
