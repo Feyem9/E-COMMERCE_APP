@@ -237,12 +237,45 @@ def initiate_payment():
 
             # ✅ Étape 4 : Enregistrer la transaction dans la base
             try:
+                # Coordonnées de l'entrepôt/point de livraison (Yaoundé, Cameroun)
+                WAREHOUSE_LAT = 3.8689
+                WAREHOUSE_LNG = 11.5213
+                
+                # Récupérer coordonnées client
+                customer_lat = data.get('customer_latitude')
+                customer_lng = data.get('customer_longitude')
+                
+                # Calculer distance et générer itinéraire si coordonnées disponibles
+                distance_km = None
+                delivery_map = None
+                
+                if customer_lat and customer_lng:
+                    # Calcul distance
+                    distance_km = calculate_distance(
+                        customer_lat, customer_lng,
+                        WAREHOUSE_LAT, WAREHOUSE_LNG
+                    )
+                    
+                    # Génération lien Google Maps pour itinéraire
+                    delivery_map = generate_delivery_map_url(
+                        WAREHOUSE_LAT, WAREHOUSE_LNG,  # Départ: Entrepôt
+                        customer_lat, customer_lng      # Arrivée: Client
+                    )
+                    
+                    print(f"📍 Position client: ({customer_lat}, {customer_lng})")
+                    print(f"📍 Distance de livraison: {distance_km} km")
+                    print(f"🗺️ Itinéraire Maps: {delivery_map}")
+                
                 new_transaction = Transactions(
                     transaction_id=transaction_id,
                     total_amount=data['total_amount'],
                     currency=data['currency'],
                     status="pending",
-                    redirect_url=result["data"].get("transaction_url")
+                    redirect_url=result["data"].get("transaction_url"),
+                    customer_latitude=customer_lat,
+                    customer_longitude=customer_lng,
+                    delivery_distance_km=distance_km,
+                    delivery_map_url=delivery_map
                 )
                 db.session.add(new_transaction)
                 db.session.commit()
