@@ -37,7 +37,8 @@ import { PaymentComponent } from './payment/payment.component';
 import { TransactionHistoryComponent } from './transaction-history/transaction-history.component';
 import { FooterComponent } from './footer/footer.component';
 import { MaintenanceComponent } from './maintenance/maintenance.component';
-import { StatusComponent } from './status/status.component';  // Ajoutez cette ligne pour le ngModel
+import { StatusComponent } from './status/status.component';
+import { DeliveryDriverComponent } from './delivery-driver/delivery-driver.component';  // Ajoutez cette ligne pour le ngModel
 
 @NgModule({
   declarations: [
@@ -55,7 +56,8 @@ import { StatusComponent } from './status/status.component';  // Ajoutez cette l
     TransactionHistoryComponent,
     FooterComponent,
     MaintenanceComponent,
-    StatusComponent
+    StatusComponent,
+    DeliveryDriverComponent
   ],
   imports: [
     BrowserModule,
