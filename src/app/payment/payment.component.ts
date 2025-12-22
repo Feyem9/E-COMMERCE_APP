@@ -46,7 +46,7 @@ export class PaymentComponent {
       next: (result: any) => {
         console.log('Paiement initié:', result);
         this.paymentUrl = result.payment_url;
-        this.qrCodeValue = result.data.t_id; // QR = transaction ID ou token sécurisé
+        this.qrCodeValue = result.data.transaction_id; // ✅ Notre ID pour validation
         this.transactionId = result.data.transaction_id;
         this.loading = false;
       },
