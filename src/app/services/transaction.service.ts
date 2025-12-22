@@ -6,9 +6,9 @@ import { environment } from '../../environment/environment';
   providedIn: 'root'
 })
 export class TransactionService {
-  //  private apiUrl = 'https://e-commerce-app-1-islr.onrender.com/transaction/payment'; // Production URL
+  //  private apiUrl = 'https://e-commerce-app-1-islr.onrender.com/transaction/initiate'; // Production URL
   // private API_URL = 'https://e-commerce-app-0hnw.onrender.com/transaction'; // Base URL for transaction-related endpoints
-  private API_URL = `${environment.apiUrl}/transaction`; // Base URL for transaction-related endpoints
+  private API_URL = `${environment.apiUrl}/transactions`; // ✅ Corrigé: /transactions avec 's'
 
   constructor(private http: HttpClient) { }
 
@@ -17,7 +17,7 @@ export class TransactionService {
   // }
 
   initiatePayment(data: any) {
-    return this.http.post<any>(`${this.API_URL}/payment`, data);
+    return this.http.post<any>(`${this.API_URL}/initiate`, data);
   }
 
   confirmTransaction(transactionId: string, token: string) {
