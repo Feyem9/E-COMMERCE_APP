@@ -160,7 +160,10 @@ export class CartComponent implements OnInit, OnDestroy {
       currency: 'XAF',
       return_url: returnUrl,
       notify_url: "https://webhook.site/d457b2f3-dd71-4f04-9af5-e2fcf3be8f34",
-      payment_country: "CM"
+      payment_country: "CM",
+      // ✅ Géolocalisation
+      customer_latitude: this.customerLocation?.lat,
+      customer_longitude: this.customerLocation?.lng
     };
     
     this.transactionService.initiatePayment(paymentData)
