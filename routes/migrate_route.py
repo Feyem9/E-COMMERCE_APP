@@ -61,3 +61,49 @@ def migrate_geoloc():
             "status": "error",
             "message": f"❌ Erreur lors de la migration: {str(e)}"
         }), 500
+
+@migrate_bp.route('/admin/migrate-qr', methods=['GET'])
+def migrate_qr():
+    """Ajoute les colonnes QR code sécurisé"""
+    try:
+        columns_to_add = [
+            ('delivery_time', 'DATETIME'),
+            ('qr_signature', 'VARCHAR(255)'),
+            ('reference', 'VARCHAR(100)')
+        ]
+        
+        added_columns = []
+        skipped_columns = []
+        
+        for column_name, column_type in columns_to_add:
+            try:
+                sql = f'ALTER TABLE transactions ADD COLUMN {column_name} {column_type}'
+                db.session.execute(text(sql))
+                db.session.commit()
+                added_columns.append(column_name)
+            except Exception as e:
+                error_msg = str(e).lower()
+                if 'duplicate' in error_msg or 'already exists' in error_msg:
+                    skipped_columns.append(column_name)
+                    db.session.rollback()
+                else:
+                    raise
+        
+        if added_columns:
+            return jsonify({
+                "status": "success",
+                "message": f"✅ {len(added_columns)} colonnes QR ajoutées!",
+                "columns_added": added_columns
+            }), 200
+        else:
+            return jsonify({
+                "status": "success",
+                "message": "✅ Colonnes QR déjà présentes!"
+            }), 200
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "status": "error",
+            "message": f"❌ Erreur: {str(e)}"
+        }), 500
