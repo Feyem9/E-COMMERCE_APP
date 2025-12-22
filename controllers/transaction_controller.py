@@ -266,6 +266,18 @@ def initiate_payment():
                     print(f"📍 Distance de livraison: {distance_km} km")
                     print(f"🗺️ Itinéraire Maps: {delivery_map}")
                 
+                # 🔐 Générer QR code sécurisé
+                temp_transaction = Transactions(
+                    transaction_id=transaction_id,
+                    total_amount=data['total_amount'],
+                    currency=data['currency'],
+                    status="pending",
+                    redirect_url=result["data"].get("transaction_url")
+                )
+                
+                qr_data, signature, reference = generate_qr_data(temp_transaction)
+                print(f"🔐 Signature: {signature[:20]}... Réf: {reference}")
+                
                 new_transaction = Transactions(
                     transaction_id=transaction_id,
                     total_amount=data['total_amount'],
@@ -275,11 +287,13 @@ def initiate_payment():
                     customer_latitude=customer_lat,
                     customer_longitude=customer_lng,
                     delivery_distance_km=distance_km,
-                    delivery_map_url=delivery_map
+                    delivery_map_url=delivery_map,
+                    qr_signature=signature,
+                    reference=reference
                 )
                 db.session.add(new_transaction)
                 db.session.commit()
-                print("✅ Transaction enregistrée avec succès")
+                print(f"✅ Transaction {reference} enregistrée")
             except Exception as e:
                 print(f"❌ Erreur lors de l'enregistrement de la transaction: {e}")
                 return jsonify({"error": f"Erreur de base de données: {str(e)}"}), 500
@@ -314,32 +328,67 @@ def initiate_payment():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Endpoint pour valider une transaction via QR code
+@app.route('/transactions/validate', methods=['POST'])
 def validate_transaction():
+    """Valide une livraison via scan QR code sécurisé"""
+    from utils.qr_security import validate_qr_data
+    from datetime import datetime
+    
     data = request.get_json()
-    qr_code = data.get('qr_code')
-
-    if not qr_code:
-        return jsonify({'error': 'QR code manquant'}), 400
-
-    # Rechercher la transaction par son ID (le QR code contient l'ID de transaction)
-    transaction = Transactions.query.filter_by(transaction_id=qr_code).first()
-
+    qr_string = data.get('qr_code')
+    
+    if not qr_string:
+        return jsonify({"error": "QR code manquant"}), 400
+    
+    # Valider QR code (signature HMAC)
+    is_valid, qr_data, error = validate_qr_data(qr_string)
+    
+    if not is_valid:
+        return jsonify({"error": f"QR invalide: {error}"}), 400
+    
+    # Chercher transaction
+    transaction = Transactions.query.filter_by(
+        transaction_id=qr_data['transaction_id']
+    ).first()
+    
     if not transaction:
-        return jsonify({'error': 'Transaction non trouvée'}), 404
+        return jsonify({"error": "Transaction introuvable"}), 404
+    
+    # Vérifier signature en BDD
+    if transaction.qr_signature != qr_data['signature']:
+        return jsonify({"error": "Signature ne correspond pas"}), 400
+    
+    # Vérifier si déjà livrée
+    if transaction.status == "success":
+        return jsonify({
+            "error": "Livraison déjà validée",
+            "delivery_time": transaction.delivery_time.isoformat() if transaction.delivery_time else None
+        }), 400
+    
+    # Vérifier status valide
+    if transaction.status not in ["pending", "confirmed"]:
+        return jsonify({"error": f"Status invalide: {transaction.status}"}), 400
+    
+    # VALIDER LA LIVRAISON
+    transaction.status = "success"
+    transaction.delivery_time = datetime.now()
+    
+    try:
+        db.session.commit()
+        
+        print(f"✅ Livraison validée: {transaction.reference}")
+        
+        return jsonify({
+            "message": "✅ Livraison confirmée avec succès !",
+            "transaction_id": transaction.transaction_id,
+            "reference": transaction.reference,
+            "amount": transaction.total_amount,
+            "currency": transaction.currency,
+            "delivery_time": transaction.delivery_time.isoformat(),
+            "distance": transaction.delivery_distance_km
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Erreur: {str(e)}"}), 500
 
-    # Vérifier que la transaction est en attente de validation
-    if transaction.status != 'pending':
-        return jsonify({'error': f'Transaction déjà {transaction.status}'}), 400
-
-    # Mettre à jour le statut de la transaction
-    transaction.status = 'completed'
-    db.session.commit()
-
-    return jsonify({
-        'message': 'Transaction validée avec succès',
-        'transaction_id': transaction.transaction_id,
-        'status': transaction.status,
-        'amount': transaction.total_amount,
-        'currency': transaction.currency
-    }), 200
