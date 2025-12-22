@@ -118,10 +118,15 @@ export class CartComponent implements OnInit, OnDestroy {
 
   // Procéder au paiement
   checkout(): void {
+    // Dynamic return URL based on current host
+    const returnUrl = typeof window !== 'undefined' 
+      ? `${window.location.origin}/payment-success`
+      : 'https://staging-market.vercel.app/payment-success';
+
     const paymentData = {
       total_amount: this.totalPrice,
       currency: 'XAF',
-      return_url: "https://8kfjw7x2-4200.uks1.devtunnels.ms/payment-success",
+      return_url: returnUrl,
       notify_url: "https://webhook.site/d457b2f3-dd71-4f04-9af5-e2fcf3be8f34",
       payment_country: "CM"
     };
