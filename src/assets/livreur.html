@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚚 Livraisons - Market App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        .header h1 span {
+            font-size: 32px;
+            margin-right: 10px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .deliveries {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .delivery-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .delivery-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .delivery-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .delivery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .transaction-id {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .delivery-info {
+            margin-bottom: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .distance {
+            color: #667eea;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .map-button {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .map-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .map-button:active {
+            transform: translateY(0);
+        }
+
+        .map-icon {
+            margin-right: 8px;
+            font-size: 20px;
+        }
+
+        .no-gps {
+            background: #e5e7eb;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+
+        .no-gps:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 18px;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .refresh-button {
+            background: white;
+            color: #667eea;
+            padding: 10px 20px;
+            border: 2px solid white;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .refresh-button:hover {
+            background: transparent;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .deliveries {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        .empty-state {
+            background: white;
+            padding: 60px 20px;
+            border-radius: 15px;
+            text-align: center;
+            grid-column: 1 / -1;
+        }
+
+        .empty-state .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><span>🚚</span> Mes Livraisons</h1>
+            <button class="refresh-button" onclick="loadDeliveries()">
+                🔄 Actualiser
+            </button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="number" id="stat-pending">-</div>
+                <div class="label">En Attente</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="stat-completed">-</div>
+                <div class="label">Livrées</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="stat-distance">-</div>
+                <div class="label">Km Aujourd'hui</div>
+            </div>
+        </div>
+
+        <!-- Error -->
+        <div id="error" class="error" style="display: none;"></div>
+
+        <!-- Loading -->
+        <div id="loading" class="loading">
+            <h2>⏳ Chargement des livraisons...</h2>
+        </div>
+
+        <!-- Deliveries -->
+        <div id="deliveries" class="deliveries" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Configuration API
+        const API_URL = 'https://theck-market.onrender.com'; // Changez selon votre environnement
+        // const API_URL = 'http://localhost:5000'; // Pour test local
+
+        // Charger les livraisons
+        async function loadDeliveries() {
+            const loadingEl = document.getElementById('loading');
+            const deliveriesEl = document.getElementById('deliveries');
+            const errorEl = document.getElementById('error');
+
+            loadingEl.style.display = 'block';
+            deliveriesEl.style.display = 'none';
+            errorEl.style.display = 'none';
+
+            try {
+                // Récupérer toutes les transactions
+                const response = await fetch(`${API_URL}/transactions`);
+
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const transactions = data.transactions || data || [];
+
+                // Filtrer les transactions avec livraison en attente
+                const pendingDeliveries = transactions.filter(t => t.status === 'pending');
+                const completedDeliveries = transactions.filter(t => t.status === 'completed' || t.status === 'success');
+
+                // Calculer distance totale aujourd'hui
+                const today = new Date().toDateString();
+                const todayDeliveries = transactions.filter(t => {
+                    const txDate = new Date(t.created_at).toDateString();
+                    return txDate === today && t.delivery_distance_km;
+                });
+                const totalDistance = todayDeliveries.reduce((sum, t) => sum + (t.delivery_distance_km || 0), 0);
+
+                // Mettre à jour stats
+                document.getElementById('stat-pending').textContent = pendingDeliveries.length;
+                document.getElementById('stat-completed').textContent = completedDeliveries.length;
+                document.getElementById('stat-distance').textContent = totalDistance.toFixed(1);
+
+                // Afficher les livraisons
+                displayDeliveries(transactions);
+
+                loadingEl.style.display = 'none';
+                deliveriesEl.style.display = 'grid';
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                loadingEl.style.display = 'none';
+                errorEl.textContent = `❌ Erreur de chargement: ${error.message}`;
+                errorEl.style.display = 'block';
+            }
+        }
+
+        // Afficher les livraisons
+        function displayDeliveries(transactions) {
+            const deliveriesEl = document.getElementById('deliveries');
+
+            if (transactions.length === 0) {
+                deliveriesEl.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📦</div>
+                        <h3>Aucune livraison</h3>
+                        <p>Il n'y a pas de livraisons pour le moment.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            deliveriesEl.innerHTML = transactions
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                .map(tx => createDeliveryCard(tx))
+                .join('');
+        }
+
+        // Créer une carte de livraison
+        function createDeliveryCard(tx) {
+            const statusClass = tx.status === 'pending' ? 'status-pending' : 'status-completed';
+            const statusText = tx.status === 'pending' ? 'En Attente' : 'Livrée';
+
+            const hasGPS = tx.customer_latitude && tx.customer_longitude;
+            const mapButton = hasGPS
+                ? `<a href="${tx.delivery_map_url || '#'}" target="_blank" class="map-button">
+                     <span class="map-icon">🗺️</span> Ouvrir GPS
+                   </a>`
+                : `<button class="map-button no-gps" disabled>
+                     ❌ GPS non disponible
+                   </button>`;
+
+            const date = new Date(tx.created_at).toLocaleString('fr-FR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            return `
+                <div class="delivery-card">
+                    <div class="delivery-header">
+                        <div class="transaction-id">#${tx.transaction_id}</div>
+                        <div class="status-badge ${statusClass}">${statusText}</div>
+                    </div>
+                    
+                    <div class="delivery-info">
+                        <div class="info-row">
+                            <span class="info-label">💰 Montant</span>
+                            <span class="info-value">${tx.total_amount} ${tx.currency}</span>
+                        </div>
+                        
+                        ${hasGPS ? `
+                        <div class="info-row">
+                            <span class="info-label">📍 Distance</span>
+                            <span class="distance">${(tx.delivery_distance_km || 0).toFixed(2)} km</span>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="info-row">
+                            <span class="info-label">🕐 Date</span>
+                            <span class="info-value">${date}</span>
+                        </div>
+                    </div>
+                    
+                    ${mapButton}
+                </div>
+            `;
+        }
+
+        // Charger au démarrage
+        loadDeliveries();
+
+        // Auto-refresh toutes les 30 secondes
+        setInterval(loadDeliveries, 30000);
+    </script>
+</body>
+
+</html>
