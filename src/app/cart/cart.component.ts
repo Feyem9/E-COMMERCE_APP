@@ -23,6 +23,10 @@ export class CartComponent implements OnInit, OnDestroy {
   total: number = 0;  // Prix total du panier
   private cartKey = 'my_cart';
 
+  // ✅ Géolocalisation
+  customerLocation: { lat: number, lng: number } | null = null;
+  locationError: string = '';
+
   constructor(private cartService: CartService,
     private fb: FormBuilder,
     formModule: FormsModule,
@@ -33,7 +37,7 @@ export class CartComponent implements OnInit, OnDestroy {
     this.loadCart();
     this.calculateTotal();
     this.cartService.clearCart();
-
+    this.getCustomerLocation();  // ✅ Demander position GPS
 
     // Initialisation du formulaire réactif
     this.cartForm = this.fb.group({
@@ -113,6 +117,34 @@ export class CartComponent implements OnInit, OnDestroy {
           console.error('Erreur lors de la suppression', err);
         }
       });
+  }
+
+  // \u2705 Obtenir la position GPS du client
+  getCustomerLocation(): void {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          this.customerLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          console.log('\ud83d\udccd Position client captur\u00e9e:', this.customerLocation);
+        },
+        (error) => {
+          this.locationError = error.message;
+          console.warn('\u26a0\ufe0f G\u00e9olocalisation refus\u00e9e:', error.message);
+          // Continuer sans g\u00e9olocalisation
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
+      );
+    } else {
+      this.locationError = 'G\u00e9olocalisation non support\u00e9e';
+      console.warn('\u26a0\ufe0f G\u00e9olocalisation non support\u00e9e par ce navigateur');
+    }
   }
 
 
