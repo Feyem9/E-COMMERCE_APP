@@ -328,7 +328,6 @@ def initiate_payment():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/transactions/validate', methods=['POST'])
 def validate_transaction():
     """Valide une livraison via scan QR code sécurisé"""
     from utils.qr_security import validate_qr_data
