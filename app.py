@@ -242,4 +242,13 @@ def check_session():
     return jsonify(dict(session))
 
 if __name__ == '__main__':
+
+# ✅ Créer/Mettre à jour les tables au démarrage
+with app.app_context():
+    try:
+        db.create_all()
+        print("✅ Tables BDD créées/mises à jour")
+    except Exception as e:
+        print(f"⚠️ Erreur création tables: {e}")
+
     app.run(debug=True)
