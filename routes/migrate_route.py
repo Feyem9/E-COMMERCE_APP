@@ -1,5 +1,5 @@
 """
-🔧 ENDPOINT TEMPORAIRE - Migration BDD Géolocalisation
+🔧 ENDPOINT TEMPORAIRE - Migration BDD Géolocalisation (SQLite Compatible)
 ⚠️ À SUPPRIMER après utilisation !
 """
 
@@ -13,40 +13,51 @@ migrate_bp = Blueprint('migrate', __name__)
 def migrate_geoloc():
     """Ajoute les colonnes de géolocalisation à la table transactions"""
     try:
-        # ALTER TABLE pour ajouter les colonnes manquantes
-        db.session.execute(text('''
-            ALTER TABLE transactions 
-            ADD COLUMN IF NOT EXISTS customer_latitude FLOAT,
-            ADD COLUMN IF NOT EXISTS customer_longitude FLOAT,
-            ADD COLUMN IF NOT EXISTS delivery_distance_km FLOAT,
-            ADD COLUMN IF NOT EXISTS delivery_map_url VARCHAR(500)
-        '''))
-        db.session.commit()
+        columns_to_add = [
+            ('customer_latitude', 'FLOAT'),
+            ('customer_longitude', 'FLOAT'),
+            ('delivery_distance_km', 'FLOAT'),
+            ('delivery_map_url', 'VARCHAR(500)')
+        ]
         
-        return jsonify({
-            "status": "success", 
-            "message": "✅ Colonnes de géolocalisation ajoutées avec succès!",
-            "columns_added": [
-                "customer_latitude",
-                "customer_longitude", 
-                "delivery_distance_km",
-                "delivery_map_url"
-            ]
-        }), 200
+        added_columns = []
+        skipped_columns = []
+        
+        # Pour SQLite, on doit ajouter les colonnes une par une (pas de IF NOT EXISTS)
+        for column_name, column_type in columns_to_add:
+            try:
+                # SQLite: ALTER TABLE ... ADD COLUMN (sans IF NOT EXISTS)
+                sql = f'ALTER TABLE transactions ADD COLUMN {column_name} {column_type}'
+                db.session.execute(text(sql))
+                db.session.commit()
+                added_columns.append(column_name)
+            except Exception as e:
+                error_msg = str(e).lower()
+                # Si la colonne existe déjà, c'est OK
+                if 'duplicate' in error_msg or 'already exists' in error_msg or 'duplicate column' in error_msg:
+                    skipped_columns.append(column_name)
+                    db.session.rollback()
+                else:
+                    # Autre erreur, on re-raise
+                    raise
+        
+        if added_columns:
+            return jsonify({
+                "status": "success", 
+                "message": f"✅ {len(added_columns)} colonnes ajoutées avec succès!",
+                "columns_added": added_columns,
+                "columns_skipped": skipped_columns
+            }), 200
+        else:
+            return jsonify({
+                "status": "success",
+                "message": "✅ Toutes les colonnes existaient déjà - Migration OK!",
+                "columns_skipped": skipped_columns
+            }), 200
         
     except Exception as e:
         db.session.rollback()
-        error_msg = str(e)
-        
-        # Si les colonnes existent déjà, c'est OK
-        if "already exists" in error_msg or "duplicate column" in error_msg.lower():
-            return jsonify({
-                "status": "success",
-                "message": "✅ Colonnes déjà existantes - Migration OK!",
-                "note": "Les colonnes étaient déjà présentes dans la base."
-            }), 200
-        
         return jsonify({
             "status": "error",
-            "message": f"❌ Erreur lors de la migration: {error_msg}"
+            "message": f"❌ Erreur lors de la migration: {str(e)}"
         }), 500
