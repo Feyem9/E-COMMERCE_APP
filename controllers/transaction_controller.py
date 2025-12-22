@@ -40,6 +40,7 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 
 
 def generate_transaction_id():
+    return f"4478-{uuid.uuid4().hex[:6]}"
 
 # 🗺️ Génération lien Google Maps pour itinéraire
 def generate_delivery_map_url(origin_lat, origin_lng, dest_lat, dest_lng):
@@ -63,7 +64,6 @@ def generate_delivery_map_url(origin_lat, origin_lng, dest_lat, dest_lng):
         print(f"⚠️ Erreur génération lien maps: {e}")
         return None
 
-    return f"4478-{uuid.uuid4().hex[:6]}"  # Revenir à 6 caractères qui fonctionnait
 def index():
     transactions = Transactions.query.all()
     return jsonify([transaction.serialize() for transaction in transactions]), 200
