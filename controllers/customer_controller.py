@@ -22,10 +22,15 @@ def send_email(to, subject, template):
     """Envoyer un email en utilisant la configuration Flask-Mail de l'app"""
     try:
         from flask_mail import Mail
+        import socket
+        
+        # Set socket timeout to prevent hanging
+        socket.setdefaulttimeout(5)  # 5 seconds max
+        
         mail_instance = current_app.extensions.get('mail')
         if not mail_instance:
             current_app.logger.warning("Flask-Mail not initialized in app.extensions")
-            return
+            return False
         
         msg = Message(
             subject=subject, 
@@ -35,8 +40,16 @@ def send_email(to, subject, template):
         )
         mail_instance.send(msg)
         current_app.logger.info(f"✅ Email sent to {to}")
+        return True
+    except socket.timeout:
+        current_app.logger.warning(f"⚠️ Email timeout for {to} - SMTP server not responding")
+        return False
     except Exception as e:
         current_app.logger.warning(f"⚠️ Error sending email to {to}: {str(e)}")
+        return False
+    finally:
+        # Reset timeout to default
+        socket.setdefaulttimeout(None)
 
 def admin_required(f):
     @wraps(f)
