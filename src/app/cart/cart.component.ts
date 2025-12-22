@@ -130,21 +130,39 @@ export class CartComponent implements OnInit, OnDestroy {
       notify_url: "https://webhook.site/d457b2f3-dd71-4f04-9af5-e2fcf3be8f34",
       payment_country: "CM"
     };
+    
     this.transactionService.initiatePayment(paymentData)
       .pipe(takeUntil(this.destroy$))
-      .subscribe(
-        (response: any) => {
+      .subscribe({
+        next: (response: any) => {
           if (response && response.payment_url) {
-            window.location.href = response.payment_url;
+            // ✅ Vider le panier AVANT de rediriger
+            this.cartItems.forEach(item => {
+              if (item.id) {
+                this.cartService.removeFromCart(item.id).subscribe();
+              }
+            });
+            
+            // Vider le panier local également
+            this.cartItems = [];
+            this.totalPrice = 0;
+            this.cartService.updateCartCount(0);
+            
+            console.log('✅ Panier vidé avec succès');
+            
+            // Attendre un peu avant de rediriger (laisser les requêtes DELETE se terminer)
+            setTimeout(() => {
+              window.location.href = response.payment_url;
+            }, 500);
           } else {
             alert('Erreur de redirection vers PayUnit.');
           }
         },
-        (err: any) => {
+        error: (err: any) => {
           console.error('Erreur paiement :', err);
           alert('Erreur lors du paiement.');
         }
-      );
+      });
   }
 
   // }
