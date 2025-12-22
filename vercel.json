@@ -1,7 +1,8 @@
 {
     "installCommand": "npm install --legacy-peer-deps",
-    "buildCommand": "npm run build -- --configuration production",
+    "buildCommand": "npm run build -- --configuration production && cp dist/market/browser/index.csr.html dist/market/browser/index.html",
     "outputDirectory": "dist/market/browser",
+    "framework": "angular",
     "rewrites": [
         {
             "source": "/(.*)",
@@ -10,7 +11,7 @@
     ],
     "headers": [
         {
-            "source": "/(.*)",
+            "source": "/index.html",
             "headers": [
                 {
                     "key": "Cache-Control",
