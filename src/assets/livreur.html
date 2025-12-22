@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🚚 Livraisons - Market App</title>
+    <!-- QR Code Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -33,6 +35,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .header h1 {
@@ -40,9 +44,155 @@
             font-size: 28px;
         }
 
-        .header h1 span {
-            font-size: 32px;
-            margin-right: 10px;
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .scan-button {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .scan-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .refresh-button {
+            background: white;
+            color: #667eea;
+            padding: 10px 20px;
+            border: 2px solid white;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .refresh-button:hover {
+            background: transparent;
+            color: white;
+        }
+
+        /* Modal Scanner */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 15px;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+        }
+
+        .close-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        #qr-reader {
+            width: 100%;
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #scan-result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .scan-result-success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+        }
+
+        .scan-result-error {
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+        }
+
+        .scan-result h3 {
+            margin-bottom: 10px;
+        }
+
+        .scan-result-success h3 {
+            color: #065f46;
+        }
+
+        .scan-result-error h3 {
+            color: #991b1b;
+        }
+
+        .scan-result p {
+            margin: 5px 0;
+            color: #333;
+        }
+
+        .scan-result strong {
+            color: #667eea;
         }
 
         .stats {
@@ -129,6 +279,7 @@
             color: #92400e;
         }
 
+        .status-success,
         .status-completed {
             background: #d1fae5;
             color: #065f46;
@@ -181,31 +332,12 @@
             text-align: center;
             transition: all 0.3s;
             box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+            margin-bottom: 10px;
         }
 
         .map-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .map-button:active {
-            transform: translateY(0);
-        }
-
-        .map-icon {
-            margin-right: 8px;
-            font-size: 20px;
-        }
-
-        .no-gps {
-            background: #e5e7eb;
-            color: #6b7280;
-            cursor: not-allowed;
-        }
-
-        .no-gps:hover {
-            transform: none;
-            box-shadow: none;
         }
 
         .loading {
@@ -223,23 +355,6 @@
             margin-bottom: 20px;
         }
 
-        .refresh-button {
-            background: white;
-            color: #667eea;
-            padding: 10px 20px;
-            border: 2px solid white;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .refresh-button:hover {
-            background: transparent;
-            color: white;
-        }
-
         @media (max-width: 768px) {
             .deliveries {
                 grid-template-columns: 1fr;
@@ -247,30 +362,12 @@
 
             .header {
                 flex-direction: column;
-                gap: 15px;
             }
-        }
 
-        .empty-state {
-            background: white;
-            padding: 60px 20px;
-            border-radius: 15px;
-            text-align: center;
-            grid-column: 1 / -1;
-        }
-
-        .empty-state .icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-        }
-
-        .empty-state h3 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .empty-state p {
-            color: #666;
+            .modal-content {
+                margin: 10% auto;
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -280,9 +377,14 @@
         <!-- Header -->
         <div class="header">
             <h1><span>🚚</span> Mes Livraisons</h1>
-            <button class="refresh-button" onclick="loadDeliveries()">
-                🔄 Actualiser
-            </button>
+            <div class="header-buttons">
+                <button class="scan-button" onclick="openScanner()">
+                    📷 Scanner QR
+                </button>
+                <button class="refresh-button" onclick="loadDeliveries()">
+                    🔄 Actualiser
+                </button>
+            </div>
         </div>
 
         <!-- Stats -->
@@ -313,10 +415,129 @@
         <div id="deliveries" class="deliveries" style="display: none;"></div>
     </div>
 
+    <!-- Modal Scanner QR -->
+    <div id="scanner-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📷 Scanner le QR Code Client</h2>
+                <button class="close-btn" onclick="closeScanner()">Fermer</button>
+            </div>
+            <div id="qr-reader"></div>
+            <div id="scan-result"></div>
+        </div>
+    </div>
+
     <script>
         // Configuration API
-        const API_URL = 'https://theck-market.onrender.com'; // Changez selon votre environnement
+        const API_URL = 'https://theck-market.onrender.com';
         // const API_URL = 'http://localhost:5000'; // Pour test local
+
+        let html5QrCode = null;
+
+        // Scanner QR Code
+        function openScanner() {
+            const modal = document.getElementById('scanner-modal');
+            const resultDiv = document.getElementById('scan-result');
+
+            modal.style.display = 'block';
+            resultDiv.style.display = 'none';
+            resultDiv.innerHTML = '';
+
+            html5QrCode = new Html5Qrcode("qr-reader");
+
+            html5QrCode.start(
+                { facingMode: "environment" },  // Caméra arrière
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 }
+                },
+                onScanSuccess,
+                onScanError
+            ).catch(err => {
+                console.error('Erreur démarrage scanner:', err);
+                alert('Impossible d\'accéder à la caméra. Vérifiez les permissions.');
+            });
+        }
+
+        function closeScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                }).catch(err => {
+                    console.error('Erreur arrêt scanner:', err);
+                });
+                html5QrCode = null;
+            }
+            document.getElementById('scanner-modal').style.display = 'none';
+        }
+
+        async function onScanSuccess(decodedText) {
+            console.log('QR Code scanné:', decodedText);
+
+            // Arrêter scanner
+            if (html5QrCode) {
+                html5QrCode.pause();
+            }
+
+            const resultDiv = document.getElementById('scan-result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = '';
+            resultDiv.innerHTML = '<p>⏳ Validation en cours...</p>';
+
+            try {
+                // Appeler API validation
+                const response = await fetch(`${API_URL}/transactions/validate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ qr_code: decodedText })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    resultDiv.className = 'scan-result scan-result-success';
+                    resultDiv.innerHTML = `
+                        <h3>✅ ${result.message}</h3>
+                        <p><strong>Référence:</strong> ${result.reference}</p>
+                        <p><strong>Transaction:</strong> ${result.transaction_id}</p>
+                        <p><strong>Montant:</strong> ${result.amount} ${result.currency}</p>
+                        <p><strong>Distance:</strong> ${result.distance} km</p>
+                        <p><strong>Livré le:</strong> ${new Date(result.delivery_time).toLocaleString('fr-FR')}</p>
+                    `;
+
+                    // Rafraîchir liste après 3 secondes
+                    setTimeout(() => {
+                        closeScanner();
+                        loadDeliveries();
+                    }, 3000);
+                } else {
+                    resultDiv.className = 'scan-result scan-result-error';
+                    resultDiv.innerHTML = `
+                        <h3>❌ Erreur de Validation</h3>
+                        <p>${result.error}</p>
+                    `;
+
+                    // Permettre de rescanner
+                    if (html5QrCode) {
+                        setTimeout(() => {
+                            html5QrCode.resume();
+                            resultDiv.style.display = 'none';
+                        }, 3000);
+                    }
+                }
+            } catch (error) {
+                resultDiv.className = 'scan-result scan-result-error';
+                resultDiv.innerHTML = `
+                    <h3>❌ Erreur Réseau</h3>
+                    <p>${error.message}</p>
+                    <p>Vérifiez votre connexion internet.</p>
+                `;
+            }
+        }
+
+        function onScanError(error) {
+            // Ignorer erreurs de scan continues (normal)
+        }
 
         // Charger les livraisons
         async function loadDeliveries() {
@@ -329,7 +550,6 @@
             errorEl.style.display = 'none';
 
             try {
-                // Récupérer toutes les transactions
                 const response = await fetch(`${API_URL}/transactions`);
 
                 if (!response.ok) {
@@ -339,9 +559,9 @@
                 const data = await response.json();
                 const transactions = data.transactions || data || [];
 
-                // Filtrer les transactions avec livraison en attente
+                // Filtrer les transactions
                 const pendingDeliveries = transactions.filter(t => t.status === 'pending');
-                const completedDeliveries = transactions.filter(t => t.status === 'completed' || t.status === 'success');
+                const completedDeliveries = transactions.filter(t => t.status === 'success' || t.status === 'completed');
 
                 // Calculer distance totale aujourd'hui
                 const today = new Date().toDateString();
@@ -376,8 +596,8 @@
 
             if (transactions.length === 0) {
                 deliveriesEl.innerHTML = `
-                    <div class="empty-state">
-                        <div class="icon">📦</div>
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px; background: white; border-radius: 15px;">
+                        <div style="font-size: 80px;">📦</div>
                         <h3>Aucune livraison</h3>
                         <p>Il n'y a pas de livraisons pour le moment.</p>
                     </div>
@@ -393,17 +613,15 @@
 
         // Créer une carte de livraison
         function createDeliveryCard(tx) {
-            const statusClass = tx.status === 'pending' ? 'status-pending' : 'status-completed';
+            const statusClass = tx.status === 'pending' ? 'status-pending' : 'status-success';
             const statusText = tx.status === 'pending' ? 'En Attente' : 'Livrée';
 
             const hasGPS = tx.customer_latitude && tx.customer_longitude;
             const mapButton = hasGPS
                 ? `<a href="${tx.delivery_map_url || '#'}" target="_blank" class="map-button">
-                     <span class="map-icon">🗺️</span> Ouvrir GPS
+                     🗺️ Ouvrir GPS
                    </a>`
-                : `<button class="map-button no-gps" disabled>
-                     ❌ GPS non disponible
-                   </button>`;
+                : '';
 
             const date = new Date(tx.created_at).toLocaleString('fr-FR', {
                 day: '2-digit',
@@ -413,6 +631,13 @@
                 minute: '2-digit'
             });
 
+            const deliveryTime = tx.delivery_time
+                ? `<div class="info-row">
+                     <span class="info-label">📦 Livré le</span>
+                     <span class="info-value">${new Date(tx.delivery_time).toLocaleString('fr-FR')}</span>
+                   </div>`
+                : '';
+
             return `
                 <div class="delivery-card">
                     <div class="delivery-header">
@@ -421,6 +646,13 @@
                     </div>
                     
                     <div class="delivery-info">
+                        ${tx.reference ? `
+                        <div class="info-row">
+                            <span class="info-label">📋 Référence</span>
+                            <span class="info-value">${tx.reference}</span>
+                        </div>
+                        ` : ''}
+                        
                         <div class="info-row">
                             <span class="info-label">💰 Montant</span>
                             <span class="info-value">${tx.total_amount} ${tx.currency}</span>
@@ -434,9 +666,11 @@
                         ` : ''}
                         
                         <div class="info-row">
-                            <span class="info-label">🕐 Date</span>
+                            <span class="info-label">🕐 Commandé</span>
                             <span class="info-value">${date}</span>
                         </div>
+                        
+                        ${deliveryTime}
                     </div>
                     
                     ${mapButton}
