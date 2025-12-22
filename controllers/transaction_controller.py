@@ -40,6 +40,29 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 
 
 def generate_transaction_id():
+
+# 🗺️ Génération lien Google Maps pour itinéraire
+def generate_delivery_map_url(origin_lat, origin_lng, dest_lat, dest_lng):
+    """
+    Génère un lien Google Maps avec directions pour le livreur
+    origin: Position entrepôt/départ
+    dest: Position client/arrivée
+    """
+    if not all([origin_lat, origin_lng, dest_lat, dest_lng]):
+        return None
+    
+    try:
+        # Format: https://www.google.com/maps/dir/ORIGIN/DESTINATION
+        base_url = "https://www.google.com/maps/dir/"
+        origin = f"{origin_lat},{origin_lng}"
+        destination = f"{dest_lat},{dest_lng}"
+        
+        map_url = f"{base_url}{origin}/{destination}"
+        return map_url
+    except Exception as e:
+        print(f"⚠️ Erreur génération lien maps: {e}")
+        return None
+
     return f"4478-{uuid.uuid4().hex[:6]}"  # Revenir à 6 caractères qui fonctionnait
 def index():
     transactions = Transactions.query.all()
