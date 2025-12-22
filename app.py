@@ -141,7 +141,7 @@ app.register_blueprint(customer , url_prefix='/customer')
 app.register_blueprint(cart , url_prefix='/cart')
 app.register_blueprint(order , url_prefix='/order')
 app.register_blueprint(product , url_prefix='/product') 
-app.register_blueprint(transaction , url_prefix='/transaction')
+app.register_blueprint(transaction , url_prefix='/transactions')  # ✅ Avec 's'
 app.register_blueprint(category , url_prefix='/category')
 
 # Initialiser la base de données avec les données
