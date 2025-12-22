@@ -241,7 +241,6 @@ def update_cart(id):
 def check_session():
     return jsonify(dict(session))
 
-if __name__ == '__main__':
 
 # ✅ Créer/Mettre à jour les tables au démarrage
 with app.app_context():
@@ -251,4 +250,5 @@ with app.app_context():
     except Exception as e:
         print(f"⚠️ Erreur création tables: {e}")
 
+if __name__ == '__main__':
     app.run(debug=True)
