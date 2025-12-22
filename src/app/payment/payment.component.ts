@@ -27,7 +27,7 @@ export class PaymentComponent {
     this.validationSuccess = false;
 
     // Determine current host for return_url
-    let returnUrl = 'https://e-commerce-app-seven-omega.vercel.app/payment-success'; // Fallback
+    let returnUrl = 'https://staging-market.vercel.app/payment-success'; // Fallback staging
     if (isPlatformBrowser(this.platformId)) {
         returnUrl = `${window.location.origin}/payment-success`;
     }
