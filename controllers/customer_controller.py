@@ -263,7 +263,7 @@ def login():
     # Date d'expiration en timestamp UNIX
     exp_timestamp = decoded['exp']
     print('Expiration timestamp:', exp_timestamp)
-    login_user(customer)  # si tu utilises flask-login
+    # login_user(customer)  # Désactivé - on utilise JWT au lieu de Flask-Login
 
     print("🎉 Connexion réussie pour :", customer.email)
 
