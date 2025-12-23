@@ -13,8 +13,7 @@ export class PaymentComponent {
   paymentUrl: string = '';
   transactionId: string = '';
   loading = false;
-  validationMessage: string = '';
-  validationSuccess: boolean = false;
+
 
   constructor(
     private transactionService: TransactionService,
@@ -61,31 +60,6 @@ export class PaymentComponent {
       },
       error: (error: any) => { 
         console.error('Erreur paiement', error);
-        this.loading = false;
-      }
-    });
-  }
-
-  validateTransaction() {
-    if (!this.qrCodeValue) {
-      this.validationMessage = 'Aucun QR code disponible pour validation';
-      this.validationSuccess = false;
-      return;
-    }
-
-    this.loading = true;
-    this.validationMessage = 'Validation en cours...';
-
-    // Appeler le backend pour valider la transaction
-    this.transactionService.validateTransaction(this.qrCodeValue).subscribe({
-      next: (response: any) => {
-        this.validationMessage = 'Transaction validée avec succès !';
-        this.validationSuccess = true;
-        this.loading = false;
-      },
-      error: (error: any) => {
-        this.validationMessage = 'Échec de la validation: ' + (error.error?.message || 'Erreur inconnue');
-        this.validationSuccess = false;
         this.loading = false;
       }
     });

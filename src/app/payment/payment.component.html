@@ -12,17 +12,6 @@
       <img [src]="'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + qrCodeValue"
         alt="QR Code de validation" />
       <p class="qr-instructions">Scannez ce code avec votre application de paiement pour valider la transaction.</p>
-
-      <!-- Bouton de validation pour test -->
-      <button (click)="validateTransaction()" [disabled]="loading" class="validate-button">
-        {{ loading ? 'Validation en cours...' : 'Valider la transaction' }}
-      </button>
-
-      <!-- Message de validation -->
-      <div *ngIf="validationMessage" [class.validation-success]="validationSuccess"
-        [class.validation-error]="!validationSuccess">
-        {{ validationMessage }}
-      </div>
     </div>
 
     <p>Ou cliquez sur le lien ci-dessous pour compléter le paiement :</p>
