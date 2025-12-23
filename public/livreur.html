@@ -681,8 +681,8 @@
         // Charger au démarrage
         loadDeliveries();
 
-        // Auto-refresh toutes les 30 secondes
-        setInterval(loadDeliveries, 30000);
+        // Auto-refresh toutes les 2 minutes (évite rate limiting)
+        setInterval(loadDeliveries, 120000);  // 120s = 2 min
     </script>
 </body>
 
