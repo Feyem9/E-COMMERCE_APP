@@ -21,9 +21,7 @@ export class PaymentComponent {
   ) { }
  
   startPayment() {
-    this.loading = true; 
-    this.validationMessage = '';
-    this.validationSuccess = false;
+    this.loading = true;
 
     // Determine current host for return_url
     let returnUrl = 'https://staging-market.vercel.app/payment-success'; // Fallback staging
