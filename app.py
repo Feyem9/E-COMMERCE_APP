@@ -21,6 +21,7 @@ from routes.product_route import product
 from routes.transaction_route import transaction
 from routes.category_route import category
 from routes.migrate_route import migrate_bp  # Migration BDD
+from routes.recreate_route import recreate_bp
 
 # db
 app = Flask(__name__)
@@ -144,6 +145,7 @@ app.register_blueprint(order , url_prefix='/order')
 app.register_blueprint(product , url_prefix='/product') 
 app.register_blueprint(transaction , url_prefix='/transactions')  # ✅ Avec 's'
 app.register_blueprint(migrate_bp)  # Migration BDD
+app.register_blueprint(recreate_bp)  # Recreation table
 app.register_blueprint(category , url_prefix='/category')
 
 # Initialiser la base de données avec les données
