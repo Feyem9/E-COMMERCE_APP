@@ -46,7 +46,16 @@ export class PaymentComponent {
       next: (result: any) => {
         console.log('Paiement initié:', result);
         this.paymentUrl = result.payment_url;
-        this.qrCodeValue = result.data.transaction_id; // ✅ Notre ID pour validation
+        
+        // 🔐 QR Code sécurisé avec signature
+        if (result.data.qr_data) {
+          this.qrCodeValue = JSON.stringify(result.data.qr_data);
+          console.log('📱 QR Code sécurisé généré:', this.qrCodeValue);
+        } else {
+          // Fallback si qr_data absent
+          this.qrCodeValue = result.data.transaction_id;
+        }
+        
         this.transactionId = result.data.transaction_id;
         this.loading = false;
       },
