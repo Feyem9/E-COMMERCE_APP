@@ -6,6 +6,7 @@ import requests
 import uuid
 from datetime import datetime
 from math import radians, cos, sin, asin, sqrt
+from utils.qr_security import generate_qr_data  # 🔐 QR Code sécurisé
 
 # Récupérer toutes les transactions
 from math import radians, cos, sin, asin, sqrt
