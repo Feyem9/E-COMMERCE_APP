@@ -54,7 +54,7 @@ export class PaymentSuccessComponent implements OnInit {
           amount: transaction.total_amount || parseFloat(this.transactionAmount) || 0,
           currency: transaction.currency || 'XAF',
           status: transaction.status || 'pending',
-          timestamp: transaction.created_at || new Date().toISOString(),
+          timestamp: transaction.qr_timestamp || transaction.created_at || new Date().toISOString(),  // 🔐 Utiliser qr_timestamp
           signature: transaction.qr_signature || ''  // 🔐 SIGNATURE du backend
         };
         
