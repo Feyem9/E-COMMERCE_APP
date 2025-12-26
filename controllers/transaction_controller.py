@@ -71,7 +71,8 @@ def index():
 
 # Récupérer une transaction par ID
 def view_transaction(transaction_id): 
-    transaction = Transactions.query.get(transaction_id)
+    # Chercher par transaction_id (string) et non par la clé primaire
+    transaction = Transactions.query.filter_by(transaction_id=transaction_id).first()
     if not transaction:
         return jsonify({'error': 'Transaction non trouvée'}), 404
     return jsonify(transaction.serialize()), 200
