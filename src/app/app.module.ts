@@ -39,6 +39,7 @@ import { FooterComponent } from './footer/footer.component';
 import { MaintenanceComponent } from './maintenance/maintenance.component';
 import { StatusComponent } from './status/status.component';
 import { DeliveryDriverComponent } from './delivery-driver/delivery-driver.component';  // Ajoutez cette ligne pour le ngModel
+import { QRCodeModule } from 'angularx-qrcode';  // Module QR Code
 
 @NgModule({
   declarations: [
@@ -77,6 +78,7 @@ import { DeliveryDriverComponent } from './delivery-driver/delivery-driver.compo
     MatListModule,
     MatCardModule,
     HttpClientModule,
+    QRCodeModule,  // Module pour générer QR codes
   ],
   providers: [
     provideClientHydration(),

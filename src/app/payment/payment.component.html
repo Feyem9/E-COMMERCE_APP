@@ -9,8 +9,7 @@
 
     <!-- Affichage du QR Code -->
     <div *ngIf="qrCodeValue" class="qr-code-container">
-      <img [src]="'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + qrCodeValue"
-        alt="QR Code de validation" />
+      <qrcode [qrdata]="qrCodeValue" [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
       <p class="qr-instructions">Scannez ce code avec votre application de paiement pour valider la transaction.</p>
     </div>
 
