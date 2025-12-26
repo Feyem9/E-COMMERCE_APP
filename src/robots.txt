@@ -1,0 +1,23 @@
+# Theck Market - Robots.txt
+# https://staging-market.vercel.app/
+
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://staging-market.vercel.app/sitemap.xml
+
+# Bloquer les pages non pertinentes pour le SEO
+Disallow: /api/
+Disallow: /admin/
+Disallow: /*.json$
+
+# Permettre les crawlers de réseaux sociaux
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
