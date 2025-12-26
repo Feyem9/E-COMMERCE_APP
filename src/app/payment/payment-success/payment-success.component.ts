@@ -1,14 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TransactionService } from '../../services/transaction.service';
 import { CartService } from '../../services/cart.service';
+import { Subscription, interval } from 'rxjs';
 
 @Component({
   selector: 'app-payment-success',
   templateUrl: './payment-success.component.html',
   styleUrls: ['./payment-success.component.scss']
 })
-export class PaymentSuccessComponent implements OnInit {  
+export class PaymentSuccessComponent implements OnInit, OnDestroy {  
   transactionId: string = '';
   transactionStatus: string = 'pending'; // Statut initial toujours "pending"
   transactionAmount: string = '';
@@ -17,6 +18,9 @@ export class PaymentSuccessComponent implements OnInit {
   validationMessage: string = '';
   validationSuccess: boolean = false;
   qrCodeValue: string = '';
+  
+  // 🔄 Polling pour rafraîchir le status automatiquement
+  private pollingSubscription: Subscription | null = null;
    
   constructor( 
     private route: ActivatedRoute,
@@ -35,8 +39,61 @@ export class PaymentSuccessComponent implements OnInit {
       // Si nous avons un ID de transaction, récupérer les données complètes depuis le backend
       if (this.transactionId) {
         this.loadTransactionData();
+        this.startPolling();  // 🔄 Démarrer le polling
       } else {
         this.loading = false;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    // Arrêter le polling quand on quitte la page
+    this.stopPolling();
+  }
+
+  // 🔄 Démarrer le polling (vérifier le status toutes les 5 secondes)
+  startPolling(): void {
+    this.pollingSubscription = interval(5000).subscribe(() => {
+      if (this.transactionStatus !== 'success' && this.transactionStatus !== 'completed') {
+        this.checkTransactionStatus();
+      } else {
+        this.stopPolling();  // Arrêter quand la transaction est validée
+      }
+    });
+    console.log('🔄 Polling démarré - vérification du status toutes les 5 secondes');
+  }
+
+  // 🔄 Arrêter le polling
+  stopPolling(): void {
+    if (this.pollingSubscription) {
+      this.pollingSubscription.unsubscribe();
+      this.pollingSubscription = null;
+      console.log('⏹️ Polling arrêté');
+    }
+  }
+
+  // 🔄 Vérifier le status de la transaction
+  checkTransactionStatus(): void {
+    this.transactionService.getTransaction(this.transactionId).subscribe({
+      next: (transaction: any) => {
+        console.log('🔄 Status vérifié:', transaction.status);
+        
+        if (transaction.status === 'success' || transaction.status === 'completed') {
+          // 🎉 La transaction a été validée par le livreur !
+          this.transactionStatus = 'success';
+          this.validationSuccess = true;
+          this.validationMessage = '🎉 Félicitations ! Votre commande a été livrée avec succès !';
+          this.stopPolling();
+          
+          // Vider le panier
+          this.cartService.clearCart();
+          
+          console.log('✅ Transaction validée ! Status:', transaction.status);
+        }
+      },
+      error: (error: any) => {
+        console.error('❌ Erreur vérification status:', error);
+        // Ne pas stopper le polling en cas d'erreur (réessayer)
       }
     });
   }
@@ -46,6 +103,16 @@ export class PaymentSuccessComponent implements OnInit {
     this.transactionService.getTransaction(this.transactionId).subscribe({
       next: (transaction: any) => {
         console.log('📦 Transaction récupérée:', transaction);
+        
+        // Vérifier si déjà validée
+        if (transaction.status === 'success' || transaction.status === 'completed') {
+          this.transactionStatus = 'success';
+          this.validationSuccess = true;
+          this.validationMessage = '🎉 Votre commande a déjà été livrée !';
+          this.loading = false;
+          this.stopPolling();
+          return;
+        }
         
         // 🔐 Créer le JSON complet pour le QR code AVEC la signature du backend
         const qrData = {
@@ -102,6 +169,7 @@ export class PaymentSuccessComponent implements OnInit {
         this.validationMessage = 'Félicitations ! Votre transaction a été validée avec succès. Vous pouvez maintenant quitter cette page.';
         this.validationSuccess = true;
         this.transactionStatus = 'completed'; // Mettre à jour le statut localement
+        this.stopPolling();
 
         // Vider le panier après validation réussie
         this.cartService.clearCart();
