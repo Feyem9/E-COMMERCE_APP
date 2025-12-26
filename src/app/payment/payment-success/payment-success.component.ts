@@ -34,7 +34,18 @@ export class PaymentSuccessComponent implements OnInit {
 
       // Si nous avons un ID de transaction, générer un QR code pour validation
       if (this.transactionId) {
-        this.qrCodeValue = this.transactionId;
+        // 🔐 Créer le JSON complet pour le QR code (pas juste le transaction_id)
+        const qrData = {
+          transaction_id: this.transactionId,
+          reference: `CMD-${new Date().toISOString().split('T')[0].replace(/-/g, '')}-${this.transactionId.slice(-6)}`,
+          amount: parseFloat(this.transactionAmount) || 0,
+          currency: 'XAF',
+          status: 'pending',
+          timestamp: new Date().toISOString()
+        };
+        this.qrCodeValue = JSON.stringify(qrData);
+        console.log('📱 QR Code généré (JSON complet):', this.qrCodeValue);
+        
         this.validationMessage = 'Veuillez scanner ce QR code pour valider votre transaction.';
         
         // ❌ SUPPRIMÉ : Plus de validation automatique !
