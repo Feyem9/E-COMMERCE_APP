@@ -311,7 +311,8 @@ def initiate_payment():
                         "t_sum": result["data"].get("t_sum"),
                         "t_url": result["data"].get("t_url"),
                         "transaction_id": transaction_id,  # Utiliser notre transaction_id généré
-                        "transaction_url": result["data"].get("transaction_url")
+                        "transaction_url": result["data"].get("transaction_url"),
+                        "qr_data": qr_data  # 🔐 Inclure QR code sécurisé
                     }
                 }
                 print("✅ Réponse finale préparée:", response_data)
@@ -333,6 +334,7 @@ def validate_transaction():
     """Valide une livraison via scan QR code sécurisé"""
     from utils.qr_security import validate_qr_data
     from datetime import datetime
+    import json
     
     data = request.get_json()
     qr_string = data.get('qr_code')
@@ -340,6 +342,55 @@ def validate_transaction():
     if not qr_string:
         return jsonify({"error": "QR code manquant"}), 400
     
+    # 🐛 DEBUG: Afficher le QR reçu
+    print(f"🔍 QR Code reçu (type: {type(qr_string)}): {qr_string[:200] if len(qr_string) > 200 else qr_string}")
+    
+    # 🔄 Gestion compatibilité ancien format (juste transaction_id)
+    try:
+        # Essayer de parser en JSON
+        test_parse = json.loads(qr_string)
+        # Si c'est un objet JSON, on continue normalement
+    except json.JSONDecodeError:
+        # Si ce n'est pas du JSON, c'est peut-être juste un transaction_id
+        print(f"⚠️ QR ancien format détecté (transaction_id simple): {qr_string}")
+        # Chercher la transaction par ID
+        transaction = Transactions.query.filter_by(transaction_id=qr_string).first()
+        
+        if not transaction:
+            return jsonify({"error": "Transaction introuvable (ancien format)"}), 404
+        
+        # Valider sans signature (ancien format non sécurisé)
+        if transaction.status == "success":
+            return jsonify({
+                "error": "Livraison déjà validée",
+                "delivery_time": transaction.delivery_time.isoformat() if transaction.delivery_time else None
+            }), 400
+        
+        if transaction.status not in ["pending", "confirmed"]:
+            return jsonify({"error": f"Status invalide: {transaction.status}"}), 400
+        
+        # VALIDER LA LIVRAISON (ancien format)
+        transaction.status = "success"
+        transaction.delivery_time = datetime.now()
+        
+        try:
+            db.session.commit()
+            print(f"✅ Livraison validée (ancien format): {transaction.reference or transaction.transaction_id}")
+            
+            return jsonify({
+                "message": "✅ Livraison confirmée avec succès ! (ancien format)",
+                "transaction_id": transaction.transaction_id,
+                "reference": transaction.reference or transaction.transaction_id,
+                "amount": transaction.total_amount,
+                "currency": transaction.currency,
+                "delivery_time": transaction.delivery_time.isoformat(),
+                "distance": transaction.delivery_distance_km
+            }), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": f"Erreur: {str(e)}"}), 500
+    
+    # 🔐 Nouveau format sécurisé avec signature
     # Valider QR code (signature HMAC)
     is_valid, qr_data, error = validate_qr_data(qr_string)
     
