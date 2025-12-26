@@ -36,11 +36,10 @@ export class PaymentSuccessComponent implements OnInit {
       if (this.transactionId) {
         this.qrCodeValue = this.transactionId;
         this.validationMessage = 'Veuillez scanner ce QR code pour valider votre transaction.';
-
-        // Simuler la détection de scan après 2 secondes pour démonstration
-        setTimeout(() => {
-          this.validateTransaction();
-        }, 2000);
+        
+        // ❌ SUPPRIMÉ : Plus de validation automatique !
+        // La validation se fait UNIQUEMENT quand le livreur scanne le QR code
+        // via l'interface livreur.html
       }
 
       this.loading = false;
