@@ -279,6 +279,7 @@ def initiate_payment():
                 
                 qr_data, signature, reference = generate_qr_data(temp_transaction)
                 print(f"🔐 Signature: {signature[:20]}... Réf: {reference}")
+                qr_timestamp = qr_data.get('timestamp', '')  # Récupérer le timestamp utilisé
                 
                 new_transaction = Transactions(
                     transaction_id=transaction_id,
@@ -291,11 +292,12 @@ def initiate_payment():
                     delivery_distance_km=distance_km,
                     delivery_map_url=delivery_map,
                     qr_signature=signature,
+                    qr_timestamp=qr_timestamp,  # Stocker le timestamp
                     reference=reference
                 )
                 db.session.add(new_transaction)
                 db.session.commit()
-                print(f"✅ Transaction {reference} enregistrée")
+                print(f"✅ Transaction {reference} enregistrée avec timestamp: {qr_timestamp}")
             except Exception as e:
                 print(f"❌ Erreur lors de l'enregistrement de la transaction: {e}")
                 return jsonify({"error": f"Erreur de base de données: {str(e)}"}), 500

@@ -19,13 +19,14 @@ class Transactions(db.Model):
     
     # 🔐 QR Code Sécurisé
     qr_signature = db.Column(db.String(255), nullable=True)  # Signature HMAC
+    qr_timestamp = db.Column(db.String(100), nullable=True)  # Timestamp utilisé pour la signature
     reference = db.Column(db.String(100), nullable=True)  # Référence commande
     
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
 
     def __init__(self, status, transaction_id, total_amount, currency, redirect_url=None, 
                  customer_latitude=None, customer_longitude=None, delivery_distance_km=None,
-                 delivery_map_url=None, qr_signature=None, reference=None, delivery_time=None):
+                 delivery_map_url=None, qr_signature=None, qr_timestamp=None, reference=None, delivery_time=None):
         self.status = status
         self.transaction_id = transaction_id
         self.total_amount = total_amount
@@ -36,6 +37,7 @@ class Transactions(db.Model):
         self.delivery_distance_km = delivery_distance_km
         self.delivery_map_url = delivery_map_url
         self.qr_signature = qr_signature
+        self.qr_timestamp = qr_timestamp
         self.reference = reference
         self.delivery_time = delivery_time
 
@@ -54,6 +56,7 @@ class Transactions(db.Model):
             'delivery_distance_km': self.delivery_distance_km,
             'delivery_map_url': self.delivery_map_url,
             'qr_signature': self.qr_signature,
+            'qr_timestamp': self.qr_timestamp,
             'reference': self.reference,
             'delivery_time': self.delivery_time.isoformat() if self.delivery_time else None,
             'created_at': self.created_at.isoformat() if self.created_at else None

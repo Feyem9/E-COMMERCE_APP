@@ -59,17 +59,23 @@ def verify_qr_signature(transaction_id, amount, currency, timestamp, signature):
     return hmac.compare_digest(signature, expected_signature)
 
 
-def generate_qr_data(transaction):
+def generate_qr_data(transaction, timestamp=None):
     """
     Génère les données complètes du QR code
     
     Args:
         transaction: Objet Transaction
+        timestamp: Timestamp à utiliser (optionnel, utilise created_at par défaut)
     
     Returns:
         dict: Données pour le QR code
     """
-    timestamp = datetime.now().isoformat()
+    # Utiliser created_at comme timestamp stable (au lieu de datetime.now())
+    if timestamp is None:
+        if hasattr(transaction, 'created_at') and transaction.created_at:
+            timestamp = transaction.created_at.isoformat()
+        else:
+            timestamp = datetime.now().isoformat()
     
     # Générer signature
     signature = generate_qr_signature(
