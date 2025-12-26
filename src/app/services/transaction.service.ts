@@ -34,6 +34,6 @@ export class TransactionService {
 
   // Récupérer une transaction par ID (avec signature)
   getTransaction(transactionId: string) {
-    return this.http.get<any>(`${this.API_URL}/${transactionId}`);
+    return this.http.get<any>(`${this.API_URL}/view_transaction/${transactionId}`);
   }
 }
