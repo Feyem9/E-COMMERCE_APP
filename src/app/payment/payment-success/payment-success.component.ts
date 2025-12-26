@@ -32,9 +32,43 @@ export class PaymentSuccessComponent implements OnInit {
       this.transactionAmount = params['transaction_amount'] || '';
       this.transactionGateway = params['transaction_gateway'] || '';
 
-      // Si nous avons un ID de transaction, générer un QR code pour validation
+      // Si nous avons un ID de transaction, récupérer les données complètes depuis le backend
       if (this.transactionId) {
-        // 🔐 Créer le JSON complet pour le QR code (pas juste le transaction_id)
+        this.loadTransactionData();
+      } else {
+        this.loading = false;
+      }
+    });
+  }
+
+  // Récupérer les données de la transaction depuis le backend (avec signature)
+  loadTransactionData(): void {
+    this.transactionService.getTransaction(this.transactionId).subscribe({
+      next: (transaction: any) => {
+        console.log('📦 Transaction récupérée:', transaction);
+        
+        // 🔐 Créer le JSON complet pour le QR code AVEC la signature du backend
+        const qrData = {
+          transaction_id: transaction.transaction_id,
+          reference: transaction.reference || `CMD-${new Date().toISOString().split('T')[0].replace(/-/g, '')}-${this.transactionId.slice(-6)}`,
+          amount: transaction.total_amount || parseFloat(this.transactionAmount) || 0,
+          currency: transaction.currency || 'XAF',
+          status: transaction.status || 'pending',
+          timestamp: transaction.created_at || new Date().toISOString(),
+          signature: transaction.qr_signature || ''  // 🔐 SIGNATURE du backend
+        };
+        
+        this.qrCodeValue = JSON.stringify(qrData);
+        console.log('📱 QR Code généré (avec signature):', this.qrCodeValue);
+        
+        this.transactionStatus = transaction.status || 'pending';
+        this.validationMessage = 'Veuillez scanner ce QR code pour valider votre transaction.';
+        this.loading = false;
+      },
+      error: (error: any) => {
+        console.error('❌ Erreur récupération transaction:', error);
+        
+        // Fallback: créer QR sans signature (pour compatibilité ancien format)
         const qrData = {
           transaction_id: this.transactionId,
           reference: `CMD-${new Date().toISOString().split('T')[0].replace(/-/g, '')}-${this.transactionId.slice(-6)}`,
@@ -44,16 +78,11 @@ export class PaymentSuccessComponent implements OnInit {
           timestamp: new Date().toISOString()
         };
         this.qrCodeValue = JSON.stringify(qrData);
-        console.log('📱 QR Code généré (JSON complet):', this.qrCodeValue);
+        console.log('⚠️ QR Code généré (sans signature - fallback):', this.qrCodeValue);
         
         this.validationMessage = 'Veuillez scanner ce QR code pour valider votre transaction.';
-        
-        // ❌ SUPPRIMÉ : Plus de validation automatique !
-        // La validation se fait UNIQUEMENT quand le livreur scanne le QR code
-        // via l'interface livreur.html
+        this.loading = false;
       }
-
-      this.loading = false;
     });
   }
 
