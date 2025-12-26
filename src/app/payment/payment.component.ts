@@ -42,18 +42,30 @@ export class PaymentComponent {
     this.transactionService.initiatePayment(data).subscribe({
       next: (result: any) => {
         console.log('Paiement initié:', result);
-        this.paymentUrl = result.payment_url;
+        console.log('🔍 Données complètes:', JSON.stringify(result, null, 2));
         
-        // 🔐 QR Code sécurisé avec signature
-        if (result.data.qr_data) {
+        this.paymentUrl = result.payment_url;
+        this.transactionId = result.data.transaction_id;
+        
+        // 🔐 QR Code sécurisé avec signature - TOUJOURS utiliser qr_data
+        if (result.data && result.data.qr_data) {
           this.qrCodeValue = JSON.stringify(result.data.qr_data);
-          console.log('📱 QR Code sécurisé généré:', this.qrCodeValue);
+          console.log('✅ QR Code sécurisé généré (JSON complet):', this.qrCodeValue);
         } else {
-          // Fallback si qr_data absent
-          this.qrCodeValue = result.data.transaction_id;
+          // Si qr_data n'existe pas, créer le JSON manuellement
+          console.warn('⚠️ qr_data absent, création manuelle du JSON');
+          const qrData = {
+            transaction_id: result.data.transaction_id,
+            reference: result.data.reference || `CMD-${new Date().toISOString().split('T')[0]}-${result.data.transaction_id.slice(-6)}`,
+            amount: result.data.total_amount || data.total_amount,
+            currency: result.data.currency || data.currency,
+            status: 'pending',
+            timestamp: new Date().toISOString()
+          };
+          this.qrCodeValue = JSON.stringify(qrData);
+          console.log('📱 QR Code créé manuellement:', this.qrCodeValue);
         }
         
-        this.transactionId = result.data.transaction_id;
         this.loading = false;
       },
       error: (error: any) => { 
