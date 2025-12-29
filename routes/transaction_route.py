@@ -1,6 +1,6 @@
 from flask import Blueprint # type:ignore
 
-from controllers.transaction_controller import index , view_transaction , update_transaction , delete_transaction , initiate_payment, validate_transaction
+from controllers.transaction_controller import index , view_transaction , update_transaction , delete_transaction , initiate_payment, validate_transaction, payment_webhook
 
 transaction = Blueprint('transaction', __name__)
 
@@ -10,3 +10,4 @@ transaction.route('/update_transaction/<id>', methods=['GET','POST'])(update_tra
 transaction.route('/delete_transaction/<id>', methods=['POST'])(delete_transaction)
 transaction.route('/initiate', methods=['POST'])(initiate_payment)
 transaction.route('/validate', methods=['POST'])(validate_transaction)
+transaction.route('/webhook', methods=['POST'])(payment_webhook)  # 📧 Webhook PayUnit

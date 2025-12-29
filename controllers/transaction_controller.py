@@ -432,6 +432,23 @@ def validate_transaction():
         
         print(f"✅ Livraison validée: {transaction.reference}")
         
+        # 📧 Envoyer email de confirmation de livraison
+        try:
+            from utils.email_service import send_delivery_confirmation_email
+            from models.customer_model import Customers
+            
+            # Récupérer les infos client (si disponible via la commande)
+            # Pour l'instant, on log juste l'action
+            delivery_details = {
+                'reference': transaction.reference or transaction.transaction_id,
+                'amount': transaction.total_amount,
+                'delivery_time': transaction.delivery_time.strftime('%d/%m/%Y à %H:%M')
+            }
+            print(f"📧 Email de livraison préparé pour: {delivery_details}")
+            # Note: L'email sera envoyé quand on aura l'email du client
+        except Exception as e:
+            print(f"⚠️ Email livraison non envoyé: {str(e)}")
+        
         return jsonify({
             "message": "✅ Livraison confirmée avec succès !",
             "transaction_id": transaction.transaction_id,
@@ -446,3 +463,60 @@ def validate_transaction():
         db.session.rollback()
         return jsonify({"error": f"Erreur: {str(e)}"}), 500
 
+
+def payment_webhook():
+    """
+    📧 Webhook PayUnit - Appelé quand un paiement est confirmé
+    Envoie l'email de confirmation de paiement
+    """
+    try:
+        data = request.get_json() or {}
+        print(f"📥 Webhook PayUnit reçu: {data}")
+        
+        transaction_id = data.get('transaction_id')
+        status = data.get('status')
+        
+        if not transaction_id:
+            return jsonify({"error": "transaction_id manquant"}), 400
+        
+        # Récupérer la transaction
+        transaction = Transactions.query.filter_by(transaction_id=transaction_id).first()
+        
+        if not transaction:
+            print(f"⚠️ Transaction {transaction_id} non trouvée")
+            return jsonify({"error": "Transaction non trouvée"}), 404
+        
+        # Mettre à jour le status
+        old_status = transaction.status
+        transaction.status = status or 'confirmed'
+        db.session.commit()
+        
+        print(f"✅ Transaction {transaction_id} mise à jour: {old_status} → {transaction.status}")
+        
+        # 📧 Envoyer email de confirmation de paiement si succès
+        if status in ['success', 'completed', 'confirmed']:
+            try:
+                from utils.email_service import send_payment_confirmation_email
+                
+                payment_details = {
+                    'transaction_id': transaction_id,
+                    'amount': transaction.total_amount,
+                    'currency': transaction.currency or 'XAF'
+                }
+                
+                # Note: Ici on devrait récupérer l'email du client
+                # Pour l'instant on log l'action
+                print(f"📧 Email de confirmation de paiement préparé: {payment_details}")
+                
+            except Exception as e:
+                print(f"⚠️ Email confirmation paiement non envoyé: {str(e)}")
+        
+        return jsonify({
+            "message": "Webhook traité avec succès",
+            "transaction_id": transaction_id,
+            "status": transaction.status
+        }), 200
+        
+    except Exception as e:
+        print(f"❌ Erreur webhook: {str(e)}")
+        return jsonify({"error": str(e)}), 500

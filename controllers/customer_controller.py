@@ -283,9 +283,19 @@ def forgot_password():
         customer = Customers.query.filter_by(email=email).first()
         if customer:
             token = s.dumps(email, salt='password-reset')
-            reset_url = url_for('customer.reset_password', token=token, _external=True)
-            html = render_template('email/reset_password.html', reset_url=reset_url)
-            send_email(email, 'Réinitialisation de mot de passe', html)
+            
+            # 📧 Utiliser le nouveau template professionnel
+            try:
+                from utils.email_service import send_password_reset_email
+                send_password_reset_email(email, customer.name, token)
+                current_app.logger.info(f"Password reset email sent to: {email}")
+            except Exception as e:
+                # Fallback: ancien système
+                current_app.logger.warning(f"New email failed, using fallback: {str(e)}")
+                reset_url = url_for('customer.reset_password', token=token, _external=True)
+                html = render_template('email/reset_password.html', reset_url=reset_url)
+                send_email(email, 'Réinitialisation de mot de passe', html)
+            
             return jsonify({'message': 'Instructions envoyées par email'}), 200
         return jsonify({'error': 'Email non trouvé'}), 404
 
