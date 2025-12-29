@@ -5,5 +5,10 @@ export const environment = {
         x_api_key: 'ta_clef_test',
         authorization: 'Bearer ton_token_test',
         baseUrl: 'https://sandbox.payunit.net/api', // mode test
+    },
+    // 📊 Google Analytics (désactivé en dev)
+    analytics: {
+        enabled: false,
+        measurementId: ''
     }
 };

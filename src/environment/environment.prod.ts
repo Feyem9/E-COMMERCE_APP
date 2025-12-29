@@ -5,5 +5,10 @@ export const environment = {
         x_api_key: 'ta_clef_prod',
         authorization: 'Bearer ton_token_prod',
         baseUrl: 'https://api.payunit.net/api', // mode production
+    },
+    // 📊 Google Analytics
+    analytics: {
+        enabled: true,
+        measurementId: 'G-XXXXXXXXXX'  // Remplacer par ton ID GA4
     }
 };
