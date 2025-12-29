@@ -337,6 +337,10 @@ export class PwaInstallComponent implements OnInit, OnDestroy {
         this.deferredPrompt = null;
         this.showInstallBanner = false;
       });
+    } else {
+      // If no native prompt, show instructions for manual install
+      alert('Pour installer l\'application : \n\nSur Chrome : Cliquez sur l\'icône "Installer" dans la barre d\'adresse.\nSur mobile : Cliquez sur le menu (3 points) puis "Installer l\'application".');
+      this.showInstallBanner = false;
     }
   }
 

@@ -86,9 +86,8 @@ import { ServiceWorkerModule } from '@angular/service-worker';  // 🔔 Service 
     PwaInstallComponent,  // 📱 Composant d'installation PWA (standalone)
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),
-      // Register the ServiceWorker as soon as the application is stable
-      // or after 30 seconds (whichever comes first).
-      registrationStrategy: 'registerWhenStable:30000'
+      // Register the ServiceWorker immediately for better PWA detection
+      registrationStrategy: 'registerImmediately'
     }),
   ],
   providers: [
