@@ -46,8 +46,13 @@ def get_dashboard_stats():
     try:
         # Nombre total d'utilisateurs
         total_users = Customers.query.count()
+        
+        # Nouveaux utilisateurs aujourd'hui (compatible SQLite et PostgreSQL)
+        today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        today_end = today_start + timedelta(days=1)
         new_users_today = Customers.query.filter(
-            func.date(Customers.created_at) == datetime.utcnow().date()
+            Customers.created_at >= today_start,
+            Customers.created_at < today_end
         ).count()
         
         # Nombre total de produits
@@ -69,12 +74,13 @@ def get_dashboard_stats():
             func.sum(Transactions.total_amount)
         ).filter(Transactions.status == 'completed').scalar() or 0
         
-        # Revenus du jour
+        # Revenus du jour (compatible SQLite et PostgreSQL)
         today_revenue = db.session.query(
             func.sum(Transactions.total_amount)
         ).filter(
             Transactions.status == 'completed',
-            func.date(Transactions.created_at) == datetime.utcnow().date()
+            Transactions.created_at >= today_start,
+            Transactions.created_at < today_end
         ).scalar() or 0
         
         # Revenus du mois
@@ -104,9 +110,9 @@ def get_dashboard_stats():
                 'completed': completed_transactions
             },
             'revenue': {
-                'total': total_revenue,
-                'today': today_revenue,
-                'monthly': monthly_revenue
+                'total': float(total_revenue),
+                'today': float(today_revenue),
+                'monthly': float(monthly_revenue)
             }
         }), 200
         
@@ -122,28 +128,27 @@ def get_revenue_stats():
         end_date = datetime.utcnow()
         start_date = end_date - timedelta(days=30)
         
-        # Revenus par jour sur les 30 derniers jours
-        daily_revenue = db.session.query(
-            func.date(Transactions.created_at).label('date'),
-            func.sum(Transactions.total_amount).label('amount'),
-            func.count(Transactions.transaction_id).label('count')
-        ).filter(
+        # Récupérer toutes les transactions complétées des 30 derniers jours
+        transactions = Transactions.query.filter(
             Transactions.status == 'completed',
             Transactions.created_at >= start_date
-        ).group_by(
-            func.date(Transactions.created_at)
-        ).order_by(
-            func.date(Transactions.created_at)
-        ).all()
+        ).order_by(Transactions.created_at).all()
+        
+        # Grouper manuellement par jour (compatible SQLite et PostgreSQL)
+        daily_data = {}
+        for t in transactions:
+            if t.created_at:
+                day_key = t.created_at.strftime('%Y-%m-%d')
+                if day_key not in daily_data:
+                    daily_data[day_key] = {'amount': 0, 'count': 0}
+                daily_data[day_key]['amount'] += float(t.total_amount or 0)
+                daily_data[day_key]['count'] += 1
         
         # Formater les données pour le graphique
-        chart_data = []
-        for record in daily_revenue:
-            chart_data.append({
-                'date': str(record.date),
-                'amount': float(record.amount or 0),
-                'count': record.count
-            })
+        chart_data = [
+            {'date': date, 'amount': data['amount'], 'count': data['count']}
+            for date, data in sorted(daily_data.items())
+        ]
         
         return jsonify({
             'daily_revenue': chart_data,
@@ -792,6 +797,10 @@ def get_admin_notifications():
     try:
         notifications = []
         
+        # Dates pour aujourd'hui (compatible SQLite et PostgreSQL)
+        today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        today_end = today_start + timedelta(days=1)
+        
         # Alerte: Produits en stock faible
         low_stock_count = Products.query.filter(Products.quantity < 10).count()
         if low_stock_count > 0:
@@ -816,9 +825,10 @@ def get_admin_notifications():
                 'priority': 'medium'
             })
         
-        # Alerte: Nouveaux utilisateurs aujourd'hui
+        # Alerte: Nouveaux utilisateurs aujourd'hui (compatible PostgreSQL)
         new_users_today = Customers.query.filter(
-            func.date(Customers.created_at) == datetime.utcnow().date()
+            Customers.created_at >= today_start,
+            Customers.created_at < today_end
         ).count()
         if new_users_today > 0:
             notifications.append({
@@ -845,12 +855,13 @@ def get_admin_notifications():
                 'priority': 'high'
             })
         
-        # Alerte: Revenus du jour
+        # Alerte: Revenus du jour (compatible PostgreSQL)
         today_revenue = db.session.query(
             func.sum(Transactions.total_amount)
         ).filter(
             Transactions.status == 'completed',
-            func.date(Transactions.created_at) == datetime.utcnow().date()
+            Transactions.created_at >= today_start,
+            Transactions.created_at < today_end
         ).scalar() or 0
         
         if today_revenue > 0:
@@ -858,7 +869,7 @@ def get_admin_notifications():
                 'type': 'success',
                 'icon': '💰',
                 'title': 'Revenus du jour',
-                'message': f'{today_revenue:,.0f} XAF générés aujourd\'hui',
+                'message': f'{float(today_revenue):,.0f} XAF générés aujourd\'hui',
                 'action': '/admin',
                 'priority': 'low'
             })
@@ -875,4 +886,3 @@ def get_admin_notifications():
     except Exception as e:
         current_app.logger.error(f"Notifications error: {str(e)}")
         return jsonify({'error': str(e)}), 500
-
