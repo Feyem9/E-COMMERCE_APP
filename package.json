@@ -27,6 +27,7 @@
     "@angular/platform-browser-dynamic": "^18.2.0",
     "@angular/platform-server": "^18.2.0",
     "@angular/router": "^18.2.0",
+    "@angular/service-worker": "^18.2.3",
     "@angular/ssr": "^18.2.3",
     "@sentry/angular": "^10.31.0",
     "@sentry/tracing": "^7.120.4",

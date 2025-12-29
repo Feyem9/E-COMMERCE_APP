@@ -1,4 +1,4 @@
-import { NgModule, ErrorHandler } from '@angular/core';
+import { NgModule, ErrorHandler, isDevMode } from '@angular/core';
 import { BrowserModule, provideClientHydration } from '@angular/platform-browser';
 import { HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
@@ -40,7 +40,9 @@ import { MaintenanceComponent } from './maintenance/maintenance.component';
 import { StatusComponent } from './status/status.component';
 import { DeliveryDriverComponent } from './delivery-driver/delivery-driver.component';  // Ajoutez cette ligne pour le ngModel
 import { QRCodeModule } from 'angularx-qrcode';  // Module QR Code
-import { NotificationDropdownComponent } from './components/notification-dropdown/notification-dropdown.component';  // 🔔 Notifications
+import { NotificationDropdownComponent } from './components/notification-dropdown/notification-dropdown.component';
+import { PwaInstallComponent } from './components/pwa-install/pwa-install.component';  // 📱 PWA Install
+import { ServiceWorkerModule } from '@angular/service-worker';  // 🔔 Service Worker
 
 @NgModule({
   declarations: [
@@ -81,6 +83,13 @@ import { NotificationDropdownComponent } from './components/notification-dropdow
     HttpClientModule,
     QRCodeModule,  // Module pour générer QR codes
     NotificationDropdownComponent,  // 🔔 Composant de notifications (standalone)
+    PwaInstallComponent,  // 📱 Composant d'installation PWA (standalone)
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      // Register the ServiceWorker as soon as the application is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
   ],
   providers: [
     provideClientHydration(),
