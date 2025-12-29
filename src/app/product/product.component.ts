@@ -26,6 +26,15 @@ export class ProductComponent implements OnInit, OnDestroy {
   placeholderImage = '/assets/images/placeholder.svg';
   private destroy$ = new Subject<void>();
 
+  // 🔍 Filtres avancés
+  categories: string[] = [];
+  selectedCategory = '';
+  minPrice: number | null = null;
+  maxPrice: number | null = null;
+  priceRangeLimits = { min: 0, max: 1000000 };
+  showFilters = false;
+  activeFiltersCount = 0;
+
   constructor(
     private productService: ProductsService,
     private cartService: CartService,
@@ -60,6 +69,18 @@ export class ProductComponent implements OnInit, OnDestroy {
         next: (data: Product[]) => {
           this.products = data;
           this.filteredProducts = [...data];
+          
+          // 🔍 Extraire les catégories uniques
+          const categorySet = new Set(data.map(p => p.category || 'Autres').filter(c => c));
+          this.categories = Array.from(categorySet).sort();
+          
+          // 📊 Calculer les limites de prix
+          if (data.length > 0) {
+            const prices = data.map(p => p.discount_price || p.current_price);
+            this.priceRangeLimits.min = Math.floor(Math.min(...prices));
+            this.priceRangeLimits.max = Math.ceil(Math.max(...prices));
+          }
+          
           this.updatePagination();
           this.loading = false;
         },
@@ -71,18 +92,85 @@ export class ProductComponent implements OnInit, OnDestroy {
       });
   }
 
-  searchProducts(): void {
-    if (!this.searchQuery.trim()) {
-      this.filteredProducts = [...this.products];
-    } else {
+  // 🔍 Appliquer tous les filtres (recherche + catégorie + prix)
+  applyFilters(): void {
+    let result = [...this.products];
+    
+    // 1️⃣ Filtre par recherche texte
+    if (this.searchQuery.trim()) {
       const query = this.searchQuery.toLowerCase();
-      this.filteredProducts = this.products.filter(product =>
+      result = result.filter(product =>
         product.name.toLowerCase().includes(query) ||
-        product.description.toLowerCase().includes(query)
+        product.description.toLowerCase().includes(query) ||
+        (product.category || '').toLowerCase().includes(query)
       );
     }
+    
+    // 2️⃣ Filtre par catégorie
+    if (this.selectedCategory) {
+      result = result.filter(product => 
+        (product.category || 'Autres') === this.selectedCategory
+      );
+    }
+    
+    // 3️⃣ Filtre par prix minimum
+    if (this.minPrice !== null && this.minPrice > 0) {
+      result = result.filter(product => 
+        (product.discount_price || product.current_price) >= this.minPrice!
+      );
+    }
+    
+    // 4️⃣ Filtre par prix maximum
+    if (this.maxPrice !== null && this.maxPrice > 0) {
+      result = result.filter(product => 
+        (product.discount_price || product.current_price) <= this.maxPrice!
+      );
+    }
+    
+    this.filteredProducts = result;
+    this.sortProducts();
     this.currentPage = 1;
     this.updatePagination();
+    this.updateActiveFiltersCount();
+  }
+
+  searchProducts(): void {
+    this.applyFilters();
+  }
+
+  // 📊 Compter les filtres actifs
+  updateActiveFiltersCount(): void {
+    let count = 0;
+    if (this.searchQuery.trim()) count++;
+    if (this.selectedCategory) count++;
+    if (this.minPrice !== null && this.minPrice > 0) count++;
+    if (this.maxPrice !== null && this.maxPrice > 0) count++;
+    this.activeFiltersCount = count;
+  }
+
+  // 🔄 Réinitialiser tous les filtres
+  resetFilters(): void {
+    this.searchQuery = '';
+    this.selectedCategory = '';
+    this.minPrice = null;
+    this.maxPrice = null;
+    this.sortBy = 'name';
+    this.sortOrder = 'asc';
+    this.filteredProducts = [...this.products];
+    this.currentPage = 1;
+    this.updatePagination();
+    this.updateActiveFiltersCount();
+  }
+
+  // 🎯 Toggle panneau de filtres
+  toggleFilters(): void {
+    this.showFilters = !this.showFilters;
+  }
+
+  // 📂 Filtrer par catégorie (raccourci)
+  filterByCategory(category: string): void {
+    this.selectedCategory = category;
+    this.applyFilters();
   }
 
   sortProducts(): void {

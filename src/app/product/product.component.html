@@ -26,22 +26,14 @@
         <div class="card-body">
           <div class="row align-items-center">
             <!-- Search -->
-            <div class="col-md-6 mb-3 mb-md-0">
+            <div class="col-md-5 mb-3 mb-md-0">
               <div class="input-group">
                 <span class="input-group-text">
                   <i class="fas fa-search"></i>
                 </span>
-                <input 
-                  type="text" 
-                  class="form-control" 
-                  placeholder="Search products..."
-                  [(ngModel)]="searchQuery"
-                  (keyup.enter)="searchProducts()"
-                  (input)="searchProducts()">
-                <button 
-                  class="btn btn-outline-secondary search-clear-btn"
-                  type="button"
-                  *ngIf="searchQuery"
+                <input type="text" class="form-control" placeholder="Search products..." [(ngModel)]="searchQuery"
+                  (keyup.enter)="searchProducts()" (input)="searchProducts()">
+                <button class="btn btn-outline-secondary search-clear-btn" type="button" *ngIf="searchQuery"
                   (click)="clearSearch()">
                   <i class="fas fa-times"></i>
                 </button>
@@ -49,22 +41,82 @@
             </div>
 
             <!-- Sort Controls -->
-            <div class="col-md-6">
-              <div class="d-flex gap-2 justify-content-md-end sort-controls">
-                <select 
-                  class="form-select flex-grow-1"
-                  [(ngModel)]="sortBy"
-                  (change)="onSortChange()"
-                  style="max-width: 200px;">
+            <div class="col-md-4 mb-3 mb-md-0">
+              <div class="d-flex gap-2 sort-controls">
+                <select class="form-select" [(ngModel)]="sortBy" (change)="onSortChange()">
                   <option value="name">Sort by Name</option>
                   <option value="price">Sort by Price</option>
                   <option value="discount">Sort by Discount</option>
                 </select>
-                <button 
-                  class="btn btn-outline-primary sort-toggle-btn"
-                  (click)="toggleSortOrder()"
+                <button class="btn btn-outline-primary sort-toggle-btn" (click)="toggleSortOrder()"
                   [title]="sortOrder === 'asc' ? 'Sort Descending' : 'Sort Ascending'">
                   <i class="fas" [ngClass]="sortOrder === 'asc' ? 'fa-sort-up' : 'fa-sort-down'"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Filter Toggle Button -->
+            <div class="col-md-3">
+              <div class="d-flex gap-2 justify-content-md-end">
+                <button class="btn btn-outline-primary filter-toggle-btn" (click)="toggleFilters()"
+                  [class.active]="showFilters">
+                  <i class="fas fa-filter me-1"></i>
+                  Filtres
+                  <span *ngIf="activeFiltersCount > 0" class="badge bg-danger ms-1">
+                    {{ activeFiltersCount }}
+                  </span>
+                </button>
+                <button *ngIf="activeFiltersCount > 0" class="btn btn-outline-secondary" (click)="resetFilters()"
+                  title="Réinitialiser les filtres">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Advanced Filters Panel -->
+          <div *ngIf="showFilters" class="advanced-filters mt-4 pt-3 border-top">
+            <div class="row g-3">
+              <!-- Category Filter -->
+              <div class="col-md-4">
+                <label class="form-label fw-bold">
+                  <i class="fas fa-folder me-1 text-primary"></i>
+                  Catégorie
+                </label>
+                <select class="form-select" [(ngModel)]="selectedCategory" (change)="applyFilters()">
+                  <option value="">Toutes les catégories</option>
+                  <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+                </select>
+              </div>
+
+              <!-- Min Price -->
+              <div class="col-md-4">
+                <label class="form-label fw-bold">
+                  <i class="fas fa-tag me-1 text-success"></i>
+                  Prix minimum (XAF)
+                </label>
+                <input type="number" class="form-control" [(ngModel)]="minPrice" (change)="applyFilters()" [min]="0"
+                  [placeholder]="'Min: ' + priceRangeLimits.min">
+              </div>
+
+              <!-- Max Price -->
+              <div class="col-md-4">
+                <label class="form-label fw-bold">
+                  <i class="fas fa-tag me-1 text-danger"></i>
+                  Prix maximum (XAF)
+                </label>
+                <input type="number" class="form-control" [(ngModel)]="maxPrice" (change)="applyFilters()" [min]="0"
+                  [placeholder]="'Max: ' + priceRangeLimits.max">
+              </div>
+            </div>
+
+            <!-- Category Quick Filters -->
+            <div class="category-quick-filters mt-3" *ngIf="categories.length > 0">
+              <label class="form-label small text-muted mb-2">Filtres rapides :</label>
+              <div class="d-flex flex-wrap gap-2">
+                <button *ngFor="let cat of categories" class="btn btn-sm" [class.btn-primary]="selectedCategory === cat"
+                  [class.btn-outline-secondary]="selectedCategory !== cat" (click)="filterByCategory(cat)">
+                  {{ cat }}
                 </button>
               </div>
             </div>
@@ -96,23 +148,15 @@
 
   <!-- Products Grid -->
   <div *ngIf="!loading && !error" class="row g-5 mb-5">
-    <div 
-      *ngFor="let product of paginatedProducts" 
-      class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+    <div *ngFor="let product of paginatedProducts" class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
       <div class="card h-100 product-card shadow-sm">
         <!-- Product Image -->
         <div class="card-img-wrapper position-relative">
-          <img 
-            [src]="getProductImage(product)" 
-            [alt]="product.name" 
-            class="card-img-top product-image"
-            (error)="onImageError($event)"
-            [loading]="currentPage === 1 ? 'eager' : 'lazy'">
-            
+          <img [src]="getProductImage(product)" [alt]="product.name" class="card-img-top product-image"
+            (error)="onImageError($event)" [loading]="currentPage === 1 ? 'eager' : 'lazy'">
+
           <!-- Discount Badge -->
-          <div 
-            *ngIf="getDiscountPercentage(product) > 0" 
-            class="discount-badge">
+          <div *ngIf="getDiscountPercentage(product) > 0" class="discount-badge">
             <span class="badge">
               -{{ getDiscountPercentage(product) }}%
             </span>
@@ -120,14 +164,10 @@
 
           <!-- Quick Actions -->
           <div class="product-overlay position-absolute w-100 h-100 d-flex align-items-center justify-content-center">
-            <button 
-              class="btn view-btn me-2"
-              (click)="viewProductDetails(product)">
+            <button class="btn view-btn me-2" (click)="viewProductDetails(product)">
               <i class="fas fa-eye"></i>
             </button>
-            <button 
-              class="btn cart-btn"
-              (click)="addToCart(product)">
+            <button class="btn cart-btn" (click)="addToCart(product)">
               <i class="fas fa-cart-plus"></i>
             </button>
           </div>
@@ -146,12 +186,11 @@
           <div class="pricing mb-3">
             <div class="d-flex align-items-center">
               <span class="current-price">
-                {{ (product.discount_price || product.current_price) | currency:'EUR':'symbol':'1.2-2' }}
+                {{ (product.discount_price || product.current_price) | currency:'XAF:'symbol':'1.2-2' }}
               </span>
-              <span 
-                *ngIf="product.discount_price && product.discount_price < product.current_price" 
+              <span *ngIf="product.discount_price && product.discount_price < product.current_price"
                 class="original-price">
-                {{ product.current_price | currency:'EUR':'symbol':'1.2-2' }}
+                {{ product.current_price | currency:'XAF':'symbol':'1.2-2' }}
               </span>
             </div>
           </div>
@@ -160,9 +199,7 @@
           <div class="stock-info mb-3">
             <div class="d-flex align-items-center">
               <i class="fas fa-box me-2 text-muted"></i>
-              <span 
-                class="small"
-                [ngClass]="{
+              <span class="small" [ngClass]="{
                   'in-stock': product.quantity > 10,
                   'low-stock': product.quantity <= 10 && product.quantity > 0,
                   'out-of-stock': product.quantity === 0
@@ -176,9 +213,7 @@
           <div class="product-actions mt-auto">
             <div class="row g-2">
               <div class="col-8">
-                <button 
-                  class="btn add-to-cart-btn w-100"
-                  [disabled]="product.quantity === 0"
+                <button class="btn add-to-cart-btn w-100" [disabled]="product.quantity === 0"
                   (click)="addToCart(product)">
                   <i class="fas fa-cart-plus me-1"></i>
                   Add to Cart
@@ -186,10 +221,7 @@
               </div>
               <div class="col-4">
                 <div class="input-group input-group-sm">
-                  <button 
-                    class="btn quantity-btn"
-                    type="button"
-                    (click)="addToCart(product, 1)"
+                  <button class="btn quantity-btn" type="button" (click)="addToCart(product, 1)"
                     [disabled]="product.quantity === 0">
                     <i class="fas fa-plus"></i>
                   </button>
@@ -219,30 +251,19 @@
       <nav aria-label="Products pagination">
         <ul class="pagination justify-content-center">
           <li class="page-item" [ngClass]="{ 'disabled': currentPage === 1 }">
-            <button 
-              class="page-link"
-              (click)="changePage(currentPage - 1)"
-              [disabled]="currentPage === 1">
+            <button class="page-link" (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
               <i class="fas fa-chevron-left"></i>
             </button>
           </li>
 
-          <li 
-            *ngFor="let page of pages" 
-            class="page-item" 
-            [ngClass]="{ 'active': page === currentPage }">
-            <button 
-              class="page-link"
-              (click)="changePage(page)">
+          <li *ngFor="let page of pages" class="page-item" [ngClass]="{ 'active': page === currentPage }">
+            <button class="page-link" (click)="changePage(page)">
               {{ page }}
             </button>
           </li>
 
           <li class="page-item" [ngClass]="{ 'disabled': currentPage === totalPages }">
-            <button 
-              class="page-link"
-              (click)="changePage(currentPage + 1)"
-              [disabled]="currentPage === totalPages">
+            <button class="page-link" (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">
               <i class="fas fa-chevron-right"></i>
             </button>
           </li>
@@ -251,8 +272,9 @@
 
       <div class="text-center text-muted pagination-info">
         <small>
-          Showing {{ ((currentPage - 1) * itemsPerPage) + 1 }} to 
-          {{ currentPage * itemsPerPage > filteredProducts.length ? filteredProducts.length : currentPage * itemsPerPage }} of 
+          Showing {{ ((currentPage - 1) * itemsPerPage) + 1 }} to
+          {{ currentPage * itemsPerPage > filteredProducts.length ? filteredProducts.length : currentPage * itemsPerPage
+          }} of
           {{ filteredProducts.length }} products
         </small>
       </div>

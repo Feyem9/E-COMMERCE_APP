@@ -6,6 +6,7 @@ export interface Product {
   discount_price: number;
   quantity: number;
   picture: string;
+  category?: string;  // 🔍 Catégorie du produit
 }
 
 export interface Cart {
