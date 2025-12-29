@@ -187,27 +187,13 @@ def register():
         db.session.commit()
         current_app.logger.info(f"✅ Customer created successfully: {email}")
 
-        # Essayer d'envoyer un email de confirmation (optionnel)
+        # Envoyer email de bienvenue avec template professionnel
         try:
-            s = URLSafeTimedSerializer(current_app.config.get('SECRET_KEY', 'default-secret'))
-            token = s.dumps(email, salt='email-confirm')
-            confirm_url = url_for('customer.confirm_email', token=token, _external=True)
-            
-            # Ne pas utiliser render_template ici, créer le HTML directement
-            html = f"""
-            <html>
-                <body>
-                    <h2>Confirmez votre inscription</h2>
-                    <p>Cliquez sur le lien ci-dessous pour confirmer votre email:</p>
-                    <a href="{confirm_url}">Confirmer mon email</a>
-                </body>
-            </html>
-            """
-            
-            send_email(email, 'Confirmez votre inscription', html)
-            current_app.logger.info(f"Confirmation email sent to: {email}")
+            from utils.email_service import send_welcome_email
+            send_welcome_email(email, name)
+            current_app.logger.info(f"Welcome email sent to: {email}")
         except Exception as e:
-            current_app.logger.warning(f"Could not send confirmation email to {email}: {str(e)}")
+            current_app.logger.warning(f"Could not send welcome email to {email}: {str(e)}")
             # Ne pas échouer l'inscription si l'email échoue
 
         return jsonify({
