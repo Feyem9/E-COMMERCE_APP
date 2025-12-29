@@ -105,7 +105,9 @@ def register():
         password = data.get('password') or ''
         contact = (data.get('contact') or '').strip()
         address = (data.get('address') or '').strip()
-        role = (data.get('role') or 'user').strip().lower()
+        # ⚠️ SÉCURITÉ: Toujours forcer le rôle à 'user' lors de l'inscription
+        # Les admins doivent être créés manuellement ou via le dashboard admin
+        role = 'user'  # Ignorer data.get('role') pour empêcher l'auto-attribution admin
 
         try:
             current_app.logger.info(f"Register attempt: email={email}, name={name}, role={role}")
