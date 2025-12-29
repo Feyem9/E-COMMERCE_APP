@@ -263,28 +263,58 @@ export class PwaInstallComponent implements OnInit, OnDestroy {
 
     // Check if already installed
     this.isInstalled = window.matchMedia('(display-mode: standalone)').matches;
+    
+    if (this.isInstalled) {
+      console.log('📱 App already installed as PWA');
+      return;
+    }
 
     // Check if user dismissed banner recently
     const dismissed = localStorage.getItem('pwa-banner-dismissed');
     if (dismissed) {
       const dismissedDate = new Date(dismissed);
       const daysSinceDismissed = (Date.now() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24);
-      if (daysSinceDismissed < 7) return; // Don't show for 7 days
+      if (daysSinceDismissed < 7) {
+        console.log('📱 Banner dismissed recently');
+        return;
+      }
     }
 
-    // Listen for install prompt
+    // Listen for install prompt (Chrome/Edge Android)
     window.addEventListener('beforeinstallprompt', (e: any) => {
+      console.log('📱 beforeinstallprompt event received');
       e.preventDefault();
       this.deferredPrompt = e;
       this.showInstallBanner = true;
     });
 
-    // Show iOS instructions for Safari
-    if (this.isIos() && !this.isInstalled) {
+    // For iOS Safari - show after delay
+    if (this.isIos() && !this.isInStandaloneMode()) {
+      console.log('📱 iOS detected - showing banner after delay');
       setTimeout(() => {
         this.showInstallBanner = true;
       }, 3000);
     }
+    
+    // For desktop browsers that support PWA but don't trigger beforeinstallprompt immediately
+    // Show a subtle prompt after 10 seconds if no event was triggered
+    setTimeout(() => {
+      if (!this.showInstallBanner && !this.isInstalled && this.canInstall()) {
+        console.log('📱 Showing install prompt after timeout');
+        this.showInstallBanner = true;
+      }
+    }, 10000);
+  }
+
+  private isInStandaloneMode(): boolean {
+    return window.matchMedia('(display-mode: standalone)').matches ||
+           (window.navigator as any).standalone === true;
+  }
+
+  private canInstall(): boolean {
+    // Check if the browser supports PWA installation
+    return 'serviceWorker' in navigator && 
+           window.matchMedia('(display-mode: browser)').matches;
   }
 
   ngOnDestroy(): void {
