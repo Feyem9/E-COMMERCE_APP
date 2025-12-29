@@ -183,4 +183,56 @@ export class AdminService {
 
     return this.http.get<any>(`${this.apiUrl}/admin/transactions`, { params });
   }
+
+  // ============================================
+  // EXPORT CSV
+  // ============================================
+  exportUsersCSV(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/admin/export/users`, { responseType: 'blob' });
+  }
+
+  exportOrdersCSV(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/admin/export/orders`, { responseType: 'blob' });
+  }
+
+  exportTransactionsCSV(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/admin/export/transactions`, { responseType: 'blob' });
+  }
+
+  // ============================================
+  // ADVANCED CHARTS DATA
+  // ============================================
+  getChartsData(): Observable<ChartsData> {
+    return this.http.get<ChartsData>(`${this.apiUrl}/admin/charts`);
+  }
+
+  // ============================================
+  // NOTIFICATIONS
+  // ============================================
+  getNotifications(): Observable<NotificationsResponse> {
+    return this.http.get<NotificationsResponse>(`${this.apiUrl}/admin/notifications`);
+  }
+}
+
+// Interfaces pour les nouvelles fonctionnalités
+export interface ChartsData {
+  orders_by_status: { status: string; count: number }[];
+  users_by_role: { role: string; count: number }[];
+  top_products: { name: string; total_sold: number }[];
+  monthly_revenue: { month: string; amount: number }[];
+  weekly_signups: { week: string; count: number }[];
+}
+
+export interface AdminNotification {
+  type: 'warning' | 'info' | 'success' | 'danger';
+  icon: string;
+  title: string;
+  message: string;
+  action: string;
+  priority: 'high' | 'medium' | 'low';
+}
+
+export interface NotificationsResponse {
+  notifications: AdminNotification[];
+  count: number;
 }

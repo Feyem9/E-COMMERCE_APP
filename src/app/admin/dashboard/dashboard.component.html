@@ -35,6 +35,23 @@
 
     <!-- Main Content -->
     <div class="dashboard-content" *ngIf="stats && !loading">
+
+        <!-- Notifications Section -->
+        <div class="notifications-section" *ngIf="notifications.length > 0">
+            <h3>🔔 Notifications</h3>
+            <div class="notifications-list">
+                <a *ngFor="let notif of notifications" [routerLink]="notif.action" class="notification-item"
+                    [ngClass]="getNotificationClass(notif.type)">
+                    <span class="notif-icon">{{ notif.icon }}</span>
+                    <div class="notif-content">
+                        <span class="notif-title">{{ notif.title }}</span>
+                        <span class="notif-message">{{ notif.message }}</span>
+                    </div>
+                    <span class="notif-arrow">→</span>
+                </a>
+            </div>
+        </div>
+
         <!-- Stats Cards Grid -->
         <div class="stats-grid">
             <!-- Users Card -->
@@ -127,6 +144,69 @@
                 <div class="mini-info">
                     <span class="mini-value">{{ stats.transactions.total }}</span>
                     <span class="mini-label">Total transactions</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="export-section">
+            <h3>📥 Exporter les données</h3>
+            <div class="export-buttons">
+                <button class="export-btn" (click)="exportUsers()" [disabled]="exportingUsers">
+                    <span class="export-icon">👥</span>
+                    <span>{{ exportingUsers ? 'Export...' : 'Utilisateurs CSV' }}</span>
+                </button>
+                <button class="export-btn" (click)="exportOrders()" [disabled]="exportingOrders">
+                    <span class="export-icon">🛒</span>
+                    <span>{{ exportingOrders ? 'Export...' : 'Commandes CSV' }}</span>
+                </button>
+                <button class="export-btn" (click)="exportTransactions()" [disabled]="exportingTransactions">
+                    <span class="export-icon">💳</span>
+                    <span>{{ exportingTransactions ? 'Export...' : 'Transactions CSV' }}</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Advanced Charts Section -->
+        <div class="charts-section" *ngIf="chartsData">
+            <h3>📊 Graphiques Avancés</h3>
+            <div class="charts-grid">
+                <!-- Orders by Status -->
+                <div class="chart-card" *ngIf="chartsData.orders_by_status.length > 0">
+                    <h4>Commandes par statut</h4>
+                    <div class="pie-chart-list">
+                        <div *ngFor="let item of chartsData.orders_by_status" class="chart-item">
+                            <div class="chart-bar-horizontal"
+                                [style.width.%]="getPercentage(item.count, chartsData.orders_by_status)">
+                            </div>
+                            <span class="chart-label">{{ item.status }}</span>
+                            <span class="chart-value">{{ item.count }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Products -->
+                <div class="chart-card" *ngIf="chartsData.top_products.length > 0">
+                    <h4>🏆 Top 5 Produits Vendus</h4>
+                    <div class="top-products-list">
+                        <div *ngFor="let product of chartsData.top_products; let i = index" class="top-product-item">
+                            <span class="rank">{{ i + 1 }}</span>
+                            <span class="product-name">{{ product.name }}</span>
+                            <span class="sold-count">{{ product.total_sold }} vendus</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users by Role -->
+                <div class="chart-card" *ngIf="chartsData.users_by_role.length > 0">
+                    <h4>Utilisateurs par rôle</h4>
+                    <div class="role-stats">
+                        <div *ngFor="let role of chartsData.users_by_role" class="role-item">
+                            <span class="role-icon">{{ role.role === 'admin' ? '👑' : '👤' }}</span>
+                            <span class="role-name">{{ role.role }}</span>
+                            <span class="role-count">{{ role.count }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

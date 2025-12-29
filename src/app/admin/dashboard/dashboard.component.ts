@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { AdminService, DashboardStats, RevenueStats, RecentActivity } from '../services/admin.service';
+import { AdminService, DashboardStats, RevenueStats, RecentActivity, ChartsData, AdminNotification } from '../services/admin.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -12,9 +12,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   stats: DashboardStats | null = null;
   revenueStats: RevenueStats | null = null;
   recentActivity: RecentActivity | null = null;
+  chartsData: ChartsData | null = null;
+  notifications: AdminNotification[] = [];
   
   loading = true;
   error: string | null = null;
+  exportingUsers = false;
+  exportingOrders = false;
+  exportingTransactions = false;
   
   private destroy$ = new Subject<void>();
 
@@ -67,6 +72,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
         },
         error: (err) => console.error('Erreur activité:', err)
       });
+
+    // Charger les données des graphiques avancés
+    this.adminService.getChartsData()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          this.chartsData = data;
+        },
+        error: (err) => console.error('Erreur charts:', err)
+      });
+
+    // Charger les notifications
+    this.adminService.getNotifications()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          this.notifications = data.notifications;
+        },
+        error: (err) => console.error('Erreur notifications:', err)
+      });
   }
 
   formatCurrency(amount: number): string {
@@ -112,4 +137,80 @@ export class DashboardComponent implements OnInit, OnDestroy {
     
     return Math.max(10, (amount / maxAmount) * 100);
   }
+
+  // ============================================
+  // EXPORT FUNCTIONS
+  // ============================================
+  exportUsers(): void {
+    this.exportingUsers = true;
+    this.adminService.exportUsersCSV()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (blob) => {
+          this.downloadFile(blob, 'users_export.csv');
+          this.exportingUsers = false;
+        },
+        error: (err) => {
+          console.error('Export users error:', err);
+          alert('Erreur lors de l\'export des utilisateurs');
+          this.exportingUsers = false;
+        }
+      });
+  }
+
+  exportOrders(): void {
+    this.exportingOrders = true;
+    this.adminService.exportOrdersCSV()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (blob) => {
+          this.downloadFile(blob, 'orders_export.csv');
+          this.exportingOrders = false;
+        },
+        error: (err) => {
+          console.error('Export orders error:', err);
+          alert('Erreur lors de l\'export des commandes');
+          this.exportingOrders = false;
+        }
+      });
+  }
+
+  exportTransactions(): void {
+    this.exportingTransactions = true;
+    this.adminService.exportTransactionsCSV()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (blob) => {
+          this.downloadFile(blob, 'transactions_export.csv');
+          this.exportingTransactions = false;
+        },
+        error: (err) => {
+          console.error('Export transactions error:', err);
+          alert('Erreur lors de l\'export des transactions');
+          this.exportingTransactions = false;
+        }
+      });
+  }
+
+  private downloadFile(blob: Blob, filename: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }
+
+  // Calculer les pourcentages pour les graphiques circulaires
+  getPercentage(count: number, items: { count: number }[]): number {
+    const total = items.reduce((sum, item) => sum + item.count, 0);
+    return total > 0 ? Math.round((count / total) * 100) : 0;
+  }
+
+  getNotificationClass(type: string): string {
+    return `notification-${type}`;
+  }
 }
+

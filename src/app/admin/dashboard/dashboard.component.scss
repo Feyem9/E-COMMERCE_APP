@@ -128,7 +128,9 @@ $border-radius-sm: 10px;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 // Error State
@@ -219,10 +221,21 @@ $border-radius-sm: 10px;
     box-shadow: $shadow-hover;
   }
 
-  &.users-card::before { background: $primary-gradient; }
-  &.products-card::before { background: $info-gradient; }
-  &.orders-card::before { background: $warning-gradient; }
-  &.revenue-card::before { background: $success-gradient; }
+  &.users-card::before {
+    background: $primary-gradient;
+  }
+
+  &.products-card::before {
+    background: $info-gradient;
+  }
+
+  &.orders-card::before {
+    background: $warning-gradient;
+  }
+
+  &.revenue-card::before {
+    background: $success-gradient;
+  }
 
   .stat-icon {
     width: 60px;
@@ -549,6 +562,305 @@ $border-radius-sm: 10px;
   font-style: italic;
 }
 
+// ============================================
+// NOTIFICATIONS SECTION
+// ============================================
+.notifications-section {
+  margin-bottom: 2rem;
+
+  h3 {
+    margin: 0 0 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+}
+
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.notification-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: $card-bg;
+  border-radius: $border-radius-sm;
+  border: 1px solid $border-color;
+  text-decoration: none;
+  color: $text-primary;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateX(4px);
+  }
+
+  &.notification-warning {
+    border-left: 3px solid #fee140;
+
+    .notif-icon {
+      color: #fee140;
+    }
+  }
+
+  &.notification-info {
+    border-left: 3px solid #4facfe;
+
+    .notif-icon {
+      color: #4facfe;
+    }
+  }
+
+  &.notification-success {
+    border-left: 3px solid #38ef7d;
+
+    .notif-icon {
+      color: #38ef7d;
+    }
+  }
+
+  &.notification-danger {
+    border-left: 3px solid #f5576c;
+
+    .notif-icon {
+      color: #f5576c;
+    }
+  }
+
+  .notif-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .notif-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    .notif-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .notif-message {
+      font-size: 0.85rem;
+      color: $text-secondary;
+    }
+  }
+
+  .notif-arrow {
+    font-size: 1.2rem;
+    color: $text-muted;
+    transition: transform 0.2s;
+  }
+
+  &:hover .notif-arrow {
+    transform: translateX(4px);
+    color: $text-primary;
+  }
+}
+
+// ============================================
+// EXPORT SECTION
+// ============================================
+.export-section {
+  background: $card-bg;
+  border-radius: $border-radius;
+  padding: 1.5rem;
+  border: 1px solid $border-color;
+  margin-bottom: 2rem;
+
+  h3 {
+    margin: 0 0 1.25rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+}
+
+.export-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.export-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid $border-color;
+  border-radius: $border-radius-sm;
+  color: $text-primary;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+
+  &:hover:not(:disabled) {
+    background: rgba(102, 126, 234, 0.2);
+    border-color: #667eea;
+    transform: translateY(-2px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .export-icon {
+    font-size: 1.2rem;
+  }
+}
+
+// ============================================
+// ADVANCED CHARTS SECTION
+// ============================================
+.charts-section {
+  margin-bottom: 2rem;
+
+  h3 {
+    margin: 0 0 1.25rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.chart-card {
+  background: $card-bg;
+  border-radius: $border-radius;
+  padding: 1.5rem;
+  border: 1px solid $border-color;
+
+  h4 {
+    margin: 0 0 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: $text-secondary;
+  }
+}
+
+.pie-chart-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.chart-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+
+  .chart-bar-horizontal {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: $primary-gradient;
+    opacity: 0.2;
+    border-radius: 4px;
+    min-width: 10px;
+    z-index: 0;
+  }
+
+  .chart-label {
+    flex: 1;
+    font-size: 0.9rem;
+    text-transform: capitalize;
+    z-index: 1;
+    padding-left: 0.5rem;
+  }
+
+  .chart-value {
+    font-weight: 700;
+    color: #667eea;
+    z-index: 1;
+  }
+}
+
+.top-products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.top-product-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+
+  .rank {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: $primary-gradient;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+
+  .product-name {
+    flex: 1;
+    font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sold-count {
+    font-size: 0.8rem;
+    color: #38ef7d;
+    font-weight: 500;
+  }
+}
+
+.role-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.role-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: $border-radius-sm;
+  flex: 1;
+  min-width: 120px;
+
+  .role-icon {
+    font-size: 1.3rem;
+  }
+
+  .role-name {
+    flex: 1;
+    font-size: 0.9rem;
+    text-transform: capitalize;
+  }
+
+  .role-count {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #667eea;
+  }
+}
+
 // Quick Actions
 .quick-actions {
   background: $card-bg;
@@ -628,5 +940,13 @@ $border-radius-sm: 10px;
 
   .chart-container .chart-bars {
     height: 150px;
+  }
+
+  .export-buttons {
+    flex-direction: column;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
   }
 }
