@@ -7,6 +7,8 @@ from flask_migrate import Migrate
 from flask_mail import Mail , Message
 from flask_cors import CORS
 from cloudinary_config import configure_cloudinary
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from extensions import limiter
 
 from config import db, SECRET_KEY , MAIL_SERVER , MAIL_PORT, MAIL_USERNAME,MAIL_PASSWORD,MAIL_USE_SSL,MAIL_USE_TLS, MAIL_DEFAULT_SENDER
@@ -22,6 +24,7 @@ from routes.transaction_route import transaction
 from routes.category_route import category
 from routes.migrate_route import migrate_bp  # Migration BDD
 from routes.recreate_route import recreate_bp
+from routes.admin_route import admin_bp  # Admin Dashboard
 
 # db
 app = Flask(__name__)
@@ -40,7 +43,7 @@ CORS(app, resources={r"/*": {
         "https://*.vercel.app"  # All Vercel apps (wildcards supported)
     ],
     "methods": ['GET', 'POST', 'OPTIONS', 'DELETE', 'PUT', 'PATCH'],
-    "allow_headers": ['Content-Type', 'Authorization'],
+    "allow_headers": ['Content-Type', 'Authorization', 'baggage', 'sentry-trace'],
     "supports_credentials": True,
     "max_age": 3600
 }})
@@ -72,7 +75,7 @@ def add_cors_headers(response):
         # Don't set credentials header if origin not whitelisted
     
     response.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS,DELETE,PUT,PATCH'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization,baggage,sentry-trace'
     return response
 
 # Configuration de l'application pour l'envoie des mails
@@ -147,6 +150,7 @@ app.register_blueprint(transaction , url_prefix='/transactions')  # ✅ Avec 's'
 app.register_blueprint(migrate_bp)  # Migration BDD
 app.register_blueprint(recreate_bp)  # Recreation table
 app.register_blueprint(category , url_prefix='/category')
+app.register_blueprint(admin_bp)  # Admin Dashboard - routes /admin/*
 
 # Initialiser la base de données avec les données
 @app.before_request
