@@ -15,9 +15,9 @@ customer.route('/customer', methods=['GET'])(all_users)
 # ROUTES PROTÉGÉES PAR RATE LIMITING
 # ============================================
 
-# REGISTER : 3 tentatives par heure (protection spam)
+# REGISTER : 20 tentatives par heure (augmenté pour tests)
 customer.route('/register', methods=['POST', 'OPTIONS'])(
-    limiter.limit("3 per hour")(register)
+    limiter.limit("20 per hour")(register)
 )
 customer.route('/register', methods=['OPTIONS'])(register_options)
 

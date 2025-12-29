@@ -585,3 +585,280 @@ def get_all_transactions_admin():
     except Exception as e:
         current_app.logger.error(f"Get transactions error: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+
+# ============================================
+# EXPORT FUNCTIONS (CSV)
+# ============================================
+@admin_required
+def export_users_csv():
+    """Exporte les utilisateurs en CSV"""
+    try:
+        import csv
+        from io import StringIO
+        from flask import Response
+        
+        users = Customers.query.all()
+        
+        output = StringIO()
+        writer = csv.writer(output)
+        
+        # En-têtes
+        writer.writerow(['ID', 'Nom', 'Email', 'Contact', 'Adresse', 'Rôle', 'Confirmé', 'Actif', 'Date inscription'])
+        
+        # Données
+        for u in users:
+            writer.writerow([
+                u.id, u.name, u.email, u.contact, u.address, 
+                u.role, u.confirmed, u.is_active,
+                u.created_at.strftime('%Y-%m-%d %H:%M') if u.created_at else ''
+            ])
+        
+        output.seek(0)
+        
+        return Response(
+            output.getvalue(),
+            mimetype='text/csv',
+            headers={
+                'Content-Disposition': 'attachment; filename=users_export.csv',
+                'Access-Control-Expose-Headers': 'Content-Disposition'
+            }
+        )
+        
+    except Exception as e:
+        current_app.logger.error(f"Export users error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
+@admin_required
+def export_orders_csv():
+    """Exporte les commandes en CSV"""
+    try:
+        import csv
+        from io import StringIO
+        from flask import Response
+        
+        orders = Orders.query.all()
+        
+        output = StringIO()
+        writer = csv.writer(output)
+        
+        writer.writerow(['ID', 'Quantité', 'Prix', 'Statut', 'Cart ID', 'Date création'])
+        
+        for o in orders:
+            writer.writerow([
+                o.id, o.quantity, o.price, o.status, o.cart_id,
+                o.created_at.strftime('%Y-%m-%d %H:%M') if o.created_at else ''
+            ])
+        
+        output.seek(0)
+        
+        return Response(
+            output.getvalue(),
+            mimetype='text/csv',
+            headers={
+                'Content-Disposition': 'attachment; filename=orders_export.csv',
+                'Access-Control-Expose-Headers': 'Content-Disposition'
+            }
+        )
+        
+    except Exception as e:
+        current_app.logger.error(f"Export orders error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
+@admin_required
+def export_transactions_csv():
+    """Exporte les transactions en CSV"""
+    try:
+        import csv
+        from io import StringIO
+        from flask import Response
+        
+        transactions = Transactions.query.all()
+        
+        output = StringIO()
+        writer = csv.writer(output)
+        
+        writer.writerow(['Transaction ID', 'Statut', 'Montant', 'Devise', 'Reference', 'Date création'])
+        
+        for t in transactions:
+            writer.writerow([
+                t.transaction_id, t.status, t.total_amount, t.currency,
+                getattr(t, 'reference', ''),
+                t.created_at.strftime('%Y-%m-%d %H:%M') if t.created_at else ''
+            ])
+        
+        output.seek(0)
+        
+        return Response(
+            output.getvalue(),
+            mimetype='text/csv',
+            headers={
+                'Content-Disposition': 'attachment; filename=transactions_export.csv',
+                'Access-Control-Expose-Headers': 'Content-Disposition'
+            }
+        )
+        
+    except Exception as e:
+        current_app.logger.error(f"Export transactions error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
+# ============================================
+# ADVANCED CHARTS DATA
+# ============================================
+@admin_required
+def get_charts_data():
+    """Récupère les données pour les graphiques avancés"""
+    try:
+        # Répartition des statuts de commandes
+        orders_by_status = db.session.query(
+            Orders.status,
+            func.count(Orders.id).label('count')
+        ).group_by(Orders.status).all()
+        
+        # Répartition des utilisateurs par rôle
+        users_by_role = db.session.query(
+            Customers.role,
+            func.count(Customers.id).label('count')
+        ).group_by(Customers.role).all()
+        
+        # Top 5 produits les plus vendus
+        top_products = db.session.query(
+            Products.name,
+            func.sum(Orders.quantity).label('total_sold')
+        ).join(Orders, Orders.product_id == Products.id) \
+         .group_by(Products.id, Products.name) \
+         .order_by(func.sum(Orders.quantity).desc()) \
+         .limit(5).all()
+        
+        # Revenus par mois (6 derniers mois)
+        six_months_ago = datetime.utcnow() - timedelta(days=180)
+        monthly_revenue = db.session.query(
+            func.strftime('%Y-%m', Transactions.created_at).label('month'),
+            func.sum(Transactions.total_amount).label('amount')
+        ).filter(
+            Transactions.status == 'completed',
+            Transactions.created_at >= six_months_ago
+        ).group_by(
+            func.strftime('%Y-%m', Transactions.created_at)
+        ).order_by('month').all()
+        
+        # Inscriptions par semaine (4 dernières semaines)
+        four_weeks_ago = datetime.utcnow() - timedelta(weeks=4)
+        weekly_signups = db.session.query(
+            func.strftime('%Y-%W', Customers.created_at).label('week'),
+            func.count(Customers.id).label('count')
+        ).filter(
+            Customers.created_at >= four_weeks_ago
+        ).group_by(
+            func.strftime('%Y-%W', Customers.created_at)
+        ).order_by('week').all()
+        
+        return jsonify({
+            'orders_by_status': [{'status': s, 'count': c} for s, c in orders_by_status],
+            'users_by_role': [{'role': r, 'count': c} for r, c in users_by_role],
+            'top_products': [{'name': n, 'total_sold': int(ts or 0)} for n, ts in top_products],
+            'monthly_revenue': [{'month': m, 'amount': float(a or 0)} for m, a in monthly_revenue],
+            'weekly_signups': [{'week': w, 'count': c} for w, c in weekly_signups]
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Charts data error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
+# ============================================
+# NOTIFICATIONS / ALERTS
+# ============================================
+@admin_required
+def get_admin_notifications():
+    """Récupère les notifications/alertes pour l'admin"""
+    try:
+        notifications = []
+        
+        # Alerte: Produits en stock faible
+        low_stock_count = Products.query.filter(Products.quantity < 10).count()
+        if low_stock_count > 0:
+            notifications.append({
+                'type': 'warning',
+                'icon': '📦',
+                'title': 'Stock faible',
+                'message': f'{low_stock_count} produit(s) ont un stock inférieur à 10',
+                'action': '/admin/products',
+                'priority': 'high'
+            })
+        
+        # Alerte: Commandes en attente
+        pending_orders = Orders.query.filter(Orders.status == 'pending').count()
+        if pending_orders > 0:
+            notifications.append({
+                'type': 'info',
+                'icon': '🛒',
+                'title': 'Commandes en attente',
+                'message': f'{pending_orders} commande(s) en attente de traitement',
+                'action': '/admin/orders',
+                'priority': 'medium'
+            })
+        
+        # Alerte: Nouveaux utilisateurs aujourd'hui
+        new_users_today = Customers.query.filter(
+            func.date(Customers.created_at) == datetime.utcnow().date()
+        ).count()
+        if new_users_today > 0:
+            notifications.append({
+                'type': 'success',
+                'icon': '👥',
+                'title': 'Nouveaux utilisateurs',
+                'message': f'{new_users_today} nouveau(x) utilisateur(s) inscrit(s) aujourd\'hui',
+                'action': '/admin/users',
+                'priority': 'low'
+            })
+        
+        # Alerte: Transactions échouées récemment
+        failed_transactions_24h = Transactions.query.filter(
+            Transactions.status == 'failed',
+            Transactions.created_at >= datetime.utcnow() - timedelta(hours=24)
+        ).count()
+        if failed_transactions_24h > 0:
+            notifications.append({
+                'type': 'danger',
+                'icon': '❌',
+                'title': 'Transactions échouées',
+                'message': f'{failed_transactions_24h} transaction(s) échouée(s) dans les dernières 24h',
+                'action': '/admin/transactions',
+                'priority': 'high'
+            })
+        
+        # Alerte: Revenus du jour
+        today_revenue = db.session.query(
+            func.sum(Transactions.total_amount)
+        ).filter(
+            Transactions.status == 'completed',
+            func.date(Transactions.created_at) == datetime.utcnow().date()
+        ).scalar() or 0
+        
+        if today_revenue > 0:
+            notifications.append({
+                'type': 'success',
+                'icon': '💰',
+                'title': 'Revenus du jour',
+                'message': f'{today_revenue:,.0f} XAF générés aujourd\'hui',
+                'action': '/admin',
+                'priority': 'low'
+            })
+        
+        # Trier par priorité
+        priority_order = {'high': 0, 'medium': 1, 'low': 2}
+        notifications.sort(key=lambda x: priority_order.get(x['priority'], 3))
+        
+        return jsonify({
+            'notifications': notifications,
+            'count': len(notifications)
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Notifications error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+

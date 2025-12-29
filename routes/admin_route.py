@@ -16,7 +16,13 @@ from controllers.admin_controller import (
     update_order_status,
     get_all_transactions_admin,
     get_revenue_stats,
-    get_recent_activity
+    get_recent_activity,
+    # Nouvelles fonctionnalités
+    export_users_csv,
+    export_orders_csv,
+    export_transactions_csv,
+    get_charts_data,
+    get_admin_notifications
 )
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -54,3 +60,17 @@ admin_bp.route('/orders/<int:order_id>/status', methods=['PATCH'])(update_order_
 # TRANSACTION MANAGEMENT
 # ============================================
 admin_bp.route('/transactions', methods=['GET'])(get_all_transactions_admin)
+
+# ============================================
+# EXPORT CSV
+# ============================================
+admin_bp.route('/export/users', methods=['GET'])(export_users_csv)
+admin_bp.route('/export/orders', methods=['GET'])(export_orders_csv)
+admin_bp.route('/export/transactions', methods=['GET'])(export_transactions_csv)
+
+# ============================================
+# ADVANCED CHARTS & NOTIFICATIONS
+# ============================================
+admin_bp.route('/charts', methods=['GET'])(get_charts_data)
+admin_bp.route('/notifications', methods=['GET'])(get_admin_notifications)
+
