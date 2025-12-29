@@ -10,6 +10,8 @@ from cloudinary_config import configure_cloudinary
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from extensions import limiter
+from utils.logging_service import setup_logging, logger, stats
+import time
 
 from config import db, SECRET_KEY , MAIL_SERVER , MAIL_PORT, MAIL_USERNAME,MAIL_PASSWORD,MAIL_USE_SSL,MAIL_USE_TLS, MAIL_DEFAULT_SENDER
 
@@ -28,6 +30,7 @@ from routes.admin_route import admin_bp  # Admin Dashboard
 
 # db
 app = Flask(__name__)
+setup_logging(app)  # 📊 Initialiser le système de logs
 configure_cloudinary()
 
 # Configuration CORS - supporter local dev et production
@@ -160,6 +163,36 @@ else:
 
 app.register_blueprint(category , url_prefix='/category')
 app.register_blueprint(admin_bp)  # Admin Dashboard - routes /admin/*
+
+@app.before_request
+def start_timer():
+    """Démarrer le timer pour chaque requête"""
+    request.start_time = time.time()
+
+@app.after_request
+def log_request_info(response):
+    """Logger les infos de la requête et mettre à jour les stats"""
+    # Éviter de logger les assets statiques
+    if request.path.startswith('/static') or request.path.endswith(('.js', '.css', '.png', '.jpg', '.ico')):
+        return response
+
+    duration = (time.time() - request.start_time) * 1000
+    status_code = response.status_code
+    endpoint = request.path
+    method = request.method
+    
+    # Log de la réponse via notre logger personnalisé
+    logger.log_response(endpoint, status_code, duration, method)
+    
+    # Mettre à jour les stats globales
+    stats.track_request(endpoint, status_code, duration)
+    
+    # ⚠️ Exemple : Tracker les commandes
+    if endpoint == '/order' and method == 'POST' and status_code == 201:
+        # On pourrait extraire le montant ici si besoin
+        stats.track_order(0) 
+        
+    return response
 
 # Initialiser la base de données avec les données
 @app.before_request
