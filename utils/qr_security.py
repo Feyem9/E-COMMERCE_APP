@@ -7,10 +7,11 @@ import hmac
 import hashlib
 import json
 import base64
+import os
 from datetime import datetime
 
-# Clé secrète pour HMAC (⚠️ À mettre dans .env en production !)
-QR_SECRET_KEY = "your-super-secret-key-change-in-production-2025"
+# 🔐 Clé secrète pour HMAC - À définir dans les variables d'environnement
+QR_SECRET_KEY = os.environ.get('QR_SECRET_KEY', 'dev-secret-key-change-in-production-2025')
 
 def generate_qr_signature(transaction_id, amount, currency, timestamp):
     """
