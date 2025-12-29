@@ -114,13 +114,17 @@ export class PushNotificationService {
       return;
     }
 
-    const notification = new Notification(options.title, {
+    // Note: 'vibrate' n'est pas dans le type standard NotificationOptions
+    // mais est supporté par certains navigateurs mobiles
+    const notificationOptions: NotificationOptions = {
       body: options.body,
       icon: options.icon || '/icons/icon-192x192.png',
       badge: '/icons/icon-72x72.png',
       data: options.data,
-      vibrate: [200, 100, 200]
-    });
+      silent: false
+    };
+
+    const notification = new Notification(options.title, notificationOptions);
 
     notification.onclick = () => {
       window.focus();
