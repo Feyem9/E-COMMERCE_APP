@@ -40,6 +40,7 @@ import { MaintenanceComponent } from './maintenance/maintenance.component';
 import { StatusComponent } from './status/status.component';
 import { DeliveryDriverComponent } from './delivery-driver/delivery-driver.component';  // Ajoutez cette ligne pour le ngModel
 import { QRCodeModule } from 'angularx-qrcode';  // Module QR Code
+import { NotificationDropdownComponent } from './components/notification-dropdown/notification-dropdown.component';  // 🔔 Notifications
 
 @NgModule({
   declarations: [
@@ -79,6 +80,7 @@ import { QRCodeModule } from 'angularx-qrcode';  // Module QR Code
     MatCardModule,
     HttpClientModule,
     QRCodeModule,  // Module pour générer QR codes
+    NotificationDropdownComponent,  // 🔔 Composant de notifications (standalone)
   ],
   providers: [
     provideClientHydration(),

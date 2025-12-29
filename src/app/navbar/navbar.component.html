@@ -130,6 +130,9 @@
 
           <!-- Icons -->
           <div class="app-navbar__icon-group">
+            <!-- Notifications (only when logged in) -->
+            <app-notification-dropdown *ngIf="isLoggedIn" class="app-navbar__icon"></app-notification-dropdown>
+
             <a class="app-navbar__icon" routerLink="/favorites" *ngIf="isLoggedIn">
               <i class="fas fa-heart"></i>
               <span class="visually-hidden">Favorites</span>
