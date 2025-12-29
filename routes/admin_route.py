@@ -74,3 +74,37 @@ admin_bp.route('/export/transactions', methods=['GET'])(export_transactions_csv)
 admin_bp.route('/charts', methods=['GET'])(get_charts_data)
 admin_bp.route('/notifications', methods=['GET'])(get_admin_notifications)
 
+# ============================================
+# HEALTH CHECK & MONITORING
+# ============================================
+@admin_bp.route('/health', methods=['GET'])
+def health_check():
+    """Endpoint de health check (public)"""
+    from flask import jsonify
+    try:
+        from utils.logging_service import get_health_status
+        status = get_health_status()
+        return jsonify(status), 200 if status['status'] == 'healthy' else 503
+    except Exception as e:
+        return jsonify({
+            'status': 'unhealthy',
+            'error': str(e)
+        }), 503
+
+@admin_bp.route('/metrics', methods=['GET'])
+def get_metrics():
+    """Endpoint de métriques (protégé)"""
+    from flask import jsonify
+    from flask_jwt_extended import jwt_required, get_jwt_identity
+    
+    try:
+        from utils.logging_service import stats
+        return jsonify({
+            'status': 'ok',
+            'stats': stats.get_stats()
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'error': str(e)
+        }), 500
