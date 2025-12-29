@@ -1,0 +1,155 @@
+<div class="admin-transactions">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <a routerLink="/admin" class="back-link">← Retour</a>
+                <h1>💳 Transactions</h1>
+                <p class="subtitle">{{ totalTransactions }} transactions au total</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+        <div class="filter-group">
+            <label>Filtrer par statut:</label>
+            <select (change)="onStatusFilterChange($event)">
+                <option value="">Tous les statuts</option>
+                <option *ngFor="let status of statuses" [value]="status">
+                    {{ getStatusIcon(status) }} {{ status | titlecase }}
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-container" *ngIf="loading">
+        <div class="spinner"></div>
+        <p>Chargement...</p>
+    </div>
+
+    <!-- Error -->
+    <div class="error-container" *ngIf="error && !loading">
+        <span>⚠️</span>
+        <p>{{ error }}</p>
+        <button class="btn-primary" (click)="loadTransactions()">Réessayer</button>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="table-container" *ngIf="!loading && !error">
+        <table class="transactions-table">
+            <thead>
+                <tr>
+                    <th>ID Transaction</th>
+                    <th>Montant</th>
+                    <th>Devise</th>
+                    <th>Statut</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let tx of transactions">
+                    <td class="id-cell">
+                        <span class="tx-id">{{ tx.transaction_id }}</span>
+                    </td>
+                    <td class="amount-cell">{{ formatCurrency(tx.total_amount) }}</td>
+                    <td>{{ tx.currency }}</td>
+                    <td>
+                        <span class="status-badge" [ngClass]="getStatusClass(tx.status)">
+                            {{ getStatusIcon(tx.status) }} {{ tx.status | titlecase }}
+                        </span>
+                    </td>
+                    <td>{{ formatDate(tx.created_at) }}</td>
+                    <td class="actions-cell">
+                        <button class="btn-view" (click)="openDetailModal(tx)">
+                            👁️ Détails
+                        </button>
+                    </td>
+                </tr>
+                <tr *ngIf="transactions.length === 0">
+                    <td colspan="6" class="empty-state">
+                        <span>📭</span>
+                        <p>Aucune transaction trouvée</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages > 1">
+        <button class="page-btn" (click)="goToPage(1)" [disabled]="currentPage === 1">««</button>
+        <button class="page-btn" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">‹</button>
+        <button *ngFor="let page of pageNumbers" class="page-btn" [class.active]="page === currentPage"
+            (click)="goToPage(page)">
+            {{ page }}
+        </button>
+        <button class="page-btn" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">›</button>
+        <button class="page-btn" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">»»</button>
+        <span class="page-info">Page {{ currentPage }} sur {{ totalPages }}</span>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <button class="modal-close" (click)="closeModal()">✕</button>
+
+            <h2>📋 Détails de la Transaction</h2>
+
+            <div class="transaction-details" *ngIf="selectedTransaction">
+                <div class="detail-row">
+                    <span class="label">ID Transaction:</span>
+                    <span class="value id-value">{{ selectedTransaction.transaction_id }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Montant:</span>
+                    <span class="value amount-value">{{ formatCurrency(selectedTransaction.total_amount) }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Devise:</span>
+                    <span class="value">{{ selectedTransaction.currency }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Statut:</span>
+                    <span class="status-badge" [ngClass]="getStatusClass(selectedTransaction.status)">
+                        {{ getStatusIcon(selectedTransaction.status) }} {{ selectedTransaction.status | titlecase }}
+                    </span>
+                </div>
+                <div class="detail-row" *ngIf="selectedTransaction.reference">
+                    <span class="label">Référence:</span>
+                    <span class="value">{{ selectedTransaction.reference }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Date:</span>
+                    <span class="value">{{ formatDate(selectedTransaction.created_at) }}</span>
+                </div>
+
+                <!-- Geolocation Info -->
+                <div class="section-title" *ngIf="selectedTransaction.customer_latitude">
+                    <h4>📍 Informations de livraison</h4>
+                </div>
+                <div class="detail-row" *ngIf="selectedTransaction.customer_latitude">
+                    <span class="label">Coordonnées:</span>
+                    <span class="value">{{ selectedTransaction.customer_latitude }}, {{
+                        selectedTransaction.customer_longitude }}</span>
+                </div>
+                <div class="detail-row" *ngIf="selectedTransaction.delivery_distance_km">
+                    <span class="label">Distance livraison:</span>
+                    <span class="value">{{ selectedTransaction.delivery_distance_km }} km</span>
+                </div>
+                <div class="detail-row" *ngIf="selectedTransaction.delivery_map_url">
+                    <span class="label">Carte:</span>
+                    <a [href]="selectedTransaction.delivery_map_url" target="_blank" class="map-link">
+                        🗺️ Voir sur Google Maps
+                    </a>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-close" (click)="closeModal()">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>

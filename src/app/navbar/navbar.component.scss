@@ -332,6 +332,19 @@
   border-color: #f9fafb;
 }
 
+.app-navbar__btn--admin {
+  color: #fef3c7;
+  background: linear-gradient(135deg, #7c3aed, #c026d3);
+  border-color: transparent;
+  box-shadow: 0 12px 28px rgba(124, 58, 237, 0.5);
+}
+
+.app-navbar__btn--admin:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 16px 38px rgba(192, 38, 211, 0.7);
+  transform: translateY(-1px);
+}
+
 /* Icon buttons (favorites + cart) */
 
 .app-navbar__icon-group {

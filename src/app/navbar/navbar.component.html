@@ -10,14 +10,8 @@
         </span>
       </a>
 
-      <button
-        class="navbar-toggler app-navbar__toggler border-0"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#mainNavbar"
-        aria-controls="mainNavbar"
-        aria-expanded="false"
-        aria-label="Toggle navigation">
+      <button class="navbar-toggler app-navbar__toggler border-0" type="button" data-bs-toggle="collapse"
+        data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
     </div>
@@ -29,10 +23,7 @@
         <div class="app-navbar__nav">
           <ul class="app-navbar__nav-list">
             <li class="app-navbar__nav-item">
-              <a
-                class="app-navbar__nav-link"
-                routerLink="/"
-                routerLinkActive="app-navbar__nav-link--active"
+              <a class="app-navbar__nav-link" routerLink="/" routerLinkActive="app-navbar__nav-link--active"
                 [routerLinkActiveOptions]="{ exact: true }">
                 <i class="fas fa-home"></i>
                 <span>Home</span>
@@ -40,24 +31,16 @@
             </li>
 
             <li class="app-navbar__nav-item">
-              <a
-                class="app-navbar__nav-link"
-                routerLink="/product"
-                routerLinkActive="app-navbar__nav-link--active">
+              <a class="app-navbar__nav-link" routerLink="/product" routerLinkActive="app-navbar__nav-link--active">
                 <i class="fas fa-store"></i>
                 <span>Shop</span>
               </a>
             </li>
 
             <li class="app-navbar__nav-item dropdown">
-              <a
-                class="app-navbar__nav-link dropdown-toggle"
-                routerLink="/categories"
-                routerLinkActive="app-navbar__nav-link--active"
-                id="categoriesDropdown"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false">
+              <a class="app-navbar__nav-link dropdown-toggle" routerLink="/categories"
+                routerLinkActive="app-navbar__nav-link--active" id="categoriesDropdown" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fas fa-th-large"></i>
                 <span>Categories</span>
               </a>
@@ -81,7 +64,9 @@
                     <span>Accessories</span>
                   </a>
                 </li>
-                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
                 <li>
                   <a class="dropdown-item" routerLink="/categories">
                     <i class="fas fa-star me-2"></i>
@@ -99,12 +84,8 @@
             <div class="app-navbar__search-icon">
               <i class="fas fa-search"></i>
             </div>
-            <input
-              type="search"
-              class="app-navbar__search-input"
-              placeholder="Search for phones, tablets, accessories..."
-              [(ngModel)]="searchQuery"
-              name="search"
+            <input type="search" class="app-navbar__search-input"
+              placeholder="Search for phones, tablets, accessories..." [(ngModel)]="searchQuery" name="search"
               aria-label="Search products" />
             <button class="app-navbar__search-button d-none d-sm-inline-flex" type="submit">
               Search
@@ -130,6 +111,12 @@
 
           <ng-template #loggedInBlock>
             <div class="app-navbar__user">
+              <!-- Admin Dashboard Link -->
+              <a *ngIf="isAdmin" class="app-navbar__btn app-navbar__btn--admin" routerLink="/admin"
+                title="Admin Dashboard">
+                <i class="fas fa-cog"></i>
+                <span class="d-none d-md-inline">Admin</span>
+              </a>
               <a class="app-navbar__user-link" routerLink="/profile">
                 <i class="fas fa-user-circle"></i>
                 <span class="d-none d-md-inline">{{ userName || 'Account' }}</span>
@@ -164,4 +151,3 @@
     </div>
   </div>
 </nav>
-

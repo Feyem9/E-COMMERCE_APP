@@ -1,0 +1,210 @@
+<div class="admin-users">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <a routerLink="/admin" class="back-link">← Retour</a>
+                <h1>👥 Gestion des Utilisateurs</h1>
+                <p class="subtitle">{{ totalUsers }} utilisateurs au total</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Rechercher par nom ou email..." [value]="searchTerm"
+                (input)="onSearch($event)" />
+        </div>
+        <div class="filter-group">
+            <select (change)="onRoleFilterChange($event)">
+                <option value="">Tous les rôles</option>
+                <option value="user">Utilisateurs</option>
+                <option value="admin">Administrateurs</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-container" *ngIf="loading">
+        <div class="spinner"></div>
+        <p>Chargement...</p>
+    </div>
+
+    <!-- Error -->
+    <div class="error-container" *ngIf="error && !loading">
+        <span>⚠️</span>
+        <p>{{ error }}</p>
+        <button class="btn-primary" (click)="loadUsers()">Réessayer</button>
+    </div>
+
+    <!-- Users Table -->
+    <div class="table-container" *ngIf="!loading && !error">
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>Rôle</th>
+                    <th>Statut</th>
+                    <th>Inscrit le</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of users" [class.inactive]="!user.is_active">
+                    <td class="id-cell">{{ user.id }}</td>
+                    <td class="name-cell">
+                        <div class="user-avatar">{{ (user.name || '?')[0].toUpperCase() }}</div>
+                        <span>{{ user.name }}</span>
+                    </td>
+                    <td class="email-cell">{{ user.email }}</td>
+                    <td>{{ user.contact }}</td>
+                    <td>
+                        <span class="role-badge" [class.admin]="user.role === 'admin'">
+                            {{ user.role === 'admin' ? '👑 Admin' : '👤 User' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge" [class.active]="user.is_active">
+                            {{ user.is_active ? '✅ Actif' : '❌ Inactif' }}
+                        </span>
+                    </td>
+                    <td>{{ formatDate(user.created_at) }}</td>
+                    <td class="actions-cell">
+                        <button class="btn-icon view" (click)="openModal(user, 'view')" title="Voir">👁️</button>
+                        <button class="btn-icon edit" (click)="openModal(user, 'edit')" title="Modifier">✏️</button>
+                        <button class="btn-icon delete" (click)="openModal(user, 'delete')" title="Supprimer"
+                            *ngIf="user.role !== 'admin'">🗑️</button>
+                    </td>
+                </tr>
+                <tr *ngIf="users.length === 0">
+                    <td colspan="8" class="empty-state">
+                        <span>📭</span>
+                        <p>Aucun utilisateur trouvé</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages > 1">
+        <button class="page-btn" (click)="goToPage(1)" [disabled]="currentPage === 1">
+            ««
+        </button>
+        <button class="page-btn" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+            ‹
+        </button>
+
+        <button *ngFor="let page of pageNumbers" class="page-btn" [class.active]="page === currentPage"
+            (click)="goToPage(page)">
+            {{ page }}
+        </button>
+
+        <button class="page-btn" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+            ›
+        </button>
+        <button class="page-btn" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">
+            »»
+        </button>
+
+        <span class="page-info">
+            Page {{ currentPage }} sur {{ totalPages }}
+        </span>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <button class="modal-close" (click)="closeModal()">✕</button>
+
+            <!-- View Modal -->
+            <div *ngIf="modalAction === 'view' && selectedUser">
+                <h2>👤 Détails de l'utilisateur</h2>
+                <div class="user-details">
+                    <div class="detail-row">
+                        <span class="label">ID:</span>
+                        <span class="value">{{ selectedUser.id }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Nom:</span>
+                        <span class="value">{{ selectedUser.name }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Email:</span>
+                        <span class="value">{{ selectedUser.email }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Contact:</span>
+                        <span class="value">{{ selectedUser.contact }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Adresse:</span>
+                        <span class="value">{{ selectedUser.address }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Rôle:</span>
+                        <span class="value">{{ selectedUser.role }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Email confirmé:</span>
+                        <span class="value">{{ selectedUser.confirmed ? 'Oui' : 'Non' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Compte actif:</span>
+                        <span class="value">{{ selectedUser.is_active ? 'Oui' : 'Non' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Date d'inscription:</span>
+                        <span class="value">{{ formatDate(selectedUser.created_at) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Modal -->
+            <div *ngIf="modalAction === 'edit' && selectedUser">
+                <h2>✏️ Modifier l'utilisateur</h2>
+                <div class="edit-actions">
+                    <div class="action-group">
+                        <h4>Statut du compte</h4>
+                        <button class="btn-action" [class.active]="selectedUser.is_active"
+                            [class.danger]="selectedUser.is_active" (click)="toggleUserActive()">
+                            {{ selectedUser.is_active ? '🔒 Désactiver le compte' : '🔓 Activer le compte' }}
+                        </button>
+                    </div>
+                    <div class="action-group" *ngIf="selectedUser.role !== 'admin'">
+                        <h4>Changer le rôle</h4>
+                        <div class="role-buttons">
+                            <button class="btn-role" [class.active]="selectedUser.role === 'user'"
+                                (click)="changeUserRole('user')">
+                                👤 Utilisateur
+                            </button>
+                            <button class="btn-role admin" [class.active]="selectedUser.role === 'admin'"
+                                (click)="changeUserRole('admin')">
+                                👑 Administrateur
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Modal -->
+            <div *ngIf="modalAction === 'delete' && selectedUser">
+                <h2>🗑️ Supprimer l'utilisateur</h2>
+                <div class="delete-warning">
+                    <span class="warning-icon">⚠️</span>
+                    <p>Êtes-vous sûr de vouloir supprimer <strong>{{ selectedUser.name }}</strong> ?</p>
+                    <p class="warning-text">Cette action est irréversible.</p>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-cancel" (click)="closeModal()">Annuler</button>
+                    <button class="btn-danger" (click)="deleteUser()">Supprimer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -34,7 +34,12 @@ const routes: Routes = [
   { path: 'help', component: HelpComponent },
   { path: 'help/order-tracking', component: OrderTrackingComponent },
   { path: 'help/store-locator', component: StoreLocatorComponent },
-  { path: 'help/faqs', component: FaqsComponent }
+  { path: 'help/faqs', component: FaqsComponent },
+  // Admin Dashboard (Lazy Loaded)
+  { 
+    path: 'admin', 
+    loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule) 
+  }
 ];
 
 @NgModule({

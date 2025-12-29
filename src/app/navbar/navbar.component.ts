@@ -27,6 +27,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   cartCount = 0;
   favoriteCount = 0;
   isLoggedIn = false;
+  isAdmin = false;
   userName = '';
   searchQuery = '';
   showSearch = false;
@@ -84,8 +85,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
       try {
         const userData = JSON.parse(user);
         this.userName = userData.name || userData.email || 'User';
+        this.isAdmin = userData.role === 'admin';
       } catch (e) {
         this.userName = 'User';
+        this.isAdmin = false;
       }
     }
   }
