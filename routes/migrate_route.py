@@ -69,6 +69,7 @@ def migrate_qr():
         columns_to_add = [
             ('delivery_time', 'DATETIME'),
             ('qr_signature', 'VARCHAR(255)'),
+            ('qr_timestamp', 'DATETIME'),
             ('reference', 'VARCHAR(100)')
         ]
         
