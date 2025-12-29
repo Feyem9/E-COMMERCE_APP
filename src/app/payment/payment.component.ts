@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, Inject, PLATFORM_ID } from '@angular/core';
 import { TransactionService } from '../services/transaction.service';
 import { environment } from '../../environment/environment';
-import { Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { AnalyticsService } from '../services/analytics.service';
 
 @Component({
   selector: 'app-payment',
@@ -17,6 +17,7 @@ export class PaymentComponent {
 
   constructor(
     private transactionService: TransactionService,
+    private analytics: AnalyticsService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) { }
  
@@ -41,6 +42,13 @@ export class PaymentComponent {
 
     this.transactionService.initiatePayment(data).subscribe({
       next: (result: any) => {
+        // 📊 Track checkout start
+        this.analytics.trackEvent('begin_checkout', {
+          total_amount: data.total_amount,
+          currency: data.currency,
+          payment_country: data.payment_country
+        });
+
         console.log('Paiement initié:', result);
         console.log('🔍 Données complètes:', JSON.stringify(result, null, 2));
         
@@ -65,6 +73,11 @@ export class PaymentComponent {
           this.qrCodeValue = JSON.stringify(qrData);
           console.log('📱 QR Code créé manuellement:', this.qrCodeValue);
         }
+        
+        // 📊 Track QR code generation
+        this.analytics.trackEvent('qr_code_generated', {
+          transaction_id: this.transactionId
+        });
         
         this.loading = false;
       },

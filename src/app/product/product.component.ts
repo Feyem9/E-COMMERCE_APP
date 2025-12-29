@@ -6,6 +6,7 @@ import { ImageMapperService } from '../services/image-mapper.service';
 import { Product } from '../models/products';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { AnalyticsService } from '../services/analytics.service';
 
 @Component({
   selector: 'app-product',
@@ -37,10 +38,11 @@ export class ProductComponent implements OnInit, OnDestroy {
 
   constructor(
     private productService: ProductsService,
-    private cartService: CartService,
+    private cartService : CartService,
     private imageMapper: ImageMapperService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private analytics: AnalyticsService
   ) { }
 
   ngOnInit(): void {
@@ -136,6 +138,11 @@ export class ProductComponent implements OnInit, OnDestroy {
 
   searchProducts(): void {
     this.applyFilters();
+    
+    // 📊 Track search event
+    if (this.searchQuery.trim()) {
+      this.analytics.trackSearch(this.searchQuery.trim());
+    }
   }
 
   // 📊 Compter les filtres actifs

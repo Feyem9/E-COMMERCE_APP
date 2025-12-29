@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { Cart, Product } from '../models/products';
 import { ApiService } from './api.service';
 import { environment } from '../../environment/environment';
+import { AnalyticsService } from './analytics.service';
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +37,7 @@ export class CartService {
   constructor(
     private http: HttpClient,
     private apiService: ApiService,
+    private analytics: AnalyticsService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     // Only load from storage, don't call API here to prevent cascading subscriptions
@@ -119,6 +121,19 @@ export class CartService {
       tap((response) => {
         // Refresh cart without subscribing - let components handle their subscriptions
         this.refreshTrigger$.next();
+        
+        // 📊 Track event (if we have product info in storage)
+        const items = this.cartItemsSubject.value;
+        const item = items.find(i => i.product_id === productId);
+        if (item) {
+          this.analytics.trackAddToCart({
+            ...item as any,
+            quantity: quantity
+          });
+        } else {
+          // Fallback simple
+          this.analytics.trackEvent('add_to_cart', { id: productId, quantity });
+        }
       }),
       catchError(error => {
         console.error('Error adding to cart:', error);
@@ -174,6 +189,12 @@ export class CartService {
 
     return this.apiService.delete<any>(`/cart/delete-cart/${cartId}`).pipe(
       tap(() => {
+        // 📊 Track event before refreshing
+        const item = this.cartItemsSubject.value.find(i => i.id === cartId);
+        if (item) {
+          this.analytics.trackRemoveFromCart(item as any);
+        }
+        
         // Refresh cart without subscribing
         this.refreshTrigger$.next();
       }),
