@@ -1,14 +1,7 @@
- <app-navbar></app-navbar>
-
-<!-- TEST SENTRY (à retirer en production) -->
-<div class="alert alert-warning text-center m-3" role="alert">
-  <strong>🧪 Mode Développement</strong> 
-  <button class="btn btn-danger btn-sm ms-3" (click)="throwTestError()">
-    <i class="fas fa-bug me-2"></i>Test Sentry Error
-  </button>
-</div>
+<app-navbar></app-navbar>
 
 <div class="home-container">
+  <!-- Hero Section -->
   <!-- Hero Section -->
   <section class="hero bg-gradient-primary text-white py-5">
     <div class="container">
@@ -17,9 +10,7 @@
           <div class="hero-text">
             <h1 class="display-4 fw-bold mb-3">Welcome to TECH-MARKET</h1>
             <p class="lead mb-4">Discover the latest smartphones and technology deals!</p>
-            <button 
-              class="btn btn-warning btn-lg px-5" 
-              (click)="navigateToProducts()">
+            <button class="btn btn-warning btn-lg px-5" (click)="navigateToProducts()">
               <i class="fas fa-shopping-cart me-2"></i>
               Shop Now
             </button>
@@ -31,7 +22,7 @@
           </div>
         </div>
       </div>
-    </div> 
+    </div>
   </section>
 
   <!-- Highlights Section -->
@@ -108,15 +99,12 @@
         <div *ngFor="let product of featuredProducts" class="col-lg-4 col-md-6">
           <div class="card h-100 shadow-sm product-card">
             <div class="card-img-wrapper position-relative">
-              <img 
-                [src]="getProductImage(product)" 
-                [alt]="product.name" 
-                class="card-img-top product-image"
-                (error)="onImageError($event)"
-                loading="eager">
+              <img [src]="getProductImage(product)" [alt]="product.name" class="card-img-top product-image"
+                (error)="onImageError($event)" loading="eager">
               <div class="discount-badge" *ngIf="product.discount_price < product.current_price">
                 <span class="badge bg-danger">
-                  {{ ((product.current_price - product.discount_price) / product.current_price * 100 | number:'1.0-0') }}% OFF
+                  {{ ((product.current_price - product.discount_price) / product.current_price * 100 | number:'1.0-0')
+                  }}% OFF
                 </span>
               </div>
             </div>
@@ -127,22 +115,17 @@
                 <span class="h5 text-success fw-bold">
                   {{ product.discount_price | currency:'EUR':'symbol':'1.2-2' }}
                 </span>
-                <span 
-                  *ngIf="product.discount_price < product.current_price" 
+                <span *ngIf="product.discount_price < product.current_price"
                   class="text-decoration-line-through text-muted ms-2">
                   {{ product.current_price | currency:'EUR':'symbol':'1.2-2' }}
                 </span>
               </div>
               <div class="card-actions">
-                <button 
-                  class="btn btn-primary w-100"
-                  (click)="addToCart(product)">
+                <button class="btn btn-primary w-100" (click)="addToCart(product)">
                   <i class="fas fa-cart-plus me-2"></i>
                   Add to Cart
                 </button>
-                <button 
-                  class="btn btn-outline-secondary w-100 mt-2"
-                  (click)="navigateToProduct(product.id)">
+                <button class="btn btn-outline-secondary w-100 mt-2" (click)="navigateToProduct(product.id)">
                   <i class="fas fa-eye me-2"></i>
                   View Details
                 </button>
@@ -154,9 +137,7 @@
 
       <!-- View All Products -->
       <div class="text-center mt-5" *ngIf="!loading && !error">
-        <button 
-          class="btn btn-outline-primary btn-lg"
-          (click)="navigateToProducts()">
+        <button class="btn btn-outline-primary btn-lg" (click)="navigateToProducts()">
           View All Products
           <i class="fas fa-arrow-right ms-2"></i>
         </button>
@@ -200,21 +181,15 @@
         <div class="col-md-6 mb-4 mb-md-0">
           <h2 class="fw-bold mb-3">Stay Updated!</h2>
           <p class="lead">
-            Subscribe to our newsletter and be the first to know about new products, 
+            Subscribe to our newsletter and be the first to know about new products,
             exclusive deals, and special promotions.
           </p>
         </div>
         <div class="col-md-6">
           <div class="newsletter-form">
             <form class="d-flex gap-2" (ngSubmit)="onNewsletterSubmit()">
-              <input 
-                type="email" 
-                class="form-control form-control-lg"
-                placeholder="Enter your email"
-                required>
-              <button 
-                type="submit" 
-                class="btn btn-warning btn-lg px-4">
+              <input type="email" class="form-control form-control-lg" placeholder="Enter your email" required>
+              <button type="submit" class="btn btn-warning btn-lg px-4">
                 Subscribe
               </button>
             </form>
@@ -232,9 +207,7 @@
           <div class="promotion-banner bg-gradient-warning text-dark p-5 rounded-3 text-center">
             <h2 class="fw-bold mb-3">🔥 Exclusive Promotions</h2>
             <p class="lead mb-4">Up to 50% off on selected smartphones! Limited time offer.</p>
-            <button 
-              class="btn btn-dark btn-lg px-5"
-              (click)="navigateToProducts()">
+            <button class="btn btn-dark btn-lg px-5" (click)="navigateToProducts()">
               <i class="fas fa-fire me-2"></i>
               Shop Now
             </button>
