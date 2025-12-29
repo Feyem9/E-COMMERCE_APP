@@ -9,6 +9,6 @@ export const environment = {
     // 📊 Google Analytics
     analytics: {
         enabled: true,
-        measurementId: 'G-XXXXXXXXXX'  // Remplacer par ton ID GA4
+        measurementId: 'G-F7ID8RRCXM'  // ✅ Measurement ID configuré
     }
 };
