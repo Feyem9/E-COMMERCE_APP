@@ -1,0 +1,152 @@
+<div class="container py-5">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="text-center mb-5">
+        <h1 class="display-4 mb-3">
+          <i class="fas fa-truck text-primary me-3"></i>
+          Order Tracking
+        </h1>
+        <p class="lead text-muted">Track your order status and delivery information</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Form -->
+  <div class="row mb-5" *ngIf="!orderData">
+    <div class="col-lg-8 mx-auto">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h4 class="card-title mb-4">Enter Order Details</h4>
+          <form (ngSubmit)="searchOrder()">
+            <div class="mb-3">
+              <label for="orderNumber" class="form-label">Order Number *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="orderNumber"
+                [(ngModel)]="orderNumber"
+                name="orderNumber"
+                placeholder="Enter your order number"
+                required>
+            </div>
+            <div class="mb-4">
+              <label for="email" class="form-label">Email Address *</label>
+              <input 
+                type="email" 
+                class="form-control" 
+                id="email"
+                [(ngModel)]="email"
+                name="email"
+                placeholder="Enter your email address"
+                required>
+            </div>
+            <div class="d-grid">
+              <button 
+                type="submit" 
+                class="btn btn-primary btn-lg"
+                [disabled]="loading || !orderNumber.trim() || !email.trim()">
+                <i class="fas fa-search me-2"></i>
+                <span *ngIf="!loading">Track Order</span>
+                <span *ngIf="loading">
+                  <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  Searching...
+                </span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Results -->
+  <div class="row" *ngIf="orderData">
+    <div class="col-lg-10 mx-auto">
+      <!-- Order Header -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-body p-4">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <h4 class="mb-2">Order #{{ orderData.orderNumber }}</h4>
+              <p class="text-muted mb-2">
+                <i class="fas fa-calendar me-2"></i>
+                Estimated Delivery: {{ orderData.estimatedDelivery | date:'MMM dd, yyyy' }}
+              </p>
+              <span class="badge bg-primary fs-6">{{ orderData.status }}</span>
+            </div>
+            <div class="col-md-4 text-md-end">
+              <button class="btn btn-outline-secondary" (click)="resetSearch()">
+                <i class="fas fa-search me-2"></i>Track Another Order
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Tracker -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-body p-4">
+          <h5 class="card-title mb-4">Tracking Progress</h5>
+          <div class="progress-tracker">
+            <div class="row">
+              <div class="col-12">
+                <div class="tracking-steps">
+                  <div 
+                    class="tracking-step" 
+                    *ngFor="let step of orderData.trackingSteps; let i = index"
+                    [class.completed]="step.completed"
+                    [class.active]="i === 3">
+                    <div class="step-icon">
+                      <i class="fas fa-check" *ngIf="step.completed"></i>
+                      <i class="fas fa-circle" *ngIf="!step.completed"></i>
+                    </div>
+                    <div class="step-content">
+                      <h6 class="step-title">{{ step.status }}</h6>
+                      <small class="text-muted">{{ step.date | date:'MMM dd' }}</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Items -->
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h5 class="card-title mb-4">Order Items</h5>
+          <div class="order-item mb-3" *ngFor="let item of orderData.items">
+            <div class="row align-items-center">
+              <div class="col-md-6">
+                <h6 class="mb-1">{{ item.name }}</h6>
+                <small class="text-muted">Quantity: {{ item.quantity }}</small>
+              </div>
+              <div class="col-md-6 text-md-end">
+                <strong>${{ item.price }}</strong>
+              </div>
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-md-6">
+              <strong>Total</strong>
+            </div>
+            <div class="col-md-6 text-md-end">
+              <strong>${{ orderData.total }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back Button -->
+  <div class="row mt-4">
+    <div class="col-lg-12 text-center">
+      <button class="btn btn-secondary" routerLink="/help">
+        <i class="fas fa-arrow-left me-2"></i>Back to Help
+      </button>
+    </div>
+  </div>
+</div>

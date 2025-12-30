@@ -1,0 +1,459 @@
+/* New TECH-MARKET navbar styling */
+
+.app-navbar {
+  --bs-navbar-padding-y: 0.9rem;
+  --bs-navbar-padding-x: 0;
+  background: radial-gradient(circle at top left, #1d4ed8 0, #020617 45%, #020617 100%);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.32);
+  color: #e5e7eb;
+}
+
+.app-navbar__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.app-navbar__brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-navbar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.app-navbar__brand:hover {
+  color: #f9fafb;
+}
+
+.app-navbar__brand-mark {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.9rem;
+  background: radial-gradient(circle at 20% 0, #38bdf8, #6366f1 60%, #0f172a 100%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  font-size: 0.9rem;
+  box-shadow: 0 16px 35px rgba(37, 99, 235, 0.75);
+}
+
+.app-navbar__brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-navbar__brand-title {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.9rem;
+}
+
+.app-navbar__brand-subtitle {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  letter-spacing: 0.08em;
+}
+
+.app-navbar__toggler {
+  color: #e5e7eb;
+}
+
+.app-navbar__toggler .navbar-toggler-icon {
+  filter: invert(1) brightness(1.4);
+}
+
+.app-navbar__content {
+  margin-top: 0.4rem;
+}
+
+.app-navbar__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 2fr) auto;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* Nav links */
+
+.app-navbar__nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.app-navbar__nav-item {
+  position: relative;
+}
+
+.app-navbar__nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  color: #e5e7eb;
+  font-weight: 500;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.18s ease-out;
+}
+
+.app-navbar__nav-link i {
+  font-size: 0.95rem;
+}
+
+.app-navbar__nav-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid transparent;
+  transition: all 0.18s ease-out;
+}
+
+.app-navbar__nav-link:hover {
+  color: #f9fafb;
+  background: rgba(148, 163, 184, 0.14);
+  transform: translateY(-1px);
+}
+
+.app-navbar__nav-link--active {
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+  color: #0b1120;
+  box-shadow: 0 12px 32px rgba(56, 189, 248, 0.6);
+}
+
+.app-navbar__nav-link--active::after {
+  border-color: rgba(15, 23, 42, 0.55);
+}
+
+/* Dropdown */
+
+.app-navbar__dropdown {
+  border: none;
+  border-radius: 0.8rem;
+  background-color: #020617;
+  padding: 0.35rem 0;
+  min-width: 13rem;
+  box-shadow: 0 28px 60px rgba(15, 23, 42, 0.95);
+}
+
+.app-navbar__dropdown .dropdown-item {
+  padding: 0.55rem 1rem;
+  font-size: 0.88rem;
+  color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  transition: all 0.16s ease-out;
+}
+
+.app-navbar__dropdown .dropdown-item i {
+  font-size: 0.9rem;
+}
+
+.app-navbar__dropdown .dropdown-item:hover {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.18), rgba(99, 102, 241, 0.32));
+  color: #f9fafb;
+}
+
+.app-navbar__dropdown .dropdown-divider {
+  border-top-color: rgba(31, 41, 55, 0.9);
+}
+
+/* Search */
+
+.app-navbar__search {
+  display: flex;
+  align-items: center;
+}
+
+.app-navbar__search-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.15rem;
+  border-radius: 999px;
+  background-color: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.7);
+}
+
+.app-navbar__search-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 999px;
+  color: #9ca3af;
+}
+
+.app-navbar__search-input {
+  flex: 1 1 auto;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  color: #e5e7eb;
+  font-size: 0.9rem;
+}
+
+.app-navbar__search-input::placeholder {
+  color: #9ca3af;
+}
+
+.app-navbar__search-input:focus-visible {
+  outline: none;
+}
+
+.app-navbar__search-button {
+  flex: 0 0 auto;
+  border: none;
+  border-radius: 999px;
+  padding: 0.35rem 1.2rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #f9fafb;
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+  box-shadow: 0 16px 38px rgba(37, 99, 235, 0.7);
+  cursor: pointer;
+  transition: all 0.18s ease-out;
+}
+
+.app-navbar__search-button:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 18px 46px rgba(56, 189, 248, 0.9);
+}
+
+/* Actions (auth, user, icons) */
+
+.app-navbar__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.app-navbar__auth {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.app-navbar__user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.app-navbar__user-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  color: #e5e7eb;
+  text-decoration: none;
+  transition: background-color 0.18s ease-out;
+}
+
+.app-navbar__user-link:hover {
+  background-color: rgba(15, 23, 42, 0.9);
+}
+
+.app-navbar__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.95rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.18s ease-out;
+}
+
+.app-navbar__btn i {
+  font-size: 0.9rem;
+}
+
+.app-navbar__btn--primary {
+  color: #0b1120;
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+  border-color: transparent;
+  box-shadow: 0 16px 38px rgba(37, 99, 235, 0.7);
+}
+
+.app-navbar__btn--primary:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 18px 46px rgba(56, 189, 248, 0.9);
+}
+
+.app-navbar__btn--ghost {
+  color: #e5e7eb;
+  background-color: transparent;
+  border-color: rgba(148, 163, 184, 0.75);
+}
+
+.app-navbar__btn--ghost:hover {
+  background-color: rgba(148, 163, 184, 0.16);
+  border-color: rgba(148, 163, 184, 1);
+}
+
+.app-navbar__btn--outline {
+  color: #f9fafb;
+  background-color: transparent;
+  border-color: rgba(249, 250, 251, 0.8);
+}
+
+.app-navbar__btn--outline:hover {
+  background-color: rgba(249, 250, 251, 0.08);
+  border-color: #f9fafb;
+}
+
+.app-navbar__btn--admin {
+  color: #fef3c7;
+  background: linear-gradient(135deg, #7c3aed, #c026d3);
+  border-color: transparent;
+  box-shadow: 0 12px 28px rgba(124, 58, 237, 0.5);
+}
+
+.app-navbar__btn--admin:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 16px 38px rgba(192, 38, 211, 0.7);
+  transform: translateY(-1px);
+}
+
+/* Icon buttons (favorites + cart) */
+
+.app-navbar__icon-group {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.app-navbar__icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 999px;
+  color: #e5e7eb;
+  background-color: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  text-decoration: none;
+  transition: all 0.18s ease-out;
+}
+
+.app-navbar__icon i {
+  font-size: 1rem;
+}
+
+.app-navbar__icon:hover {
+  color: #f9fafb;
+  border-color: rgba(56, 189, 248, 0.9);
+  box-shadow: 0 14px 32px rgba(37, 99, 235, 0.75);
+}
+
+.app-navbar__badge {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  transform: translate(-40%, -30%);
+  border-radius: 999px;
+  font-size: 0.65rem;
+  padding: 0.12rem 0.45rem;
+  color: #f9fafb;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.9);
+}
+
+/* Responsive */
+
+@media (max-width: 991.98px) {
+  .app-navbar__content {
+    margin-top: 0.75rem;
+  }
+
+  .app-navbar__layout {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.85rem;
+  }
+
+  .app-navbar__actions {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .app-navbar__brand-subtitle {
+    display: none;
+  }
+
+  .app-navbar__search {
+    order: 3;
+  }
+
+  .app-navbar__nav {
+    order: 2;
+  }
+
+  .app-navbar__search-form {
+    width: 100%;
+  }
+
+  .app-navbar__icon-group {
+    gap: 0.35rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .app-navbar {
+    --bs-navbar-padding-y: 0.75rem;
+  }
+
+  .app-navbar__brand-title {
+    font-size: 0.82rem;
+  }
+
+  .app-navbar__brand-mark {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+
+  .app-navbar__search-button {
+    display: none !important;
+  }
+
+  .app-navbar__btn span {
+    display: none;
+  }
+
+  .app-navbar__btn {
+    padding-inline: 0.55rem;
+  }
+}

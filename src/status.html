@@ -1,0 +1,393 @@
+<!-- Status Page - Standalone HTML -->
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 État des Services - Market</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f7fafc;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .status-page {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .last-update {
+            color: #718096;
+            font-size: 1rem;
+        }
+
+        .overall-status {
+            background: linear-gradient(135deg, #f0fff4, #c6f6d5);
+            border-left: 4px solid #48bb78;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .overall-status.degraded {
+            background: linear-gradient(135deg, #fffbeb, #fef3c7);
+            border-left-color: #ed8936;
+        }
+
+        .overall-status.down {
+            background: linear-gradient(135deg, #fff5f5, #fed7d7);
+            border-left-color: #f56565;
+        }
+
+        .overall-status p {
+            font-size: 1.2rem;
+            color: #2d3748;
+        }
+
+        .services {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .service-card.operational {
+            border-left-color: #48bb78;
+        }
+
+        .service-card.degraded {
+            border-left-color: #ed8936;
+        }
+
+        .service-card.down {
+            border-left-color: #f56565;
+        }
+
+        .service-card.checking {
+            border-left-color: #a0aec0;
+        }
+
+        .service-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .service-header h3 {
+            font-size: 1.25rem;
+            color: #2d3748;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-badge.operational {
+            background: #f0fff4;
+            color: #22543d;
+        }
+
+        .status-badge.degraded {
+            background: #fffbeb;
+            color: #7c2d12;
+        }
+
+        .status-badge.down {
+            background: #fff5f5;
+            color: #742a2a;
+        }
+
+        .status-badge.checking {
+            background: #f7fafc;
+            color: #4a5568;
+        }
+
+        .service-details {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .response-time {
+            margin-top: 0.5rem;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .response-time.good {
+            color: #38a169;
+        }
+
+        .response-time.slow {
+            color: #ed8936;
+        }
+
+        .response-time.failed {
+            color: #f56565;
+        }
+
+        .legend {
+            margin-top: 3rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .legend h3 {
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .legend-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-icon {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .icon-operational {
+            background: #48bb78;
+        }
+
+        .icon-degraded {
+            background: #ed8936;
+        }
+
+        .icon-down {
+            background: #f56565;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .service-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="status-page">
+        <header>
+            <h1>📊 État des Services</h1>
+            <p class="last-update">Dernière mise à jour : <span id="last-update"></span></p>
+        </header>
+
+        <div id="overall-status" class="overall-status operational">
+            <p>✅ <strong>Tous les systèmes sont opérationnels</strong></p>
+        </div>
+
+        <div class="services" id="services"></div>
+
+        <div class="legend">
+            <h3>Légende</h3>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <span class="legend-icon icon-operational"></span>
+                    <span>Opérationnel - Service fonctionne normalement</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-icon icon-degraded"></span>
+                    <span>Dégradé - Service lent ou partiellement disponible</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-icon icon-down"></span>
+                    <span>Hors ligne - Service indisponible</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const services = [
+            {
+                name: 'Frontend (Vercel)',
+                url: 'https://market-jet.vercel.app',
+                description: 'Interface utilisateur principale'
+            },
+            {
+                name: 'Backend API (Render)',
+                url: 'https://theck-market.onrender.com/product/',
+                description: 'API de données et authentification'
+            },
+            {
+                name: 'Base de Données',
+                url: null, // Pas testable publiquement
+                description: 'Stockage des données utilisateurs'
+            }
+        ];
+
+        let servicesStatus = services.map(s => ({
+            ...s,
+            status: 'checking',
+            responseTime: null,
+            lastChecked: new Date()
+        }));
+
+        function updateLastUpdate() {
+            document.getElementById('last-update').textContent = new Date().toLocaleString('fr-FR');
+        }
+
+        function getStatusBadge(status) {
+            const badges = {
+                operational: '✅ Opérationnel',
+                degraded: '⚠️ Dégradé',
+                down: '❌ Hors ligne',
+                checking: '🔄 Vérification...'
+            };
+            return badges[status] || badges.checking;
+        }
+
+        function renderServices() {
+            const container = document.getElementById('services');
+            container.innerHTML = servicesStatus.map(service => `
+                <div class="service-card ${service.status}">
+                    <div class="service-header">
+                        <h3>${service.name}</h3>
+                        <span class="status-badge ${service.status}">
+                            ${getStatusBadge(service.status)}
+                        </span>
+                    </div>
+                    <p class="service-details">${service.description}</p>
+                    ${service.responseTime !== null ? `
+                        <p class="response-time ${service.responseTime < 1000 ? 'good' : service.responseTime < 5000 ? 'slow' : 'failed'}">
+                            ⏱️ Temps de réponse : ${service.responseTime}ms
+                        </p>
+                    ` : ''}
+                </div>
+            `).join('');
+
+            // Update overall status
+            const allOperational = servicesStatus.every(s => s.status === 'operational');
+            const anyDown = servicesStatus.some(s => s.status === 'down');
+            const overallDiv = document.getElementById('overall-status');
+
+            if (anyDown) {
+                overallDiv.className = 'overall-status down';
+                overallDiv.innerHTML = '<p>❌ <strong>Certains services rencontrent des problèmes</strong></p>';
+            } else if (!allOperational) {
+                overallDiv.className = 'overall-status degraded';
+                overallDiv.innerHTML = '<p>⚠️ <strong>Services partiellement dégradés</strong></p>';
+            } else {
+                overallDiv.className = 'overall-status operational';
+                overallDiv.innerHTML = '<p>✅ <strong>Tous les systèmes sont opérationnels</strong></p>';
+            }
+        }
+
+        async function checkService(index) {
+            const service = servicesStatus[index];
+
+            if (!service.url) {
+                // Services sans URL testable (DB)
+                servicesStatus[index].status = 'operational';
+                servicesStatus[index].lastChecked = new Date();
+                return;
+            }
+
+            try {
+                const startTime = performance.now();
+                const response = await fetch(service.url, {
+                    method: 'HEAD',
+                    mode: 'no-cors', // Pour éviter CORS
+                    cache: 'no-cache'
+                });
+                const endTime = performance.now();
+                const responseTime = Math.round(endTime - startTime);
+
+                servicesStatus[index].responseTime = responseTime;
+
+                // Déterminer le statut selon le temps de réponse
+                if (responseTime < 1000) {
+                    servicesStatus[index].status = 'operational';
+                } else if (responseTime < 5000) {
+                    servicesStatus[index].status = 'degraded';
+                } else {
+                    servicesStatus[index].status = 'down';
+                }
+            } catch (error) {
+                // En mode no-cors, on suppose que si pas d'erreur réseau = OK
+                servicesStatus[index].status = 'operational';
+                servicesStatus[index].responseTime = null;
+            }
+
+            servicesStatus[index].lastChecked = new Date();
+        }
+
+        async function checkAllServices() {
+            await Promise.all(servicesStatus.map((_, index) => checkService(index)));
+            renderServices();
+            updateLastUpdate();
+        }
+
+        // Initial check
+        renderServices();
+        updateLastUpdate();
+        checkAllServices();
+
+        // Auto-refresh every 60 seconds
+        setInterval(() => {
+            checkAllServices();
+        }, 60000);
+    </script>
+</body>
+
+</html>

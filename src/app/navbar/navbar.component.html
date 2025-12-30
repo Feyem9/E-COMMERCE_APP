@@ -1,0 +1,156 @@
+<nav class="app-navbar navbar navbar-expand-lg navbar-dark main-navbar">
+  <div class="container app-navbar__inner">
+    <!-- Brand + Toggler -->
+    <div class="app-navbar__brand-row">
+      <a class="app-navbar__brand" routerLink="/">
+        <span class="app-navbar__brand-mark">TM</span>
+        <span class="app-navbar__brand-text">
+          <span class="app-navbar__brand-title">TECH-MARKET</span>
+          <span class="app-navbar__brand-subtitle d-none d-md-inline">Premium Tech & Accessories</span>
+        </span>
+      </a>
+
+      <button class="navbar-toggler app-navbar__toggler border-0" type="button" data-bs-toggle="collapse"
+        data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="collapse navbar-collapse app-navbar__content" id="mainNavbar">
+      <div class="app-navbar__layout">
+        <!-- Left: Navigation -->
+        <div class="app-navbar__nav">
+          <ul class="app-navbar__nav-list">
+            <li class="app-navbar__nav-item">
+              <a class="app-navbar__nav-link" routerLink="/" routerLinkActive="app-navbar__nav-link--active"
+                [routerLinkActiveOptions]="{ exact: true }">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+              </a>
+            </li>
+
+            <li class="app-navbar__nav-item">
+              <a class="app-navbar__nav-link" routerLink="/product" routerLinkActive="app-navbar__nav-link--active">
+                <i class="fas fa-store"></i>
+                <span>Shop</span>
+              </a>
+            </li>
+
+            <li class="app-navbar__nav-item dropdown">
+              <a class="app-navbar__nav-link dropdown-toggle" routerLink="/categories"
+                routerLinkActive="app-navbar__nav-link--active" id="categoriesDropdown" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-th-large"></i>
+                <span>Categories</span>
+              </a>
+
+              <ul class="dropdown-menu app-navbar__dropdown" aria-labelledby="categoriesDropdown">
+                <li>
+                  <a class="dropdown-item" routerLink="/categories/smartphones">
+                    <i class="fas fa-mobile me-2"></i>
+                    <span>Smartphones</span>
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" routerLink="/categories/tablets">
+                    <i class="fas fa-tablet me-2"></i>
+                    <span>Tablets</span>
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" routerLink="/categories/accessories">
+                    <i class="fas fa-headphones me-2"></i>
+                    <span>Accessories</span>
+                  </a>
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+                <li>
+                  <a class="dropdown-item" routerLink="/categories">
+                    <i class="fas fa-star me-2"></i>
+                    <span>All Categories</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Center: Search bar -->
+        <div class="app-navbar__search">
+          <form class="app-navbar__search-form" (ngSubmit)="onSearch()">
+            <div class="app-navbar__search-icon">
+              <i class="fas fa-search"></i>
+            </div>
+            <input type="search" class="app-navbar__search-input"
+              placeholder="Search for phones, tablets, accessories..." [(ngModel)]="searchQuery" name="search"
+              aria-label="Search products" />
+            <button class="app-navbar__search-button d-none d-sm-inline-flex" type="submit">
+              Search
+            </button>
+          </form>
+        </div>
+
+        <!-- Right: User / Favorites / Cart -->
+        <div class="app-navbar__actions">
+          <!-- Auth -->
+          <ng-container *ngIf="!isLoggedIn; else loggedInBlock">
+            <div class="app-navbar__auth">
+              <a class="app-navbar__btn app-navbar__btn--ghost" routerLink="/login">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Login</span>
+              </a>
+              <a class="app-navbar__btn app-navbar__btn--primary" routerLink="/register">
+                <i class="fas fa-user-plus"></i>
+                <span>Sign up</span>
+              </a>
+            </div>
+          </ng-container>
+
+          <ng-template #loggedInBlock>
+            <div class="app-navbar__user">
+              <!-- Admin Dashboard Link -->
+              <a *ngIf="isAdmin" class="app-navbar__btn app-navbar__btn--admin" routerLink="/admin"
+                title="Admin Dashboard">
+                <i class="fas fa-cog"></i>
+                <span class="d-none d-md-inline">Admin</span>
+              </a>
+              <a class="app-navbar__user-link" routerLink="/profile">
+                <i class="fas fa-user-circle"></i>
+                <span class="d-none d-md-inline">{{ userName || 'Account' }}</span>
+              </a>
+              <button class="app-navbar__btn app-navbar__btn--outline" type="button" (click)="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="d-none d-md-inline">Logout</span>
+              </button>
+            </div>
+          </ng-template>
+
+          <!-- Icons -->
+          <div class="app-navbar__icon-group">
+            <!-- Notifications (only when logged in) -->
+            <app-notification-dropdown *ngIf="isLoggedIn" class="app-navbar__icon"></app-notification-dropdown>
+
+            <a class="app-navbar__icon" routerLink="/favorites" *ngIf="isLoggedIn">
+              <i class="fas fa-heart"></i>
+              <span class="visually-hidden">Favorites</span>
+              <span *ngIf="favoriteCount > 0" class="app-navbar__badge bg-danger">
+                {{ favoriteCount }}
+              </span>
+            </a>
+
+            <a class="app-navbar__icon" routerLink="/cart">
+              <i class="fas fa-shopping-cart"></i>
+              <span class="visually-hidden">Cart</span>
+              <span *ngIf="cartCount > 0" class="app-navbar__badge bg-primary">
+                {{ cartCount }}
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

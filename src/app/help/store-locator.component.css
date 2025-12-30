@@ -1,0 +1,21 @@
+.store-item .card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.store-item .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+}
+
+.input-group {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.btn-group-vertical .btn {
+  border-radius: 4px !important;
+}
+
+.badge {
+  padding: 8px 12px;
+}

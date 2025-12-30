@@ -1,0 +1,308 @@
+<div class="admin-dashboard">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="header-title">
+                <h1>🎛️ Tableau de Bord Admin</h1>
+                <p class="subtitle">Bienvenue dans votre espace d'administration</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-refresh" (click)="refreshData()" [disabled]="loading">
+                    <span class="icon">🔄</span>
+                    <span>Actualiser</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-container" *ngIf="loading">
+        <div class="loader">
+            <div class="spinner"></div>
+            <p>Chargement des données...</p>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-container" *ngIf="error && !loading">
+        <div class="error-card">
+            <span class="error-icon">⚠️</span>
+            <h3>Erreur</h3>
+            <p>{{ error }}</p>
+            <button class="btn-primary" (click)="refreshData()">Réessayer</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dashboard-content" *ngIf="stats && !loading">
+
+        <!-- Notifications Section -->
+        <div class="notifications-section" *ngIf="notifications.length > 0">
+            <h3>🔔 Notifications</h3>
+            <div class="notifications-list">
+                <a *ngFor="let notif of notifications" [routerLink]="notif.action" class="notification-item"
+                    [ngClass]="getNotificationClass(notif.type)">
+                    <span class="notif-icon">{{ notif.icon }}</span>
+                    <div class="notif-content">
+                        <span class="notif-title">{{ notif.title }}</span>
+                        <span class="notif-message">{{ notif.message }}</span>
+                    </div>
+                    <span class="notif-arrow">→</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Cards Grid -->
+        <div class="stats-grid">
+            <!-- Users Card -->
+            <div class="stat-card users-card">
+                <div class="stat-icon">
+                    <span>👥</span>
+                </div>
+                <div class="stat-info">
+                    <h3>Utilisateurs</h3>
+                    <div class="stat-value">{{ stats.users.total }}</div>
+                    <div class="stat-badge positive" *ngIf="stats.users.new_today > 0">
+                        +{{ stats.users.new_today }} aujourd'hui
+                    </div>
+                </div>
+                <div class="stat-trend up">
+                    <span>↗️</span>
+                </div>
+            </div>
+
+            <!-- Products Card -->
+            <div class="stat-card products-card">
+                <div class="stat-icon">
+                    <span>📦</span>
+                </div>
+                <div class="stat-info">
+                    <h3>Produits</h3>
+                    <div class="stat-value">{{ stats.products.total }}</div>
+                    <div class="stat-badge warning" *ngIf="stats.products.low_stock > 0">
+                        {{ stats.products.low_stock }} en stock faible
+                    </div>
+                </div>
+                <div class="stat-trend">
+                    <span>📊</span>
+                </div>
+            </div>
+
+            <!-- Orders Card -->
+            <div class="stat-card orders-card">
+                <div class="stat-icon">
+                    <span>🛒</span>
+                </div>
+                <div class="stat-info">
+                    <h3>Commandes</h3>
+                    <div class="stat-value">{{ stats.orders.total }}</div>
+                    <div class="stat-badge info" *ngIf="stats.orders.pending > 0">
+                        {{ stats.orders.pending }} en attente
+                    </div>
+                </div>
+                <div class="stat-trend">
+                    <span>📋</span>
+                </div>
+            </div>
+
+            <!-- Revenue Card -->
+            <div class="stat-card revenue-card">
+                <div class="stat-icon">
+                    <span>💰</span>
+                </div>
+                <div class="stat-info">
+                    <h3>Revenus Total</h3>
+                    <div class="stat-value">{{ formatCurrency(stats.revenue.total) }}</div>
+                    <div class="stat-badge positive">
+                        {{ formatCurrency(stats.revenue.today) }} aujourd'hui
+                    </div>
+                </div>
+                <div class="stat-trend up">
+                    <span>📈</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secondary Stats -->
+        <div class="secondary-stats">
+            <div class="stat-mini">
+                <span class="mini-icon">✅</span>
+                <div class="mini-info">
+                    <span class="mini-value">{{ stats.transactions.completed }}</span>
+                    <span class="mini-label">Transactions réussies</span>
+                </div>
+            </div>
+            <div class="stat-mini">
+                <span class="mini-icon">📅</span>
+                <div class="mini-info">
+                    <span class="mini-value">{{ formatCurrency(stats.revenue.monthly) }}</span>
+                    <span class="mini-label">Revenus du mois</span>
+                </div>
+            </div>
+            <div class="stat-mini">
+                <span class="mini-icon">🔄</span>
+                <div class="mini-info">
+                    <span class="mini-value">{{ stats.transactions.total }}</span>
+                    <span class="mini-label">Total transactions</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="export-section">
+            <h3>📥 Exporter les données</h3>
+            <div class="export-buttons">
+                <button class="export-btn" (click)="exportUsers()" [disabled]="exportingUsers">
+                    <span class="export-icon">👥</span>
+                    <span>{{ exportingUsers ? 'Export...' : 'Utilisateurs CSV' }}</span>
+                </button>
+                <button class="export-btn" (click)="exportOrders()" [disabled]="exportingOrders">
+                    <span class="export-icon">🛒</span>
+                    <span>{{ exportingOrders ? 'Export...' : 'Commandes CSV' }}</span>
+                </button>
+                <button class="export-btn" (click)="exportTransactions()" [disabled]="exportingTransactions">
+                    <span class="export-icon">💳</span>
+                    <span>{{ exportingTransactions ? 'Export...' : 'Transactions CSV' }}</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Advanced Charts Section -->
+        <div class="charts-section" *ngIf="chartsData">
+            <h3>📊 Graphiques Avancés</h3>
+            <div class="charts-grid">
+                <!-- Orders by Status -->
+                <div class="chart-card" *ngIf="chartsData.orders_by_status.length > 0">
+                    <h4>Commandes par statut</h4>
+                    <div class="pie-chart-list">
+                        <div *ngFor="let item of chartsData.orders_by_status" class="chart-item">
+                            <div class="chart-bar-horizontal"
+                                [style.width.%]="getPercentage(item.count, chartsData.orders_by_status)">
+                            </div>
+                            <span class="chart-label">{{ item.status }}</span>
+                            <span class="chart-value">{{ item.count }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Products -->
+                <div class="chart-card" *ngIf="chartsData.top_products.length > 0">
+                    <h4>🏆 Top 5 Produits Vendus</h4>
+                    <div class="top-products-list">
+                        <div *ngFor="let product of chartsData.top_products; let i = index" class="top-product-item">
+                            <span class="rank">{{ i + 1 }}</span>
+                            <span class="product-name">{{ product.name }}</span>
+                            <span class="sold-count">{{ product.total_sold }} vendus</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users by Role -->
+                <div class="chart-card" *ngIf="chartsData.users_by_role.length > 0">
+                    <h4>Utilisateurs par rôle</h4>
+                    <div class="role-stats">
+                        <div *ngFor="let role of chartsData.users_by_role" class="role-item">
+                            <span class="role-icon">{{ role.role === 'admin' ? '👑' : '👤' }}</span>
+                            <span class="role-name">{{ role.role }}</span>
+                            <span class="role-count">{{ role.count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts and Activity Section -->
+        <div class="dashboard-grid">
+            <!-- Revenue Chart Section -->
+            <div class="chart-section" *ngIf="revenueStats">
+                <div class="section-header">
+                    <h2>📈 Évolution des Revenus (30 jours)</h2>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-bars">
+                        <div class="chart-bar" *ngFor="let day of revenueStats.daily_revenue"
+                            [style.height.%]="getBarHeight(day.amount)"
+                            [title]="day.date + ': ' + formatCurrency(day.amount)">
+                            <div class="bar-tooltip">
+                                <span class="tooltip-date">{{ day.date }}</span>
+                                <span class="tooltip-amount">{{ formatCurrency(day.amount) }}</span>
+                                <span class="tooltip-count">{{ day.count }} transactions</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-legend">
+                        <span>Derniers 30 jours</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity Section -->
+            <div class="activity-section" *ngIf="recentActivity">
+                <div class="section-header">
+                    <h2>🕐 Activité Récente</h2>
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="activity-group">
+                    <h4>Dernières Transactions</h4>
+                    <div class="activity-list">
+                        <div class="activity-item" *ngFor="let tx of recentActivity.recent_transactions?.slice(0, 5)">
+                            <div class="activity-icon tx-icon">💳</div>
+                            <div class="activity-content">
+                                <span class="activity-title">{{ tx.transaction_id }}</span>
+                                <span class="activity-meta">{{ formatCurrency(tx.total_amount) }}</span>
+                            </div>
+                            <span class="status-badge" [ngClass]="getStatusClass(tx.status)">
+                                {{ tx.status }}
+                            </span>
+                        </div>
+                        <div class="empty-state" *ngIf="!recentActivity.recent_transactions?.length">
+                            <span>Aucune transaction récente</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Users -->
+                <div class="activity-group">
+                    <h4>Nouveaux Utilisateurs</h4>
+                    <div class="activity-list">
+                        <div class="activity-item" *ngFor="let user of recentActivity.recent_users">
+                            <div class="activity-icon user-icon">👤</div>
+                            <div class="activity-content">
+                                <span class="activity-title">{{ user.name }}</span>
+                                <span class="activity-meta">{{ user.email }}</span>
+                            </div>
+                            <span class="activity-time">{{ formatDate(user.created_at) }}</span>
+                        </div>
+                        <div class="empty-state" *ngIf="!recentActivity.recent_users?.length">
+                            <span>Aucun nouvel utilisateur</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h3>⚡ Actions Rapides</h3>
+            <div class="actions-grid">
+                <a routerLink="/admin/users" class="action-card">
+                    <span class="action-icon">👥</span>
+                    <span class="action-label">Gérer Utilisateurs</span>
+                </a>
+                <a routerLink="/admin/products" class="action-card">
+                    <span class="action-icon">📦</span>
+                    <span class="action-label">Gérer Produits</span>
+                </a>
+                <a routerLink="/admin/orders" class="action-card">
+                    <span class="action-icon">🛒</span>
+                    <span class="action-label">Gérer Commandes</span>
+                </a>
+                <a routerLink="/admin/transactions" class="action-card">
+                    <span class="action-icon">💳</span>
+                    <span class="action-label">Voir Transactions</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

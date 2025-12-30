@@ -1,0 +1,24 @@
+<div class="payment">
+  <button (click)="startPayment()" [disabled]="loading">
+    {{ loading ? 'Traitement...' : 'Payer maintenant' }}
+  </button>
+
+  <div *ngIf="paymentUrl" class="payment-success">
+    <h3>Paiement initié avec succès !</h3>
+    <p>Veuillez scanner ce QR code pour valider votre facture :</p>
+
+    <!-- Affichage du QR Code -->
+    <div *ngIf="qrCodeValue" class="qr-code-container">
+      <qrcode [qrdata]="qrCodeValue" [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
+      <p class="qr-instructions">Scannez ce code avec votre application de paiement pour valider la transaction.</p>
+    </div>
+
+    <p>Ou cliquez sur le lien ci-dessous pour compléter le paiement :</p>
+    <a [href]="paymentUrl" target="_blank" class="payment-link">{{ paymentUrl }}</a>
+
+    <div *ngIf="transactionId" class="transaction-info">
+      <p>ID de transaction : <strong>{{ transactionId }}</strong></p>
+      <p>Statut : <span [class.pending]="true">En attente de validation</span></p>
+    </div>
+  </div>
+</div>

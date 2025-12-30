@@ -1,0 +1,119 @@
+<div class="admin-orders">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <a routerLink="/admin" class="back-link">← Retour</a>
+                <h1>🛒 Gestion des Commandes</h1>
+                <p class="subtitle">{{ totalOrders }} commandes au total</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+        <div class="filter-group">
+            <label>Filtrer par statut:</label>
+            <select (change)="onStatusFilterChange($event)">
+                <option value="">Tous les statuts</option>
+                <option *ngFor="let status of statuses" [value]="status">
+                    {{ getStatusIcon(status) }} {{ status | titlecase }}
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-container" *ngIf="loading">
+        <div class="spinner"></div>
+        <p>Chargement...</p>
+    </div>
+
+    <!-- Error -->
+    <div class="error-container" *ngIf="error && !loading">
+        <span>⚠️</span>
+        <p>{{ error }}</p>
+        <button class="btn-primary" (click)="loadOrders()">Réessayer</button>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="table-container" *ngIf="!loading && !error">
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Quantité</th>
+                    <th>Prix</th>
+                    <th>Statut</th>
+                    <th>Panier ID</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let order of orders">
+                    <td class="id-cell">#{{ order.id }}</td>
+                    <td>{{ order.quantity }} article(s)</td>
+                    <td class="price-cell">{{ formatCurrency(order.price) }}</td>
+                    <td>
+                        <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+                            {{ getStatusIcon(order.status) }} {{ order.status | titlecase }}
+                        </span>
+                    </td>
+                    <td>#{{ order.cart_id }}</td>
+                    <td>{{ formatDate(order.created_at) }}</td>
+                    <td class="actions-cell">
+                        <button class="btn-status" (click)="openStatusModal(order)">
+                            ✏️ Modifier statut
+                        </button>
+                    </td>
+                </tr>
+                <tr *ngIf="orders.length === 0">
+                    <td colspan="7" class="empty-state">
+                        <span>📭</span>
+                        <p>Aucune commande trouvée</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages > 1">
+        <button class="page-btn" (click)="goToPage(1)" [disabled]="currentPage === 1">««</button>
+        <button class="page-btn" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">‹</button>
+        <button *ngFor="let page of pageNumbers" class="page-btn" [class.active]="page === currentPage"
+            (click)="goToPage(page)">
+            {{ page }}
+        </button>
+        <button class="page-btn" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">›</button>
+        <button class="page-btn" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">»»</button>
+        <span class="page-info">Page {{ currentPage }} sur {{ totalPages }}</span>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <button class="modal-close" (click)="closeModal()">✕</button>
+
+            <h2>📋 Modifier le statut</h2>
+
+            <div class="order-info" *ngIf="selectedOrder">
+                <p><strong>Commande #{{ selectedOrder.id }}</strong></p>
+                <p>Statut actuel:
+                    <span class="status-badge" [ngClass]="getStatusClass(selectedOrder.status)">
+                        {{ getStatusIcon(selectedOrder.status) }} {{ selectedOrder.status | titlecase }}
+                    </span>
+                </p>
+            </div>
+
+            <div class="status-options">
+                <button *ngFor="let status of statuses" class="status-btn"
+                    [class.active]="selectedOrder?.status === status" [ngClass]="getStatusClass(status)"
+                    (click)="updateStatus(status)">
+                    {{ getStatusIcon(status) }} {{ status | titlecase }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

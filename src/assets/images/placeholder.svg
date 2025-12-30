@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e0e0e0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#cccccc;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="300" fill="url(#grad1)"/>
+  
+  <!-- Image Icon -->
+  <circle cx="100" cy="80" r="20" fill="#999"/>
+  <path d="M 50 150 L 150 70 L 250 150 L 350 50 L 350 250 L 50 250 Z" fill="#999" opacity="0.3"/>
+  
+  <!-- Text -->
+  <text x="200" y="180" font-size="24" font-weight="bold" fill="#666" text-anchor="middle" font-family="Arial, sans-serif">
+    No Image
+  </text>
+  <text x="200" y="220" font-size="14" fill="#999" text-anchor="middle" font-family="Arial, sans-serif">
+    Image not available
+  </text>
+</svg>

@@ -1,0 +1,220 @@
+<!-- Maintenance Page - Standalone HTML -->
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Maintenance en Cours - Market</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .maintenance-container {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .maintenance-icon {
+            font-size: 5rem;
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .info-box {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .info-box p {
+            margin: 0.5rem 0;
+            font-size: 1.1rem;
+            color: #4a5568;
+        }
+
+        .info-box strong {
+            color: #2d3748;
+        }
+
+        .thank-you {
+            font-size: 1.2rem;
+            margin: 2rem 0;
+            color: #4a5568;
+        }
+
+        .contact {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .contact p {
+            color: #718096;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: color 0.3s;
+        }
+
+        .contact a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            margin: 2rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 60%;
+            animation: progress 2s ease-in-out infinite;
+        }
+
+        @keyframes progress {
+
+            0%,
+            100% {
+                width: 30%;
+            }
+
+            50% {
+                width: 70%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .maintenance-container {
+                padding: 2rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .maintenance-icon {
+                font-size: 4rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="maintenance-container">
+        <i class="fas fa-tools maintenance-icon"></i>
+        <h1>🔧 Maintenance en Cours</h1>
+        <p class="subtitle">Nous améliorons notre service pour vous</p>
+
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+
+        <div class="info-box">
+            <p><strong>Durée estimée :</strong> 30 minutes</p>
+            <p><strong>Retour prévu :</strong> <span id="estimated-return">Calcul...</span></p>
+            <p><strong>Début :</strong> <span id="start-time">Calcul...</span></p>
+        </div>
+
+        <p class="thank-you">Merci de votre patience ! 🙏</p>
+
+        <div class="contact">
+            <p>Questions ? Contactez-nous :</p>
+            <a href="mailto:support@market-jet.com">support@market-jet.com</a>
+        </div>
+    </div>
+
+    <script>
+        // Calculer les temps
+        const now = new Date();
+        const returnTime = new Date(now.getTime() + 30 * 60000); // +30 minutes
+
+        document.getElementById('start-time').textContent = now.toLocaleTimeString('fr-FR', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        document.getElementById('estimated-return').textContent = returnTime.toLocaleTimeString('fr-FR', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        // Auto-refresh toutes les 5 minutes
+        setTimeout(() => {
+            location.reload();
+        }, 5 * 60 * 1000);
+    </script>
+</body>
+
+</html>

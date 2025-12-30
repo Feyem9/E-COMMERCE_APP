@@ -1,0 +1,52 @@
+<app-navbar></app-navbar>
+
+<div class="container">
+    <h1 class="text-center my-5">Your Cart</h1>
+  
+    <div *ngIf="cartItems.length === 0" class="text-center">
+      <p>Your cart is empty</p>
+    </div>
+  
+    <div *ngIf="cartItems.length > 0">
+      <div *ngFor="let item of cartItems; let i = index" class="cart-item row mb-4">
+        <div class="col-3">
+          <img [src]="item.product_image" alt="{{ item.product_name }}" class="img-fluid">
+        </div> 
+        <div class="col-6">
+          <h4>{{ item.product_name }}</h4>  
+          <p>{{ item.product_description }}</p>
+          <p><strong>Price:</strong> ${{ item.current_price }}</p>
+        </div> 
+        <div class="col-3 d-flex align-items-center">
+
+            <button (click)="decreaseQuantity(item)">-</button>
+    <span>{{ item.quantity }}</span>
+    <button (click)="increaseQuantity(item)">+</button>
+  <div>
+    {{ item.id }} - {{ item.product_name }}
+    <button 
+      (click)="removeItem(item)" 
+      class="btn btn-danger ml-3">
+     Remove</button>
+  </div>
+        </div>
+      </div>
+  
+      <!-- Total Price -->
+      <div class="cart-total  text-right my-4" style="text-align: right;
+      margin: 20px 0;
+      padding: 15px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(36, 35, 35, 0.1);">
+        <h3 style="  color: #0004ffef;
+  margin: 0;">Total: {{ showTotal }} FCFA </h3>
+      </div>
+  
+      <!-- Checkout Button -->
+      <div class="text-center">
+        <button (click)="payer()" class="btn btn-success">Proceed to Checkout</button>
+      </div>
+    </div>
+  </div>   
+  

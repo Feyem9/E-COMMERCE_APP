@@ -1,0 +1,170 @@
+<div class="admin-products">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <a routerLink="/admin" class="back-link">← Retour</a>
+                <h1>📦 Gestion des Produits</h1>
+                <p class="subtitle">{{ totalProducts }} produits au total</p>
+            </div>
+            <button class="btn-add" (click)="openCreateModal()">
+                <span>➕</span> Ajouter un produit
+            </button>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-section">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Rechercher un produit..." [value]="searchTerm" (input)="onSearch($event)" />
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-container" *ngIf="loading">
+        <div class="spinner"></div>
+        <p>Chargement...</p>
+    </div>
+
+    <!-- Error -->
+    <div class="error-container" *ngIf="error && !loading">
+        <span>⚠️</span>
+        <p>{{ error }}</p>
+        <button class="btn-primary" (click)="loadProducts()">Réessayer</button>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="products-grid" *ngIf="!loading && !error">
+        <div class="product-card" *ngFor="let product of products">
+            <div class="product-image">
+                <img [src]="product.picture" [alt]="product.name" loading="lazy" />
+                <span class="discount-badge" *ngIf="getDiscount(product) > 0">
+                    -{{ getDiscount(product) }}%
+                </span>
+                <span class="stock-badge" [class.low]="product.quantity < 10">
+                    {{ product.quantity }} en stock
+                </span>
+            </div>
+            <div class="product-info">
+                <h3 class="product-name">{{ product.name }}</h3>
+                <p class="product-description">{{ product.description }}</p>
+                <div class="product-pricing">
+                    <span class="current-price">{{ formatCurrency(product.discount_price || product.current_price)
+                        }}</span>
+                    <span class="original-price"
+                        *ngIf="product.discount_price && product.discount_price < product.current_price">
+                        {{ formatCurrency(product.current_price) }}
+                    </span>
+                </div>
+            </div>
+            <div class="product-actions">
+                <button class="btn-edit" (click)="openEditModal(product)">
+                    ✏️ Modifier
+                </button>
+                <button class="btn-delete" (click)="openDeleteModal(product)">
+                    🗑️
+                </button>
+            </div>
+        </div>
+
+        <div class="empty-state" *ngIf="products.length === 0">
+            <span>📭</span>
+            <p>Aucun produit trouvé</p>
+            <button class="btn-primary" (click)="openCreateModal()">Créer un produit</button>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages > 1">
+        <button class="page-btn" (click)="goToPage(1)" [disabled]="currentPage === 1">««</button>
+        <button class="page-btn" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">‹</button>
+
+        <button *ngFor="let page of pageNumbers" class="page-btn" [class.active]="page === currentPage"
+            (click)="goToPage(page)">
+            {{ page }}
+        </button>
+
+        <button class="page-btn" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">›</button>
+        <button class="page-btn" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">»»</button>
+
+        <span class="page-info">Page {{ currentPage }} sur {{ totalPages }}</span>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <button class="modal-close" (click)="closeModal()">✕</button>
+
+            <!-- Create/Edit Modal -->
+            <div *ngIf="modalAction === 'create' || modalAction === 'edit'">
+                <h2>{{ modalAction === 'create' ? '➕ Nouveau Produit' : '✏️ Modifier le Produit' }}</h2>
+
+                <form class="product-form" (ngSubmit)="saveProduct()">
+                    <div class="form-group">
+                        <label>Nom du produit *</label>
+                        <input type="text" [(ngModel)]="productForm.name" name="name"
+                            placeholder="Ex: T-shirt Premium" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description *</label>
+                        <textarea [(ngModel)]="productForm.description" name="description" rows="3"
+                            placeholder="Description du produit..."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Prix original (XAF) *</label>
+                            <input type="number" [(ngModel)]="productForm.current_price" name="current_price" min="0" />
+                        </div>
+                        <div class="form-group">
+                            <label>Prix remise (XAF)</label>
+                            <input type="number" [(ngModel)]="productForm.discount_price" name="discount_price"
+                                min="0" />
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Quantité en stock</label>
+                            <input type="number" [(ngModel)]="productForm.quantity" name="quantity" min="0" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>URL de l'image *</label>
+                        <input type="url" [(ngModel)]="productForm.picture" name="picture" placeholder="https://..." />
+                        <div class="image-preview" *ngIf="productForm.picture">
+                            <img [src]="productForm.picture" alt="Aperçu" />
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" (click)="closeModal()">Annuler</button>
+                        <button type="submit" class="btn-save">
+                            {{ modalAction === 'create' ? 'Créer' : 'Enregistrer' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Delete Modal -->
+            <div *ngIf="modalAction === 'delete' && selectedProduct">
+                <h2>🗑️ Supprimer le produit</h2>
+                <div class="delete-warning">
+                    <div class="product-preview">
+                        <img [src]="selectedProduct.picture" [alt]="selectedProduct.name" />
+                        <span>{{ selectedProduct.name }}</span>
+                    </div>
+                    <p>Êtes-vous sûr de vouloir supprimer ce produit ?</p>
+                    <p class="warning-text">Cette action est irréversible.</p>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-cancel" (click)="closeModal()">Annuler</button>
+                    <button class="btn-danger" (click)="deleteProduct()">Supprimer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

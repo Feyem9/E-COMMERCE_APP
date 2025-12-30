@@ -1,0 +1,87 @@
+<div class="container py-5">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="text-center mb-5">
+        <h1 class="display-4 mb-3">
+          <i class="fas fa-question text-primary me-3"></i>
+          Frequently Asked Questions
+        </h1>
+        <p class="lead text-muted">Find answers to common questions</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ Categories -->
+  <div class="row">
+    <div class="col-lg-10 mx-auto">
+      <div class="faq-category mb-5" *ngFor="let category of faqs; let categoryIndex = index">
+        <h3 class="category-title mb-4">
+          <i class="fas fa-folder-open text-primary me-2"></i>
+          {{ category.category }}
+        </h3>
+        
+        <div class="accordion" [id]="'accordion-' + categoryIndex">
+          <div 
+            class="accordion-item" 
+            *ngFor="let faq of category.questions; let questionIndex = index">
+            <h2 class="accordion-header">
+              <button 
+                class="accordion-button"
+                [class.collapsed]="!faq.expanded"
+                type="button"
+                (click)="toggleFaq(categoryIndex, questionIndex)"
+                [attr.aria-expanded]="faq.expanded">
+                {{ faq.question }}
+              </button>
+            </h2>
+            <div 
+              class="accordion-collapse collapse"
+              [class.show]="faq.expanded">
+              <div class="accordion-body">
+                <p class="mb-0">{{ faq.answer }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Support -->
+  <div class="row mt-5">
+    <div class="col-lg-8 mx-auto">
+      <div class="card bg-light border-0">
+        <div class="card-body text-center p-4">
+          <h4 class="card-title mb-3">
+            <i class="fas fa-headset text-primary me-2"></i>
+            Still Need Help?
+          </h4>
+          <p class="card-text text-muted mb-4">
+            Can't find the answer you're looking for? Our support team is here to help!
+          </p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <a href="tel:+18001234567890" class="btn btn-primary w-100">
+                <i class="fas fa-phone me-2"></i>Call Support
+              </a>
+            </div>
+            <div class="col-md-6">
+              <a href="mailto:info&#64;company.com" class="btn btn-outline-primary w-100">
+                <i class="fas fa-envelope me-2"></i>Email Us
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back Button -->
+  <div class="row mt-4">
+    <div class="col-lg-12 text-center">
+      <button class="btn btn-secondary" routerLink="/help">
+        <i class="fas fa-arrow-left me-2"></i>Back to Help
+      </button>
+    </div>
+  </div>
+</div>
