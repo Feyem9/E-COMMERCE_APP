@@ -187,14 +187,24 @@ def register():
         db.session.commit()
         current_app.logger.info(f"✅ Customer created successfully: {email}")
 
-        # Envoyer email de bienvenue avec template professionnel
+        # Envoyer email de bienvenue en arrière-plan (asynchrone)
         try:
             from utils.email_service import send_welcome_email
-            send_welcome_email(email, name)
-            current_app.logger.info(f"Welcome email sent to: {email}")
+            import threading
+            
+            def send_email_async():
+                try:
+                    send_welcome_email(email, name)
+                    print(f"✅ Welcome email sent to: {email}")
+                except Exception as e:
+                    print(f"⚠️ Could not send welcome email to {email}: {str(e)}")
+            
+            # Lancer l'envoi d'email dans un thread séparé (fire-and-forget)
+            email_thread = threading.Thread(target=send_email_async, daemon=True)
+            email_thread.start()
+            current_app.logger.info(f"📧 Welcome email queued for: {email}")
         except Exception as e:
-            current_app.logger.warning(f"Could not send welcome email to {email}: {str(e)}")
-            # Ne pas échouer l'inscription si l'email échoue
+            current_app.logger.warning(f"Could not queue welcome email to {email}: {str(e)}")
 
         return jsonify({
             'message': 'Registration successful',
