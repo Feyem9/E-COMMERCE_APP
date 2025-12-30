@@ -185,12 +185,12 @@ def log_request_info(response):
     logger.log_response(endpoint, status_code, duration, method)
     
     # Mettre à jour les stats globales
-    stats.track_request(endpoint, status_code, duration)
+    stats.increment_request(endpoint, success=(status_code < 400))
     
     # ⚠️ Exemple : Tracker les commandes
     if endpoint == '/order' and method == 'POST' and status_code == 201:
         # On pourrait extraire le montant ici si besoin
-        stats.track_order(0) 
+        stats.add_order(0) 
         
     return response
 

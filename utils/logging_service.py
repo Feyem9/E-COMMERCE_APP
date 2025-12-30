@@ -88,13 +88,15 @@ class AppLogger:
             'user_agent': request.headers.get('User-Agent', '')[:50] if request else None
         })
     
-    def log_response(self, endpoint, status_code, duration_ms):
+    def log_response(self, endpoint, status_code, duration_ms, method=None):
         """Log une réponse API"""
         emoji = "✅" if status_code < 400 else "❌"
-        self.info(f"{emoji} Response {status_code} in {duration_ms:.2f}ms", {
+        method_str = f"{method} " if method else ""
+        self.info(f"{emoji} {method_str}Response {status_code} in {duration_ms:.2f}ms", {
             'endpoint': endpoint,
             'status': status_code,
-            'duration_ms': duration_ms
+            'duration_ms': duration_ms,
+            'method': method
         })
     
     def log_user_action(self, action, user_id, details=None):
