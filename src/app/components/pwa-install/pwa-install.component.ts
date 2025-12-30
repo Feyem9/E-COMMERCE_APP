@@ -275,11 +275,9 @@ export class PwaInstallComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // 🔧 DEBUG: Force show banner after 5 seconds regardless of dismissed state
-    setTimeout(() => {
-      console.log('📱 [DEBUG] Forcing banner display after 5s');
-      this.showInstallBanner = true;
-    }, 5000);
+    // 🔧 DEBUG: Force show banner IMMEDIATELY
+    console.log('📱 [DEBUG] Forcing banner display NOW');
+    this.showInstallBanner = true;
 
     // Listen for install prompt (Chrome/Edge Android)
     window.addEventListener('beforeinstallprompt', (e: any) => {
