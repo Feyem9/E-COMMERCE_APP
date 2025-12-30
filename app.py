@@ -176,7 +176,8 @@ def log_request_info(response):
     if request.path.startswith('/static') or request.path.endswith(('.js', '.css', '.png', '.jpg', '.ico')):
         return response
 
-    duration = (time.time() - request.start_time) * 1000
+    start_time = getattr(request, 'start_time', time.time())
+    duration = (time.time() - start_time) * 1000
     status_code = response.status_code
     endpoint = request.path
     method = request.method
@@ -197,16 +198,37 @@ def log_request_info(response):
 # Initialiser la base de données avec les données
 @app.before_request
 def initialize_db():
-    """Initialiser la base de données une seule fois au démarrage"""
+    """Initialiser la base de données et appliquer les migrations au démarrage"""
     if not hasattr(app, 'db_initialized'):
         try:
             with app.app_context():
                 from models.product_model import Products
+                
+                # 🛠️ Migration automatique pour Android/QR Code
+                from sqlalchemy import text
+                columns = [
+                    ('qr_timestamp', 'DATETIME'), ('qr_signature', 'VARCHAR(255)'),
+                    ('delivery_time', 'DATETIME'), ('reference', 'VARCHAR(100)'),
+                    ('customer_latitude', 'FLOAT'), ('customer_longitude', 'FLOAT'),
+                    ('delivery_distance_km', 'FLOAT'), ('delivery_map_url', 'VARCHAR(500)')
+                ]
+                
+                for col_name, col_type in columns:
+                    try:
+                        db.session.execute(text(f'ALTER TABLE transactions ADD COLUMN {col_name} {col_type}'))
+                        db.session.commit()
+                        print(f"✅ Migration: Colonne {col_name} ajoutée")
+                    except Exception as e:
+                        db.session.rollback()
+                        # On ignore si la colonne existe déjà
+                
+                # Peuplement initial si vide
                 existing_count = Products.query.count()
                 if existing_count == 0:
                     print("🌱 Peuplement initial de la base de données...")
                     from populate_db import populate_products
                     populate_products()
+                
                 app.db_initialized = True
         except Exception as e:
             print(f"⚠️  Erreur lors de l'initialisation de la BD: {e}")
