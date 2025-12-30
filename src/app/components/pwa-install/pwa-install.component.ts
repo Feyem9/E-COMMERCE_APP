@@ -294,6 +294,13 @@ export class PwaInstallComponent implements OnInit, OnDestroy {
         this.showInstallBanner = true;
       }, 3000);
     }
+
+    // Force Service Worker update detection
+    if (this.isBrowser && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(registration => {
+        registration.update();
+      });
+    }
   }
 
   private isInStandaloneMode(): boolean {
