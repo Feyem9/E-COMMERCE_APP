@@ -259,26 +259,27 @@ export class PwaInstallComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    if (!this.isBrowser) return;
+    console.log('📱 PwaInstallComponent ngOnInit started, isBrowser:', this.isBrowser);
+    
+    if (!this.isBrowser) {
+      console.log('📱 Not a browser, skipping PWA init');
+      return;
+    }
 
     // Check if already installed
     this.isInstalled = window.matchMedia('(display-mode: standalone)').matches;
+    console.log('📱 isInstalled:', this.isInstalled);
     
     if (this.isInstalled) {
       console.log('📱 App already installed as PWA');
       return;
     }
 
-    // Check if user dismissed banner recently
-    const dismissed = localStorage.getItem('pwa-banner-dismissed');
-    if (dismissed) {
-      const dismissedDate = new Date(dismissed);
-      const daysSinceDismissed = (Date.now() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24);
-      if (daysSinceDismissed < 7) {
-        console.log('📱 Banner dismissed recently');
-        return;
-      }
-    }
+    // 🔧 DEBUG: Force show banner after 5 seconds regardless of dismissed state
+    setTimeout(() => {
+      console.log('📱 [DEBUG] Forcing banner display after 5s');
+      this.showInstallBanner = true;
+    }, 5000);
 
     // Listen for install prompt (Chrome/Edge Android)
     window.addEventListener('beforeinstallprompt', (e: any) => {
@@ -295,15 +296,6 @@ export class PwaInstallComponent implements OnInit, OnDestroy {
         this.showInstallBanner = true;
       }, 3000);
     }
-    
-    // For desktop browsers that support PWA but don't trigger beforeinstallprompt immediately
-    // Show a subtle prompt after 10 seconds if no event was triggered
-    setTimeout(() => {
-      if (!this.showInstallBanner && !this.isInstalled && this.canInstall()) {
-        console.log('📱 Showing install prompt after timeout');
-        this.showInstallBanner = true;
-      }
-    }, 10000);
   }
 
   private isInStandaloneMode(): boolean {
