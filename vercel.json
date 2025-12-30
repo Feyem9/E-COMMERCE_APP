@@ -1,17 +1,25 @@
 {
-    "installCommand": "npm install --legacy-peer-deps",
-    "buildCommand": "npm run build -- --configuration production && cp dist/market/browser/index.csr.html dist/market/browser/index.html",
-    "outputDirectory": "dist/market/browser",
-    "framework": "angular",
     "rewrites": [
         {
-            "source": "/(.*)",
+            "source": "/icons/(.*)",
+            "destination": "/icons/$1"
+        },
+        {
+            "source": "/assets/(.*)",
+            "destination": "/assets/$1"
+        },
+        {
+            "source": "/manifest.webmanifest",
+            "destination": "/manifest.webmanifest"
+        },
+        {
+            "source": "/((?!icons|assets|manifest).*)",
             "destination": "/index.html"
         }
     ],
     "headers": [
         {
-            "source": "/index.html",
+            "source": "/icons/(.*)",
             "headers": [
                 {
                     "key": "Cache-Control",
