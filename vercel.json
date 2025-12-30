@@ -4,13 +4,17 @@
     "framework": null,
     "rewrites": [
         {
+            "source": "/assets/(.*)",
+            "destination": "/assets/$1"
+        },
+        {
             "source": "/(.*)",
             "destination": "/index.html"
         }
     ],
     "headers": [
         {
-            "source": "/icons/(.*)",
+            "source": "/assets/icons/(.*)",
             "headers": [
                 {
                     "key": "Cache-Control",
@@ -19,15 +23,6 @@
                 {
                     "key": "Content-Type",
                     "value": "image/png"
-                }
-            ]
-        },
-        {
-            "source": "/manifest.webmanifest",
-            "headers": [
-                {
-                    "key": "Content-Type",
-                    "value": "application/manifest+json"
                 }
             ]
         }
