@@ -43,4 +43,10 @@ Thumbs.db
 
 __pycache__/
 *.pyc
+.venv/
+.env
 
+# Database files - CRITICAL: prevent data loss on restart
+instance/
+*.db
+flask_session/
