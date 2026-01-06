@@ -53,7 +53,6 @@ export class AuthService {
       this.isLoggedInSubject.next(true);
       this.userSubject.next(fakeUser);
       
-      console.log('Connexion temporaire activée');
     }
   }
 

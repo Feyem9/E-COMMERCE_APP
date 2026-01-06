@@ -172,7 +172,6 @@ export class CategoriesComponent implements OnInit {
   addToCart(productId: number): void {
     this.cartService.addToCart(productId, 1).subscribe({
       next: () => {
-        console.log(`Product ${productId} added to cart successfully`);
         // You could show a toast notification here
       },
       error: (error) => {
@@ -182,7 +181,6 @@ export class CategoriesComponent implements OnInit {
   }
 
   addToFavorites(productId: number): void {
-    console.log(`Product ${productId} added to favorites`);
     // Logic for adding to favorites
   }
 }

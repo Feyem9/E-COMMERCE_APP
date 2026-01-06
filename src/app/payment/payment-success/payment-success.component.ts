@@ -60,7 +60,6 @@ export class PaymentSuccessComponent implements OnInit, OnDestroy {
         this.stopPolling();  // Arrêter quand la transaction est validée
       }
     });
-    console.log('🔄 Polling démarré - vérification du status toutes les 5 secondes');
   }
 
   // 🔄 Arrêter le polling
@@ -68,7 +67,6 @@ export class PaymentSuccessComponent implements OnInit, OnDestroy {
     if (this.pollingSubscription) {
       this.pollingSubscription.unsubscribe();
       this.pollingSubscription = null;
-      console.log('⏹️ Polling arrêté');
     }
   }
 
@@ -76,7 +74,6 @@ export class PaymentSuccessComponent implements OnInit, OnDestroy {
   checkTransactionStatus(): void {
     this.transactionService.getTransaction(this.transactionId).subscribe({
       next: (transaction: any) => {
-        console.log('🔄 Status vérifié:', transaction.status);
         
         if (transaction.status === 'success' || transaction.status === 'completed') {
           // 🎉 La transaction a été validée par le livreur !
@@ -88,7 +85,6 @@ export class PaymentSuccessComponent implements OnInit, OnDestroy {
           // Vider le panier
           this.cartService.clearCart();
           
-          console.log('✅ Transaction validée ! Status:', transaction.status);
         }
       },
       error: (error: any) => {
@@ -102,7 +98,6 @@ export class PaymentSuccessComponent implements OnInit, OnDestroy {
   loadTransactionData(): void {
     this.transactionService.getTransaction(this.transactionId).subscribe({
       next: (transaction: any) => {
-        console.log('📦 Transaction récupérée:', transaction);
         
         // Vérifier si déjà validée
         if (transaction.status === 'success' || transaction.status === 'completed') {
@@ -126,7 +121,6 @@ export class PaymentSuccessComponent implements OnInit, OnDestroy {
         };
         
         this.qrCodeValue = JSON.stringify(qrData);
-        console.log('📱 QR Code généré (avec signature):', this.qrCodeValue);
         
         this.transactionStatus = transaction.status || 'pending';
         this.validationMessage = 'Veuillez scanner ce QR code pour valider votre transaction.';
@@ -145,7 +139,6 @@ export class PaymentSuccessComponent implements OnInit, OnDestroy {
           timestamp: new Date().toISOString()
         };
         this.qrCodeValue = JSON.stringify(qrData);
-        console.log('⚠️ QR Code généré (sans signature - fallback):', this.qrCodeValue);
         
         this.validationMessage = 'Veuillez scanner ce QR code pour valider votre transaction.';
         this.loading = false;

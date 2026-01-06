@@ -120,12 +120,10 @@ export class OrderedComponent implements OnInit {
   }
 
   trackOrder(trackingNumber: string): void {
-    console.log(`Tracking order: ${trackingNumber}`);
     // Logique pour suivre la commande
   }
 
   reorder(orderId: string): void {
-    console.log(`Reordering: ${orderId}`);
     // Logique pour passer une nouvelle commande
   }
 }

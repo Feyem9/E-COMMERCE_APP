@@ -40,7 +40,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
   //   }).subscribe({
   //     next: (data) => {
   //       this.user = data;
-  //       console.log('✅ Profil reçu :', data);
   //     },
   //     error: (error) => {
   //       console.error('❌ Erreur lors du chargement du profil :', error);
@@ -66,7 +65,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (data) => {
           this.user = data;
-          console.log('✅ Profil reçu :', data);
         },
         error: (error) => {
           console.error('❌ Erreur lors du chargement du profil :', error);

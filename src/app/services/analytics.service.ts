@@ -52,7 +52,6 @@ export class AnalyticsService {
     });
 
     this.initialized = true;
-    console.log('📊 Analytics initialized');
   }
 
   /**
@@ -74,12 +73,10 @@ export class AnalyticsService {
     eventParams: { [key: string]: any } = {}
   ): void {
     if (!this.isBrowser || typeof gtag === 'undefined') {
-      console.log(`📊 Event (offline): ${eventName}`, eventParams);
       return;
     }
 
     gtag('event', eventName, eventParams);
-    console.log(`📊 Event tracked: ${eventName}`, eventParams);
   }
 
   // ============================================

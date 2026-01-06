@@ -237,7 +237,6 @@ export class ProductComponent implements OnInit, OnDestroy {
 
   viewProductDetails(product: Product): void {
     // Navigate to product detail page (to be implemented)
-    console.log('View details for:', product.name);
   }
 
   getDiscountPercentage(product: Product): number {

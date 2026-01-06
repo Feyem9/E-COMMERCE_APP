@@ -259,29 +259,23 @@ export class PwaInstallComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    console.log('📱 PwaInstallComponent ngOnInit started, isBrowser:', this.isBrowser);
     
     if (!this.isBrowser) {
-      console.log('📱 Not a browser, skipping PWA init');
       return;
     }
 
     // Check if already installed
     this.isInstalled = window.matchMedia('(display-mode: standalone)').matches;
-    console.log('📱 isInstalled:', this.isInstalled);
     
     if (this.isInstalled) {
-      console.log('📱 App already installed as PWA');
       return;
     }
 
     // 🔧 DEBUG: Force show banner IMMEDIATELY
-    console.log('📱 [DEBUG] Forcing banner display NOW');
     this.showInstallBanner = true;
 
     // Listen for install prompt (Chrome/Edge Android)
     window.addEventListener('beforeinstallprompt', (e: any) => {
-      console.log('📱 beforeinstallprompt event received');
       e.preventDefault();
       this.deferredPrompt = e;
       this.showInstallBanner = true;
@@ -289,7 +283,6 @@ export class PwaInstallComponent implements OnInit, OnDestroy {
 
     // For iOS Safari - show after delay
     if (this.isIos() && !this.isInStandaloneMode()) {
-      console.log('📱 iOS detected - showing banner after delay');
       setTimeout(() => {
         this.showInstallBanner = true;
       }, 3000);
@@ -328,7 +321,6 @@ export class PwaInstallComponent implements OnInit, OnDestroy {
       this.deferredPrompt.prompt();
       this.deferredPrompt.userChoice.then((choiceResult: any) => {
         if (choiceResult.outcome === 'accepted') {
-          console.log('✅ PWA installed');
           this.isInstalled = true;
         }
         this.deferredPrompt = null;

@@ -74,7 +74,6 @@ export class LoginComponent {
 
     this.authService.login(payload).subscribe({
       next: (res) => {
-        console.log('🎉 Connexion réussie', res);
         localStorage.setItem('access_token', res.access_token);
         localStorage.setItem('identity', res.user.id.toString());
         localStorage.setItem('email', res.user.email);
@@ -83,7 +82,6 @@ export class LoginComponent {
         this.authService.profile().subscribe({
           next: (profileData) => {
             this.isSubmitting = false;
-            console.log('Profile:', profileData);
             this.router.navigate(['/profile']);
           },
           error: (err: any) => {

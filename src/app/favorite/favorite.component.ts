@@ -66,7 +66,6 @@ export class FavoriteComponent implements OnInit {
 
   addToCart(productId: number): void {
     // Logique pour ajouter au panier
-    console.log(`Product ${productId} added to cart`);
     // Ici vous pourriez appeler un service pour ajouter au panier
   }
 }

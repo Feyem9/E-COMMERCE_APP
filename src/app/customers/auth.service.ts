@@ -89,7 +89,6 @@ export class AuthService {
       })
       .pipe(
         tap(res => {
-          console.log('✅ Réponse login reçue :', res);
           if (typeof localStorage !== 'undefined') {
             localStorage.setItem('access_token', res.access_token);
             localStorage.setItem('user', JSON.stringify(res.user));

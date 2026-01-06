@@ -49,8 +49,6 @@ export class PaymentComponent {
           payment_country: data.payment_country
         });
 
-        console.log('Paiement initié:', result);
-        console.log('🔍 Données complètes:', JSON.stringify(result, null, 2));
         
         this.paymentUrl = result.payment_url;
         this.transactionId = result.data.transaction_id;
@@ -58,7 +56,6 @@ export class PaymentComponent {
         // 🔐 QR Code sécurisé avec signature - TOUJOURS utiliser qr_data
         if (result.data && result.data.qr_data) {
           this.qrCodeValue = JSON.stringify(result.data.qr_data);
-          console.log('✅ QR Code sécurisé généré (JSON complet):', this.qrCodeValue);
         } else {
           // Si qr_data n'existe pas, créer le JSON manuellement
           console.warn('⚠️ qr_data absent, création manuelle du JSON');
@@ -71,7 +68,6 @@ export class PaymentComponent {
             timestamp: new Date().toISOString()
           };
           this.qrCodeValue = JSON.stringify(qrData);
-          console.log('📱 QR Code créé manuellement:', this.qrCodeValue);
         }
         
         // 📊 Track QR code generation

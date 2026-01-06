@@ -54,11 +54,9 @@ export class PushNotificationService {
       this.permission$.next(permission);
       
       if (permission === 'granted') {
-        console.log('✅ Notification permission granted');
         await this.initializeFirebase();
         return true;
       } else {
-        console.log('❌ Notification permission denied');
         return false;
       }
     } catch (error) {
@@ -74,7 +72,6 @@ export class PushNotificationService {
     try {
       // Firebase will be initialized here once config is set
       // Import Firebase dynamically to avoid issues in SSR
-      console.log('📱 Firebase initialization pending - configure firebase.config.ts');
       
       /* 
       // Uncomment when Firebase is configured:
@@ -87,11 +84,9 @@ export class PushNotificationService {
       
       const token = await getToken(messaging, { vapidKey });
       this.token$.next(token);
-      console.log('✅ FCM Token:', token);
       
       // Listen for messages when app is in foreground
       onMessage(messaging, (payload) => {
-        console.log('📬 Message received:', payload);
         this.showNotification(payload);
       });
       */
@@ -143,7 +138,6 @@ export class PushNotificationService {
     }
 
     // Send to your backend to subscribe token to topic
-    console.log(`📢 Subscribe to topic: ${topic}`);
     // TODO: Implement backend call
   }
 
@@ -154,7 +148,6 @@ export class PushNotificationService {
     const token = this.token$.value;
     if (!token) return;
 
-    console.log(`🔕 Unsubscribe from topic: ${topic}`);
     // TODO: Implement backend call
   }
 }

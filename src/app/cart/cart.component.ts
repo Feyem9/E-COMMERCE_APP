@@ -54,7 +54,6 @@ export class CartComponent implements OnInit, OnDestroy {
     this.cartService.getCartItems()
       .pipe(takeUntil(this.destroy$))
       .subscribe(items => {
-        console.log('Données reçues dans le panier :', items);  // ⬅️ Vérifie ici
 
         this.cartItems = items;
         this.calculateTotal();
@@ -72,7 +71,6 @@ export class CartComponent implements OnInit, OnDestroy {
           res => {
             item.quantity = res.new_quantity;
             this.calculateTotal();
-            console.log('Quantité mise à jour avec succès sur le backend', res);
           },
           err => {
             console.error('Erreur lors de la diminution de la quantité', err);
@@ -90,7 +88,6 @@ export class CartComponent implements OnInit, OnDestroy {
         res => {
           item.quantity = res.new_quantity;
           this.calculateTotal();
-          console.log('Quantité mise à jour avec succès sur le backend', res);
         },
         err => {
           console.error('Erreur lors de l\'augmentation de la quantité', err);
@@ -101,7 +98,6 @@ export class CartComponent implements OnInit, OnDestroy {
 
 
   removeItem(item: Cart): void {
-    console.log('items', item.id);
 
     if (!item.id) {
       console.error('ID du produit manquant');
@@ -128,7 +124,6 @@ export class CartComponent implements OnInit, OnDestroy {
             lat: position.coords.latitude,
             lng: position.coords.longitude
           };
-          console.log('\ud83d\udccd Position client captur\u00e9e:', this.customerLocation);
         },
         (error) => {
           this.locationError = error.message;
@@ -183,7 +178,6 @@ export class CartComponent implements OnInit, OnDestroy {
             this.totalPrice = 0;
             this.cartService.updateCartCount(0);
             
-            console.log('✅ Panier vidé avec succès');
             
             // Attendre un peu avant de rediriger (laisser les requêtes DELETE se terminer)
             setTimeout(() => {
@@ -216,7 +210,6 @@ export class CartComponent implements OnInit, OnDestroy {
       const quantity = Number(item.quantity) || 0;
       return acc + (price * quantity);
     }, 0);
-    console.log('Total Price:', this.totalPrice);
 
     // Mettre à jour le nombre d'articles dans le panier
     this.cartService.updateCartCount(this.cartItems.length);
